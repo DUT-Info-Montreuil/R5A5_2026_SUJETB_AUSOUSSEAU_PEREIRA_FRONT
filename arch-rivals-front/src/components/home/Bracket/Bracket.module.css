@@ -1,0 +1,171 @@
+.section {
+  padding: 0 clamp(16px, 5vw, 72px) var(--space-section-y);
+}
+
+.frame {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: clamp(20px, 3vw, 40px);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 4px double var(--color-gold-dark);
+  box-shadow:
+    0 0 0 1px var(--color-surface-glow),
+    0 30px 80px rgba(0, 0, 0, 0.55);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.label {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+}
+
+.reset {
+  min-height: 36px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--team-pending-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.reset:hover:not(:disabled),
+.reset:focus-visible {
+  border-color: var(--color-gold);
+  color: var(--color-gold-hover);
+}
+
+.reset:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Défilement horizontal interne : le body ne scrolle jamais en largeur. */
+.scroller {
+  overflow-x: auto;
+  /* Laisse la place à l'outline de focus des équipes. */
+  padding: 4px;
+  margin: -4px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--bracket-cols), minmax(140px, 1fr));
+  gap: clamp(8px, 1.5vw, 20px);
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  gap: 10px;
+  min-width: 0;
+}
+
+.match {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  font-family: var(--font-body);
+  font-size: 15px;
+  color: var(--color-text);
+  text-align: left;
+  border: 1px solid;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.team:hover:not(:disabled),
+.team:focus-visible {
+  border-color: var(--color-gold);
+}
+
+.team:disabled {
+  cursor: default;
+}
+
+.pending {
+  background: var(--team-pending-bg);
+  border-color: var(--team-pending-border);
+}
+
+.winner {
+  background: var(--team-winner-bg);
+  border-color: var(--team-winner-border);
+}
+
+.loser {
+  background: var(--team-loser-bg);
+  border-color: var(--team-loser-border);
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.score {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-gold);
+}
+
+.championCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.championLabel {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--color-gold);
+}
+
+.champion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 64px;
+  padding: 0 12px;
+  background: linear-gradient(180deg, #3a2c12, #231a0c);
+  border: 2px solid var(--color-gold);
+  box-shadow: 0 0 30px rgba(217, 178, 92, 0.25);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--color-gold-hover);
+  text-align: center;
+}

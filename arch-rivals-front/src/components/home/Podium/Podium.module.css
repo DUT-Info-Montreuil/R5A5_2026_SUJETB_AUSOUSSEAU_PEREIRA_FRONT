@@ -1,0 +1,100 @@
+.section {
+  padding: var(--space-section-y) var(--space-page-x);
+  text-align: center;
+  border-top: 1px solid var(--color-gold-line);
+  background: linear-gradient(180deg, var(--color-bg), var(--color-bg-alt));
+}
+
+.title {
+  margin: 0 auto;
+  max-width: 12ch;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(34px, 6vw, 72px);
+  line-height: 1.05;
+  color: var(--color-text-strong);
+  text-shadow: var(--title-shadow);
+  overflow-wrap: break-word;
+}
+
+.podium {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(6px, 1.5vw, 18px);
+  max-width: 760px;
+  margin: 64px auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.team {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  padding-top: 18px;
+  border: 2px solid;
+  border-bottom: none;
+  font-family: var(--font-ui);
+  font-weight: 700;
+}
+
+.first .team {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 17px;
+  letter-spacing: 0.08em;
+  color: var(--color-gold-hover);
+}
+
+.first .step {
+  height: 230px;
+  background: linear-gradient(180deg, #5a4318, #2a1f0c);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 40px rgba(217, 178, 92, 0.25);
+  font-size: 64px;
+  color: var(--color-gold-hover);
+}
+
+.second .step {
+  height: 150px;
+  background: linear-gradient(180deg, #3a3335, #232022);
+  border-color: var(--color-silver);
+  font-size: 46px;
+  color: var(--color-silver-light);
+}
+
+.third .step {
+  height: 105px;
+  padding-top: 16px;
+  background: linear-gradient(180deg, #4a3226, #241812);
+  border-color: var(--color-bronze);
+  font-size: 40px;
+  color: var(--color-bronze-light);
+}
+
+.base {
+  max-width: 760px;
+  height: 3px;
+  margin: 0 auto;
+  background: var(--color-gold);
+}

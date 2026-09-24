@@ -1,0 +1,18 @@
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 28px var(--space-page-x);
+  border-top: 1px solid var(--color-gold-line);
+  font-size: 14px;
+  color: var(--color-text-faint);
+}
+
+.tag {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: var(--color-gold);
+}
