@@ -1,0 +1,54 @@
+:root {
+  /* Fonds */
+  --color-bg: #141215;
+  --color-bg-alt: #1a1518;
+  --color-surface: #1e1a1c;
+  --color-surface-deep: #17141a;
+  --color-surface-glow: #2a2226;
+
+  /* Texte */
+  --color-text: #ece3cf;
+  --color-text-strong: #f4ead4;
+  --color-text-muted: #bfb39a;
+  --color-text-faint: #8f8570;
+  --color-on-gold: #1a1410;
+
+  /* Or */
+  --color-gold: #d9b25c;
+  --color-gold-hover: #f2d58a;
+  --color-gold-dark: #8a6b2c;
+  --color-gold-shadow: #6b4f16;
+  --color-gold-line: rgba(217, 178, 92, 0.25);
+  --color-gold-soft: rgba(217, 178, 92, 0.6);
+
+  /* Argent (2e) et bronze (3e) */
+  --color-silver: #9a9aa3;
+  --color-silver-light: #d6d6de;
+  --color-bronze: #b87a4b;
+  --color-bronze-light: #d9a37a;
+
+  /* États */
+  --color-danger: #e0826f;
+
+  /* Équipes du bracket */
+  --team-winner-bg: #2e2412;
+  --team-winner-border: #d9b25c;
+  --team-loser-bg: #151316;
+  --team-loser-border: #2b262a;
+  --team-pending-bg: #221e22;
+  --team-pending-border: #3d3540;
+
+  /* Polices */
+  --font-display: 'Cinzel Decorative', 'Cinzel', Georgia, serif;
+  --font-ui: 'Cinzel', Georgia, serif;
+  --font-body: 'EB Garamond', Georgia, serif;
+
+  /* Espacements */
+  --space-page-x: clamp(20px, 5vw, 72px);
+  --space-section-y: clamp(56px, 8vw, 110px);
+  --space-hero-top: clamp(48px, 8vw, 110px);
+
+  /* Effets */
+  --title-shadow: 0 2px 0 var(--color-gold-shadow), 0 6px 24px rgba(0, 0, 0, 0.6);
+  --focus-ring: 2px solid var(--color-gold-hover);
+}

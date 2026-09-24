@@ -1,0 +1,110 @@
+.dialog {
+  width: min(460px, calc(100% - 32px));
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow-y: auto;
+  color: var(--color-text);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 4px double var(--color-gold-dark);
+  box-shadow:
+    0 0 0 1px var(--color-surface-glow),
+    0 30px 80px rgba(0, 0, 0, 0.7);
+}
+
+.dialog::backdrop {
+  background: rgba(10, 8, 10, 0.78);
+  backdrop-filter: blur(2px);
+}
+
+.dialog[open] {
+  animation: dialogIn 0.18s ease-out;
+}
+
+@keyframes dialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.inner {
+  position: relative;
+  padding: clamp(24px, 5vw, 40px);
+}
+
+.close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 28px;
+  line-height: 1;
+  border: 0;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.title {
+  margin: 0 40px 0 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(26px, 6vw, 34px);
+  line-height: 1.1;
+  color: var(--color-text-strong);
+  text-shadow: var(--title-shadow);
+}
+
+.subtitle {
+  margin: 10px 0 24px;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-gold-line);
+}
+
+.tab {
+  min-height: 46px;
+  padding: 0 8px;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--color-text-faint);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+
+.tab:hover,
+.tab:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.tab[aria-selected='true'] {
+  color: var(--color-gold);
+  border-bottom-color: var(--color-gold);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog[open] {
+    animation: none;
+  }
+}

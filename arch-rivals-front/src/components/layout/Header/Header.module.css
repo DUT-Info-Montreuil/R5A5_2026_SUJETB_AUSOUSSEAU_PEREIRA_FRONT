@@ -1,0 +1,128 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  padding: 22px var(--space-page-x);
+  border-bottom: 1px solid var(--color-gold-line);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.14em;
+  color: var(--color-text);
+}
+
+.logo:hover,
+.logo:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 28px;
+  font-family: var(--font-ui);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--color-text-muted);
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 26px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  border: 2px solid var(--color-gold-hover);
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--color-on-gold),
+    0 0 0 1px var(--color-gold);
+  cursor: pointer;
+}
+
+.play:hover:not(:disabled),
+.play:focus-visible {
+  background: var(--color-gold-hover);
+  color: var(--color-on-gold);
+}
+
+.play:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.user {
+  max-width: 14ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--color-gold-hover);
+}
+
+.logout {
+  min-height: 44px;
+  padding: 0 4px;
+  background: none;
+  color: var(--color-text-faint);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.logout:hover,
+.logout:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+@media (max-width: 520px) {
+  .header {
+    justify-content: center;
+  }
+
+  .nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .play {
+    padding: 0 18px;
+  }
+}

@@ -1,0 +1,15 @@
+.crown {
+  display: block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 6px 14px rgba(217, 178, 92, 0.45));
+}
+
+.animated {
+  animation: crownFloat 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated {
+    animation: none;
+  }
+}
