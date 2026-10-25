@@ -29,6 +29,18 @@
 
   /* États */
   --color-danger: #e0826f;
+  --color-success: #8fc98a;
+  --color-live: #e8806a;
+
+  /* Jeux */
+  --color-game-ow2: #9ab8d9;
+
+  /* Champs, cartes et séparateurs */
+  --color-input-bg: #1b181b;
+  --color-input-border: #5a4a2a;
+  --color-card-border: #3d3540;
+  --color-track: #2b262a;
+  --color-separator: #5e5560;
 
   /* Équipes du bracket */
   --team-winner-bg: #2e2412;

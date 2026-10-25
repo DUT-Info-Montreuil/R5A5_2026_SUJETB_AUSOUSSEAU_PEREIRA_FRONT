@@ -1,0 +1,154 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 1px solid var(--color-card-border);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--color-gold-dark);
+}
+
+.body {
+  display: flex;
+  gap: 18px;
+  min-width: 0;
+  padding: 20px 24px;
+}
+
+/* Vignette du jeu */
+.game {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--team-loser-bg);
+  border: 1px solid currentColor;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.VAL {
+  color: var(--color-live);
+}
+
+.LOL {
+  color: var(--color-gold);
+}
+
+.CS2 {
+  color: var(--color-bronze-light);
+}
+
+.OW2 {
+  color: var(--color-game-ow2);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-strong);
+}
+
+/* Badge d'état du tournoi */
+.badge {
+  padding: 3px 10px;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  border: 1px solid currentColor;
+}
+
+.ouvertes {
+  color: var(--color-success);
+}
+
+.closes {
+  color: var(--color-bronze-light);
+}
+
+.cours {
+  color: var(--color-live);
+}
+
+.termine {
+  color: var(--color-silver);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.meta > span {
+  white-space: nowrap;
+}
+
+.sep {
+  margin-right: 12px;
+  color: var(--color-separator);
+}
+
+.mine {
+  color: var(--color-text);
+}
+
+.noTeam {
+  color: var(--color-text-faint);
+}
+
+.info {
+  font-style: italic;
+  color: var(--color-gold);
+}
+
+/* Remplissage des inscriptions */
+.track {
+  width: min(100%, 280px);
+  height: 4px;
+  background: var(--color-track);
+}
+
+.track::before {
+  content: '';
+  display: block;
+  width: var(--progress);
+  height: 100%;
+  background: var(--color-success);
+}
+
+@media (max-width: 520px) {
+  .body {
+    padding: 18px 16px;
+  }
+
+  .meta > span {
+    white-space: normal;
+  }
+}
