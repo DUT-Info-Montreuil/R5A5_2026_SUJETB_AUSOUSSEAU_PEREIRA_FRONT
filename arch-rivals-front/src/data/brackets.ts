@@ -2,8 +2,19 @@ import type { MatchResult, TournamentDetail } from '../types/tournament'
 
 type Bracket = Pick<TournamentDetail, 'teams' | 'results'>
 
-const at = (time: string): MatchResult => ({ kind: 'scheduled', time })
+const at = (time: string, startsAt?: string): MatchResult => ({
+  kind: 'scheduled',
+  time,
+  startsAt,
+})
 const done = (a: number, b: number): MatchResult => ({ kind: 'done', score: [a, b] })
+
+/** Aujourd'hui à hh:mm (heure locale), pour que le « Ce soir » du mock reste vrai. */
+function tonightAt(hours: number, minutes: number) {
+  const date = new Date()
+  date.setHours(hours, minutes, 0, 0)
+  return date.toISOString()
+}
 
 // Données mock : arbres des tournois dont les inscriptions sont closes.
 export const BRACKETS: Record<string, Bracket> = {
@@ -23,7 +34,7 @@ export const BRACKETS: Record<string, Bracket> = {
       '0-1': done(13, 10),
       '0-2': done(9, 13),
       '0-3': { kind: 'live', score: [8, 6] },
-      '1-0': at('Ce soir · 21h00'),
+      '1-0': at('Ce soir · 21h00', tonightAt(21, 0)),
       '1-1': at('Demain · 19h00'),
       '2-0': at('Sam. 1er nov. · 20h00'),
     },

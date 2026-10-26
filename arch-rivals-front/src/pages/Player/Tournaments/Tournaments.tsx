@@ -1,8 +1,10 @@
 import { useSearchParams } from 'react-router'
+import NextMatchBanner from '../../../components/tournaments/NextMatchBanner/NextMatchBanner'
 import TournamentCard from '../../../components/tournaments/TournamentCard/TournamentCard'
 import TournamentTabs from '../../../components/tournaments/TournamentTabs/TournamentTabs'
 import { useAuth } from '../../../hooks/useAuth'
 import { useTournaments } from '../../../hooks/useTournaments'
+import { pickNextMatch } from '../../../utils/bracket'
 import {
   inTab,
   isTournamentTab,
@@ -26,6 +28,8 @@ export default function Tournaments() {
   const visible = searching
     ? tournaments.filter((t) => matchesQuery(t, query))
     : tournaments.filter((t) => inTab(t, tab))
+
+  const next = pickNextMatch(tournaments)
 
   const tabs = TOURNAMENT_TABS.map(({ id, label }) => ({
     id,
@@ -53,6 +57,8 @@ export default function Tournaments() {
           aria-label="Chercher un tournoi ou un jeu"
         />
       </div>
+
+      {next && <NextMatchBanner tournament={next.tournament} match={next.match} />}
 
       <TournamentTabs tabs={tabs} active={searching ? null : tab} onSelect={selectTab} />
 

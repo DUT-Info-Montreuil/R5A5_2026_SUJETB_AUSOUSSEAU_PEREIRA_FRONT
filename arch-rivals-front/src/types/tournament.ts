@@ -38,7 +38,8 @@ export type Tournament = {
 
 /** Résultat (ou programmation) d'un match, saisi par l'administrateur. */
 export type MatchResult =
-  | { kind: 'scheduled'; time: string }
+  /** `time` est affiché tel quel ; `startsAt` (ISO 8601) sert au compte à rebours. */
+  | { kind: 'scheduled'; time: string; startsAt?: string }
   | { kind: 'live'; score: [number, number] }
   | { kind: 'done'; score: [number, number] }
   /** `forfeit` : côté de l'équipe déclarée forfait, son adversaire est qualifié. */

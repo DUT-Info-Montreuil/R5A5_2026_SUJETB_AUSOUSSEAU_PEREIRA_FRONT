@@ -1,12 +1,27 @@
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router'
-import type { Tournament } from '../../../types/tournament'
+import type { TournamentDetail } from '../../../types/tournament'
+import { playerProgress, type PlayerProgress } from '../../../utils/bracket'
 import { GAME_TAGS, TEAMS_PER_TOURNAMENT, TOURNAMENT_FORMAT } from '../../../utils/tournaments'
 import StateBadge from '../StateBadge/StateBadge'
 import styles from './TournamentCard.module.css'
 
 type TournamentCardProps = {
-  tournament: Tournament
+  tournament: TournamentDetail
+}
+
+/** Ligne d'avancement du joueur dans un tournoi dont l'arbre est tiré. */
+function progressLine(progress: PlayerProgress): string {
+  switch (progress.kind) {
+    case 'next':
+      return `${progress.match.round} vs ${progress.match.opponent} · ${progress.match.time}`
+    case 'eliminated':
+      return `Éliminés en ${progress.round.toLowerCase()}`
+    case 'champion':
+      return 'Vainqueurs'
+    case 'none':
+      return ''
+  }
 }
 
 export default function TournamentCard({ tournament }: TournamentCardProps) {
@@ -20,7 +35,9 @@ export default function TournamentCard({ tournament }: TournamentCardProps) {
   const myLine = myTeam
     ? `${myTeam.name} · ${myTeam.isCaptain ? 'Capitaine' : myTeam.role}`
     : 'Tu n’as pas encore d’équipe'
-  const info = open ? `${registeredTeams} / ${TEAMS_PER_TOURNAMENT} équipes · ${closing}` : ''
+  const info = open
+    ? `${registeredTeams} / ${TEAMS_PER_TOURNAMENT} équipes · ${closing}`
+    : progressLine(playerProgress(tournament))
   const progress = {
     '--progress': `${(registeredTeams / TEAMS_PER_TOURNAMENT) * 100}%`,
   } as CSSProperties

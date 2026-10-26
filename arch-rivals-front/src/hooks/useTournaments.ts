@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 import { fetchTournaments } from '../services/tournaments'
-import type { Tournament } from '../types/tournament'
+import type { TournamentDetail } from '../types/tournament'
 
 type Status = 'loading' | 'ready' | 'error'
 
 export function useTournaments() {
-  const [tournaments, setTournaments] = useState<Tournament[]>([])
+  const [tournaments, setTournaments] = useState<TournamentDetail[]>([])
   const [status, setStatus] = useState<Status>('loading')
 
   useEffect(() => {
