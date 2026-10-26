@@ -1,0 +1,24 @@
+.badge {
+  padding: 3px 10px;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  border: 1px solid currentColor;
+}
+
+.ouvertes {
+  color: var(--color-success);
+}
+
+.closes {
+  color: var(--color-bronze-light);
+}
+
+.cours {
+  color: var(--color-live);
+}
+
+.termine {
+  color: var(--color-silver);
+}

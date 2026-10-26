@@ -12,9 +12,18 @@
 
 .body {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 24px;
+  padding: 20px 24px;
+}
+
+.main {
+  flex: 1 1 320px;
+  display: flex;
   gap: 18px;
   min-width: 0;
-  padding: 20px 24px;
 }
 
 /* Vignette du jeu */
@@ -72,32 +81,6 @@
   color: var(--color-text-strong);
 }
 
-/* Badge d'état du tournoi */
-.badge {
-  padding: 3px 10px;
-  white-space: nowrap;
-  font-family: var(--font-ui);
-  font-size: 11px;
-  letter-spacing: 0.18em;
-  border: 1px solid currentColor;
-}
-
-.ouvertes {
-  color: var(--color-success);
-}
-
-.closes {
-  color: var(--color-bronze-light);
-}
-
-.cours {
-  color: var(--color-live);
-}
-
-.termine {
-  color: var(--color-silver);
-}
-
 .meta {
   display: flex;
   flex-wrap: wrap;
@@ -141,6 +124,44 @@
   width: var(--progress);
   height: 100%;
   background: var(--color-success);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid var(--color-gold-soft);
+}
+
+.action:hover,
+.action:focus-visible {
+  color: var(--color-text);
+  border-color: var(--color-gold-hover);
+}
+
+.primary,
+.primary:hover,
+.primary:focus-visible {
+  color: var(--color-on-gold);
+  background: var(--color-gold);
+  border-color: var(--color-gold-hover);
 }
 
 @media (max-width: 520px) {

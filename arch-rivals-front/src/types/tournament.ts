@@ -35,3 +35,18 @@ export type Tournament = {
   closing?: string
   myTeam: MyTeamSummary | null
 }
+
+/** Résultat (ou programmation) d'un match, saisi par l'administrateur. */
+export type MatchResult =
+  | { kind: 'scheduled'; time: string }
+  | { kind: 'live'; score: [number, number] }
+  | { kind: 'done'; score: [number, number] }
+  /** `forfeit` : côté de l'équipe déclarée forfait, son adversaire est qualifié. */
+  | { kind: 'forfeit'; forfeit: Side }
+
+export type TournamentDetail = Tournament & {
+  /** Les 8 équipes dans l'ordre du tirage, absentes tant que les inscriptions sont ouvertes. */
+  teams: Team[] | null
+  /** Clé "tour-match" (ex. "0-3" = 4e quart, "2-0" = finale), comme dans useBracket. */
+  results: Record<string, MatchResult>
+}
