@@ -16,7 +16,7 @@ import styles from './Tournaments.module.css'
 
 export default function Tournaments() {
   const { user } = useAuth()
-  const { tournaments, status } = useTournaments()
+  const { tournaments, status, createTeam, requestToJoin } = useTournaments()
 
   // Onglet et recherche vivent dans l'URL : ils survivent à F5 et se partagent.
   const [params, setParams] = useSearchParams()
@@ -77,7 +77,12 @@ export default function Tournaments() {
       {status === 'ready' && (
         <div className={styles.list}>
           {visible.map((t) => (
-            <TournamentCard key={t.id} tournament={t} />
+            <TournamentCard
+              key={t.id}
+              tournament={t}
+              onCreateTeam={createTeam}
+              onRequestToJoin={requestToJoin}
+            />
           ))}
           {visible.length === 0 && <p className={styles.empty}>Aucun tournoi ne correspond.</p>}
         </div>

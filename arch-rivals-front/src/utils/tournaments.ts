@@ -19,6 +19,19 @@ export const GAME_TAGS: Record<Game, string> = {
   'Overwatch 2': 'OW2',
 }
 
+/** Rôles de jeu proposés dans une équipe, selon le jeu du tournoi. */
+export const GAME_ROLES: Record<Game, readonly string[]> = {
+  Valorant: ['Duelliste', 'Initiateur', 'Contrôleur', 'Sentinelle', 'Flex'],
+  'League of Legends': ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+  'Counter-Strike 2': ['Entry', 'AWPer', 'Lurker', 'Support', 'IGL'],
+  'Overwatch 2': ['Tank', 'DPS', 'Soutien'],
+}
+
+/** Le joueur peut créer ou rejoindre une équipe : inscriptions ouvertes, sans équipe ni demande. */
+export function canJoinOrCreate(tournament: Tournament) {
+  return tournament.state === 'ouvertes' && !tournament.myTeam && !tournament.myRequest
+}
+
 export type TournamentTab = 'cours' | 'avenir' | 'termines'
 
 export const TOURNAMENT_TABS: readonly { id: TournamentTab; label: string; states: TournamentState[] }[] = [

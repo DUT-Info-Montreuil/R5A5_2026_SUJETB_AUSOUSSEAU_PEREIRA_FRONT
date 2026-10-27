@@ -34,6 +34,24 @@ export type Tournament = {
   /** Fin des inscriptions, uniquement tant qu'elles sont ouvertes. */
   closing?: string
   myTeam: MyTeamSummary | null
+  /** Demande en attente du joueur (une seule par tournoi), null s'il n'en a pas. */
+  myRequest: JoinRequest | null
+}
+
+export type JoinRequest = {
+  teamId: string
+  teamName: Team
+}
+
+/** Équipe telle qu'on la voit de l'extérieur (annuaire, équipes qui recrutent). */
+export type TeamListing = {
+  id: string
+  name: Team
+  tournamentId: string
+  captain: string
+  memberCount: number
+  /** Une équipe fermée n'accepte aucune demande et n'apparaît pas parmi celles qui recrutent. */
+  visibility: 'open' | 'closed'
 }
 
 /** Résultat (ou programmation) d'un match, saisi par l'administrateur. */

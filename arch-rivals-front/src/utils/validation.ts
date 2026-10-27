@@ -32,3 +32,14 @@ export function validatePassword(value: string) {
   if (new TextEncoder().encode(value).length > PASSWORD_MAX_BYTES) return 'Mot de passe trop long.'
   return null
 }
+
+export const TEAM_NAME_MIN = 3
+export const TEAM_NAME_MAX = 24
+
+export function validateTeamName(value: string) {
+  const v = value.trim()
+  if (!v) return "Le nom de l'équipe est obligatoire."
+  if (v.length < TEAM_NAME_MIN || v.length > TEAM_NAME_MAX)
+    return `Entre ${TEAM_NAME_MIN} et ${TEAM_NAME_MAX} caractères.`
+  return null
+}

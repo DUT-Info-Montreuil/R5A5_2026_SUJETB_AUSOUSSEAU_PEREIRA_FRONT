@@ -10,6 +10,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     date: 'Depuis le 18 oct.',
     registeredTeams: 8,
     myTeam: { name: "Chevaliers d'Avalon", role: 'Duelliste', isCaptain: true },
+    myRequest: null,
   },
   {
     id: 't2',
@@ -19,6 +20,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     date: 'Depuis le 12 oct.',
     registeredTeams: 8,
     myTeam: { name: "Lames d'Argent", role: 'Support', isCaptain: false },
+    myRequest: null,
   },
   {
     id: 't3',
@@ -29,6 +31,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     registeredTeams: 6,
     closing: 'Clôture le 30 oct.',
     myTeam: { name: "Chevaliers d'Avalon", role: 'Entry', isCaptain: true },
+    myRequest: null,
   },
   {
     id: 't4',
@@ -38,6 +41,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     date: '15 nov. · 20h00',
     registeredTeams: 8,
     myTeam: { name: 'Les Croisés', role: 'DPS', isCaptain: false },
+    myRequest: null,
   },
   {
     id: 't5',
@@ -48,6 +52,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     registeredTeams: 5,
     closing: 'Clôture le 1er déc.',
     myTeam: null,
+    myRequest: null,
   },
   {
     id: 't6',
@@ -57,6 +62,7 @@ export const TOURNAMENTS: readonly Tournament[] = [
     date: '24 août',
     registeredTeams: 8,
     myTeam: { name: "Chevaliers d'Avalon", role: 'Duelliste', isCaptain: true },
+    myRequest: null,
   },
   {
     id: 't7',
@@ -66,5 +72,6 @@ export const TOURNAMENTS: readonly Tournament[] = [
     date: '21 sept.',
     registeredTeams: 8,
     myTeam: { name: "Chevaliers d'Avalon", role: 'Entry', isCaptain: true },
+    myRequest: null,
   },
 ]

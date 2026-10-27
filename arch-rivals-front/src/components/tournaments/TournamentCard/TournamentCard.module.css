@@ -102,6 +102,10 @@
   color: var(--color-text);
 }
 
+.requested {
+  color: var(--color-gold);
+}
+
 .noTeam {
   color: var(--color-text-faint);
 }
@@ -148,6 +152,11 @@
   color: var(--color-text);
   background: transparent;
   border: 1px solid var(--color-gold-soft);
+}
+
+.action {
+  cursor: pointer;
+  border-radius: 0;
 }
 
 .action:hover,
