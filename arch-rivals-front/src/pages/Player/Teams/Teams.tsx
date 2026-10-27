@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import TeamChips from '../../../components/teams/TeamChips/TeamChips'
 import TeamSheet from '../../../components/teams/TeamSheet/TeamSheet'
 import { useMyTeams } from '../../../hooks/useMyTeams'
@@ -6,7 +6,8 @@ import { useTournaments } from '../../../hooks/useTournaments'
 import styles from './Teams.module.css'
 
 export default function Teams() {
-  const { teams, status: teamsStatus } = useMyTeams()
+  const { teams, status: teamsStatus, actionsFor } = useMyTeams()
+  const navigate = useNavigate()
   const { tournaments, status: tournamentsStatus } = useTournaments()
 
   // L'équipe affichée vit dans l'URL (?tournoi=t1) : « Mon équipe » y mène directement.
@@ -60,7 +61,20 @@ export default function Teams() {
             onSelect={(id) => setParams({ tournoi: id })}
           />
           <div className={styles.grid}>
-            <TeamSheet team={current.team} tournament={current.tournament} />
+            {/* key : changer d'équipe remet à zéro l'état d'interface (renommage, confirmations). */}
+            <TeamSheet
+              key={current.tournament.id}
+              team={current.team}
+              tournament={current.tournament}
+              actions={{
+                ...actionsFor(current.tournament.id),
+                // Après un départ, retour aux tournois à venir pour trouver une autre équipe.
+                leave: async () => {
+                  await actionsFor(current.tournament.id).leave()
+                  navigate('/joueur/tournois?onglet=avenir')
+                },
+              }}
+            />
           </div>
         </>
       )}

@@ -26,6 +26,12 @@ export function toDetail(tournament: Tournament): TournamentDetail {
   })
 }
 
+/** L'équipe telle que le joueur connecté la voit : les demandes ne sont visibles que du capitaine. */
+export function teamView(team: MyTeam): MyTeam {
+  const copy = structuredClone(team)
+  return team.captainId === team.myMemberId ? copy : { ...copy, requests: [] }
+}
+
 export function findTournament(id: string): Tournament {
   const tournament = db.tournaments.find((t) => t.id === id)
   if (!tournament) throw new ApiError(404, 'Tournoi introuvable.')

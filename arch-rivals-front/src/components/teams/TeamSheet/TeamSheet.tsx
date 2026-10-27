@@ -1,22 +1,30 @@
 import { Link } from 'react-router'
+import type { TeamActions } from '../../../hooks/useMyTeams'
 import type { MyTeam } from '../../../types/team'
 import type { Tournament } from '../../../types/tournament'
-import { bannerInitials, initials } from '../../../utils/initials'
-import { missingPlayers } from '../../../utils/teams'
-import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
-import Lock from '../../icons/Lock'
+import { bannerInitials } from '../../../utils/initials'
+import { isCaptain, missingPlayers } from '../../../utils/teams'
+import { GAME_ROLES, PLAYERS_PER_TEAM } from '../../../utils/tournaments'
+import JoinRequests from '../JoinRequests/JoinRequests'
+import LeaveTeam from '../LeaveTeam/LeaveTeam'
+import MemberRow from '../MemberRow/MemberRow'
+import TeamNameEditor from '../TeamNameEditor/TeamNameEditor'
+import VisibilitySwitch from '../VisibilitySwitch/VisibilitySwitch'
 import styles from './TeamSheet.module.css'
 
 type TeamSheetProps = {
   team: MyTeam
   tournament: Tournament
+  actions: TeamActions
 }
 
-export default function TeamSheet({ team, tournament }: TeamSheetProps) {
-  // L'effectif ne bouge que tant que les inscriptions sont ouvertes.
+export default function TeamSheet({ team, tournament, actions }: TeamSheetProps) {
+  // L'effectif ne bouge que tant que les inscriptions sont ouvertes (B-11),
+  // et seul le capitaine y touche (B-10).
   const open = tournament.state === 'ouvertes'
+  const captain = isCaptain(team)
+  const editable = captain && open
   const missing = missingPlayers(team)
-  const closedTeam = team.visibility === 'closed'
   // « Clôture le 30 oct. » → « 30 oct ».
   const closingDate = tournament.closing?.replace(/^Clôture le /, '').replace(/\.$/, '')
 
@@ -27,7 +35,7 @@ export default function TeamSheet({ team, tournament }: TeamSheetProps) {
           {bannerInitials(team.name)}
         </div>
         <div className={styles.identity}>
-          <h2 className={styles.name}>{team.name}</h2>
+          <TeamNameEditor name={team.name} editable={editable} onRename={actions.rename} />
           <Link to={`/joueur/tournois/${tournament.id}`} className={styles.tournament}>
             {tournament.name} · {tournament.game} →
           </Link>
@@ -56,19 +64,11 @@ export default function TeamSheet({ team, tournament }: TeamSheetProps) {
         </p>
       )}
 
-      <div className={closedTeam ? `${styles.visibility} ${styles.closedTeam}` : styles.visibility}>
-        <span className={styles.visIcon}>
-          <Lock open={!closedTeam} />
-        </span>
-        <span className={styles.visText}>
-          <span className={styles.visLabel}>{closedTeam ? 'ÉQUIPE FERMÉE' : 'ÉQUIPE OUVERTE'}</span>
-          <span className={styles.visHint}>
-            {closedTeam
-              ? 'Aucune demande possible : l’équipe n’apparaît plus parmi celles qui recrutent.'
-              : 'Tout joueur sans équipe dans ce tournoi peut demander à rejoindre.'}
-          </span>
-        </span>
-      </div>
+      <VisibilitySwitch
+        visibility={team.visibility}
+        editable={editable}
+        onChange={actions.setVisibility}
+      />
 
       <div className={styles.roster}>
         <div className={styles.rosterHead}>
@@ -78,28 +78,19 @@ export default function TeamSheet({ team, tournament }: TeamSheetProps) {
           </span>
         </div>
         <ul className={styles.members}>
-          {team.members.map((member) => {
-            const captain = member.id === team.captainId
-            const me = member.id === team.myMemberId
-            const classes = [styles.member, captain && styles.captainRow, me && styles.meRow]
-              .filter(Boolean)
-              .join(' ')
-            return (
-              <li key={member.id} className={classes}>
-                <span className={styles.avatar} aria-hidden="true">
-                  {initials(member.username)}
-                </span>
-                <span className={styles.memberText}>
-                  <span className={styles.memberLine}>
-                    <span className={styles.memberName}>{member.username}</span>
-                    {captain && <span className={styles.captainTag}>CAPITAINE</span>}
-                    {me && <span className={styles.meTag}>toi</span>}
-                  </span>
-                  <span className={styles.role}>{member.role}</span>
-                </span>
-              </li>
-            )
-          })}
+          {team.members.map((member) => (
+            <MemberRow
+              key={member.id}
+              member={member}
+              isCaptain={member.id === team.captainId}
+              isMe={member.id === team.myMemberId}
+              editable={editable}
+              roles={GAME_ROLES[tournament.game]}
+              onRoleChange={(role) => actions.setRole(member.id, role)}
+              onTransfer={() => actions.transferCaptain(member.id)}
+              onKick={() => actions.kick(member.id)}
+            />
+          ))}
           {Array.from({ length: missing }, (_, i) => (
             <li key={`libre-${i}`} className={styles.free}>
               <span className={styles.freeAvatar} aria-hidden="true">
@@ -110,6 +101,22 @@ export default function TeamSheet({ team, tournament }: TeamSheetProps) {
           ))}
         </ul>
       </div>
+
+      {editable && team.requests.length > 0 && (
+        <JoinRequests
+          requests={team.requests}
+          full={missing === 0}
+          onAccept={actions.accept}
+          onRefuse={actions.refuse}
+        />
+      )}
+
+      {open && !captain && <LeaveTeam teamName={team.name} onLeave={actions.leave} />}
+      {open && captain && team.members.length > 1 && (
+        <p className={styles.note}>
+          Pour quitter l'équipe, passe d'abord le rôle de capitaine à un autre membre.
+        </p>
+      )}
     </section>
   )
 }

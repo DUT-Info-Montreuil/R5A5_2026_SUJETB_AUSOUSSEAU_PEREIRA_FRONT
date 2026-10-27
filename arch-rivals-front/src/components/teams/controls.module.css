@@ -1,0 +1,94 @@
+/* Boutons et confirmations partagés par les composants de la fiche d'équipe. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0 12px;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 14px;
+  border: 1px solid var(--color-card-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.btn:hover:not(:disabled),
+.btn:focus-visible {
+  border-color: var(--color-gold-hover);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Action principale (fond or) */
+.primary {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-on-gold);
+  background: var(--color-gold);
+  border-color: var(--color-gold);
+}
+
+.primary:hover:not(:disabled),
+.primary:focus-visible {
+  background: var(--color-gold-hover);
+}
+
+/* Action secondaire dorée */
+.gold {
+  color: var(--color-gold);
+  border-color: var(--color-input-border);
+}
+
+/* Action destructrice (exclure, quitter) */
+.danger {
+  color: #e8a090;
+  border-color: #5a2e28;
+}
+
+.danger:hover:not(:disabled),
+.danger:focus-visible {
+  border-color: var(--color-live);
+}
+
+.dangerFilled {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--color-on-gold);
+  background: var(--color-live);
+  border-color: var(--color-live);
+}
+
+/* Ligne de confirmation « Exclure X ? [Exclure] [Annuler] » */
+.confirm {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  padding-top: 8px;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.confirmText {
+  flex: 1;
+  min-width: 160px;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.error {
+  margin: 0;
+  width: 100%;
+  font-size: 15px;
+  color: var(--color-danger);
+}

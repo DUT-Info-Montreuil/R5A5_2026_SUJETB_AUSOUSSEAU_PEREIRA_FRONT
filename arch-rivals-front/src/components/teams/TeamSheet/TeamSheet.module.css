@@ -39,15 +39,6 @@
   min-width: 0;
 }
 
-.name {
-  margin: 0;
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: clamp(20px, 2.4vw, 26px);
-  color: var(--color-text-strong);
-  overflow-wrap: anywhere;
-}
-
 .tournament {
   font-size: 16px;
   color: var(--color-text-muted);
@@ -97,47 +88,6 @@
   color: var(--color-warning-text);
 }
 
-/* Visibilité de l'équipe */
-.visibility {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  color: var(--color-success);
-}
-
-.closedTeam {
-  color: var(--color-closed);
-}
-
-.visIcon {
-  width: 44px;
-  height: 44px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid currentColor;
-}
-
-.visText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.visLabel {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 14px;
-  letter-spacing: 0.14em;
-}
-
-.visHint {
-  font-size: 15px;
-  color: var(--color-text-muted);
-}
-
 /* Effectif */
 .roster {
   display: flex;
@@ -175,81 +125,6 @@
   list-style: none;
 }
 
-.member {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-  padding: 10px 12px;
-  background: var(--color-input-bg);
-  border: 1px solid var(--color-card-border);
-}
-
-.captainRow {
-  background: var(--team-winner-bg);
-}
-
-.meRow {
-  border-color: var(--color-gold);
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--team-pending-bg);
-  border: 1px solid var(--color-gold-dark);
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 13px;
-  color: var(--color-gold-hover);
-}
-
-.memberText {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  flex: 1;
-  min-width: 120px;
-}
-
-.memberLine {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.memberName {
-  font-family: var(--font-ui);
-  font-weight: 700;
-  font-size: 15px;
-  color: var(--color-text-strong);
-}
-
-.captainTag {
-  padding: 1px 7px;
-  font-family: var(--font-ui);
-  font-size: 10px;
-  letter-spacing: 0.16em;
-  color: var(--color-on-gold);
-  background: var(--color-gold);
-}
-
-.meTag {
-  font-size: 14px;
-  font-style: italic;
-  color: var(--color-text-faint);
-}
-
-.role {
-  font-size: 15px;
-  color: var(--color-text-muted);
-}
-
 .free {
   display: flex;
   align-items: center;
@@ -270,4 +145,11 @@
   border: 1px dashed #4a4044;
   font-family: var(--font-ui);
   font-style: normal;
+}
+
+.note {
+  margin: 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
 }

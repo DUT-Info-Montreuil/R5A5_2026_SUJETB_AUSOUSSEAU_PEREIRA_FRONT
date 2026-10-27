@@ -1,0 +1,58 @@
+.view {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: clamp(20px, 2.4vw, 26px);
+  color: var(--color-text-strong);
+  overflow-wrap: anywhere;
+}
+
+.rename {
+  min-height: 32px;
+  padding: 0 4px;
+  background: none;
+  color: var(--color-gold);
+  font-size: 15px;
+  font-style: italic;
+  border: 0;
+  cursor: pointer;
+}
+
+.rename:hover,
+.rename:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 160px;
+  min-height: 44px;
+  padding: 0 12px;
+  background: var(--team-loser-bg);
+  border: 1px solid var(--color-gold);
+  border-radius: 0;
+  color: var(--color-text);
+  font-family: var(--font-ui);
+  font-size: 16px;
+}
+
+.input[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.form button {
+  min-height: 44px;
+}

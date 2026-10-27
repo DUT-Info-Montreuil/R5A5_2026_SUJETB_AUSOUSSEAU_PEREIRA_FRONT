@@ -4,7 +4,7 @@ import type { TeamListing, TournamentDetail } from '../types/tournament'
 import { GAME_ROLES, PLAYERS_PER_TEAM, TEAMS_PER_TOURNAMENT } from '../utils/tournaments'
 import { validateTeamName } from '../utils/validation'
 import { ApiError } from './api'
-import { db, findTournament, toDetail } from './mockBackend'
+import { db, findTournament, teamView, toDetail } from './mockBackend'
 
 // Contrat prévu avec le back (le joueur est identifié par son token) :
 //   GET  /me/teams                          → MyTeam[]  (tournois pas encore terminés)
@@ -24,7 +24,7 @@ function assertOpenAndFree(tournamentId: string) {
 
 export async function fetchMyTeams(): Promise<MyTeam[]> {
   const active = new Set(db.tournaments.filter((t) => t.state !== 'termine').map((t) => t.id))
-  return structuredClone(db.myTeams.filter((team) => active.has(team.tournamentId)))
+  return db.myTeams.filter((team) => active.has(team.tournamentId)).map(teamView)
 }
 
 export async function fetchRecruitingTeams(tournamentId: string): Promise<TeamListing[]> {
@@ -60,6 +60,7 @@ export async function createTeam(tournamentId: string, name: string): Promise<To
     captainId: ME,
     visibility: 'open',
     myMemberId: ME,
+    requests: [],
     members: [meMember(role)],
   })
   tournament.registeredTeams += 1

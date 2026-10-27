@@ -14,6 +14,7 @@ export const MY_TEAMS: readonly MyTeam[] = [
     captainId: ME,
     visibility: 'open',
     myMemberId: ME,
+    requests: [],
     members: [
       meMember('Duelliste'),
       { id: 'm-gauvain', username: 'Gauvain', role: 'Initiateur' },
@@ -28,6 +29,7 @@ export const MY_TEAMS: readonly MyTeam[] = [
     captainId: 'm-galaad',
     visibility: 'open',
     myMemberId: ME,
+    requests: [],
     members: [
       { id: 'm-galaad', username: 'Galaad', role: 'Top' },
       { id: 'm-yvain', username: 'Yvain', role: 'Jungle' },
@@ -42,6 +44,10 @@ export const MY_TEAMS: readonly MyTeam[] = [
     captainId: ME,
     visibility: 'open',
     myMemberId: ME,
+    requests: [
+      { id: 'r-tristan', username: 'Tristan', note: 'Lurker · IUT de Vannes' },
+      { id: 'r-iseult', username: 'Iseult', note: 'Support · IUT de Brest' },
+    ],
     members: [
       meMember('Entry'),
       { id: 'm-gauvain', username: 'Gauvain', role: 'AWPer' },
@@ -55,6 +61,7 @@ export const MY_TEAMS: readonly MyTeam[] = [
     captainId: 'm-arthur',
     visibility: 'open',
     myMemberId: ME,
+    requests: [],
     members: [
       { id: 'm-arthur', username: 'Arthur_P', role: 'Tank' },
       meMember('DPS'),
