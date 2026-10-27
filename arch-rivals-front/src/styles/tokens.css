@@ -32,6 +32,14 @@
   --color-success: #8fc98a;
   --color-live: #e8806a;
 
+  --color-success-soft: #a9d6a4;
+  --color-success-line: #3e5a3b;
+  --color-locked-line: #5a4030;
+  --color-warning-bg: #2a1714;
+  --color-warning-line: #a4503f;
+  --color-warning-text: #f0c2b6;
+  --color-closed: #c9a0dc;
+
   /* Jeux */
   --color-game-ow2: #9ab8d9;
 

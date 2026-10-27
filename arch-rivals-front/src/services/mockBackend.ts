@@ -1,6 +1,8 @@
 import { BRACKETS } from '../data/brackets'
+import { MY_TEAMS } from '../data/myTeams'
 import { TEAM_DIRECTORY } from '../data/teamDirectory'
 import { TOURNAMENTS } from '../data/tournaments'
+import type { MyTeam } from '../types/team'
 import type { TeamListing, Tournament, TournamentDetail } from '../types/tournament'
 import { ApiError } from './api'
 
@@ -11,6 +13,7 @@ import { ApiError } from './api'
 export const db = {
   tournaments: TOURNAMENTS.map((t) => ({ ...t })) as Tournament[],
   teams: TEAM_DIRECTORY.map((t) => ({ ...t })) as TeamListing[],
+  myTeams: structuredClone(MY_TEAMS) as MyTeam[],
 }
 
 /** Copie renvoyée au front, comme le ferait une réponse JSON. */

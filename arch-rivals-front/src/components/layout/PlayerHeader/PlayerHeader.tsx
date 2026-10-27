@@ -20,6 +20,9 @@ export default function PlayerHeader() {
         <NavLink to="/joueur/tournois" className={navClass}>
           Tournois
         </NavLink>
+        <NavLink to="/joueur/equipes" className={navClass}>
+          Équipes
+        </NavLink>
         <span className={styles.profile}>
           <span className={styles.avatar} aria-hidden="true">
             {initials(username)}

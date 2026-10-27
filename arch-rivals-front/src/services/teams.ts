@@ -1,3 +1,5 @@
+import { ME, meMember } from '../data/myTeams'
+import type { MyTeam } from '../types/team'
 import type { TeamListing, TournamentDetail } from '../types/tournament'
 import { GAME_ROLES, PLAYERS_PER_TEAM, TEAMS_PER_TOURNAMENT } from '../utils/tournaments'
 import { validateTeamName } from '../utils/validation'
@@ -5,6 +7,7 @@ import { ApiError } from './api'
 import { db, findTournament, toDetail } from './mockBackend'
 
 // Contrat prévu avec le back (le joueur est identifié par son token) :
+//   GET  /me/teams                          → MyTeam[]  (tournois pas encore terminés)
 //   GET  /tournaments/:id/teams?recrute=1   → TeamListing[]  (ouvertes et pas complètes)
 //   POST /tournaments/:id/teams  { name }   → 201 TournamentDetail  (le joueur devient capitaine)
 //   POST /teams/:teamId/join-requests       → 201 TournamentDetail
@@ -17,6 +20,11 @@ function assertOpenAndFree(tournamentId: string) {
   if (tournament.myTeam) throw new ApiError(409, 'Tu as déjà une équipe dans ce tournoi.')
   if (tournament.myRequest) throw new ApiError(409, 'Tu as déjà une demande en cours.')
   return tournament
+}
+
+export async function fetchMyTeams(): Promise<MyTeam[]> {
+  const active = new Set(db.tournaments.filter((t) => t.state !== 'termine').map((t) => t.id))
+  return structuredClone(db.myTeams.filter((team) => active.has(team.tournamentId)))
 }
 
 export async function fetchRecruitingTeams(tournamentId: string): Promise<TeamListing[]> {
@@ -44,7 +52,16 @@ export async function createTeam(tournamentId: string, name: string): Promise<To
   )
   if (taken) throw new ApiError(409, 'Ce nom est déjà pris dans ce tournoi.')
 
-  tournament.myTeam = { name: teamName, role: GAME_ROLES[tournament.game][0], isCaptain: true }
+  const role = GAME_ROLES[tournament.game][0]
+  tournament.myTeam = { name: teamName, role, isCaptain: true }
+  db.myTeams.push({
+    tournamentId,
+    name: teamName,
+    captainId: ME,
+    visibility: 'open',
+    myMemberId: ME,
+    members: [meMember(role)],
+  })
   tournament.registeredTeams += 1
   return toDetail(tournament)
 }

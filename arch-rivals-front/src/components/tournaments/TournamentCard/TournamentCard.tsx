@@ -115,6 +115,14 @@ export default function TournamentCard({
           >
             {detailLabel}
           </Link>
+          {myTeam && state !== 'termine' && (
+            <Link
+              to={`/joueur/equipes?tournoi=${id}`}
+              className={`${styles.action} ${styles.primary}`}
+            >
+              Mon équipe
+            </Link>
+          )}
           {canJoin && (
             <>
               <button
