@@ -7,8 +7,8 @@ type JoinRequestsProps = {
   requests: readonly IncomingRequest[]
   /** Effectif au complet : plus personne ne peut être accepté. */
   full: boolean
-  onAccept: (requestId: number) => Promise<void>
-  onRefuse: (requestId: number) => Promise<void>
+  onAccept: (request: IncomingRequest) => Promise<void>
+  onRefuse: (request: IncomingRequest) => Promise<void>
 }
 
 export default function JoinRequests({ requests, full, onAccept, onRefuse }: JoinRequestsProps) {
@@ -34,7 +34,7 @@ export default function JoinRequests({ requests, full, onAccept, onRefuse }: Joi
               <button
                 type="button"
                 className={`${controls.btn} ${full ? '' : controls.primary}`}
-                onClick={() => run(() => onAccept(request.id))}
+                onClick={() => run(() => onAccept(request))}
                 disabled={full || pending}
               >
                 {full ? 'Équipe complète' : 'Accepter'}
@@ -42,7 +42,7 @@ export default function JoinRequests({ requests, full, onAccept, onRefuse }: Joi
               <button
                 type="button"
                 className={controls.btn}
-                onClick={() => run(() => onRefuse(request.id))}
+                onClick={() => run(() => onRefuse(request))}
                 disabled={pending}
               >
                 Refuser

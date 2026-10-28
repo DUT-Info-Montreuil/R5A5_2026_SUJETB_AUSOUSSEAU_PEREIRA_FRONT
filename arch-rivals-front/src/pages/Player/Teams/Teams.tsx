@@ -4,7 +4,8 @@ import TeamChat from '../../../components/teams/TeamChat/TeamChat'
 import TeamChips from '../../../components/teams/TeamChips/TeamChips'
 import TeamDirectory from '../../../components/teams/TeamDirectory/TeamDirectory'
 import TeamSheet from '../../../components/teams/TeamSheet/TeamSheet'
-import { useMyTeams } from '../../../hooks/useMyTeams'
+import { useMyTeams, type MyTeamEntry, type TeamActions } from '../../../hooks/useMyTeams'
+import { useToastAfter } from '../../../hooks/useToast'
 import { matchesTeamQuery, teamDirectory } from '../../../utils/teamDirectory'
 import styles from './Teams.module.css'
 
@@ -13,6 +14,7 @@ type View = 'miennes' | 'toutes'
 export default function Teams() {
   const { entries, status, userId, actionsFor, tournaments, requests, requestToJoin } = useMyTeams()
   const navigate = useNavigate()
+  const toastAfter = useToastAfter()
 
   // Onglet, équipe affichée (?tournoi=12), recherche et filtre vivent dans l'URL :
   // « Mon équipe » y mène directement, et F5 garde la vue.
@@ -42,6 +44,27 @@ export default function Teams() {
   const thenBackToTournaments = (action: () => Promise<void>) => async () => {
     await action()
     navigate('/joueur/tournois?onglet=avenir')
+  }
+
+  /** Actions sur l'équipe affichée, avec un toast de confirmation pour chacune. */
+  function teamActions(entry: MyTeamEntry): TeamActions {
+    const base = actionsFor(entry)
+    const { team } = entry
+    const nameOf = (id: number) =>
+      team.members.find((m) => m.userId === id)?.username ?? 'Le joueur'
+    return {
+      ...base,
+      rename: toastAfter(base.rename, () => 'Bannière renommée'),
+      transferCaptaincy: toastAfter(
+        base.transferCaptaincy,
+        (id) => `${nameOf(id)} est désormais capitaine`,
+      ),
+      kick: toastAfter(base.kick, (id) => `${nameOf(id)} a été exclu de l’équipe`),
+      accept: toastAfter(base.accept, (request) => `${request.username} rejoint l’équipe`),
+      reject: toastAfter(base.reject, (request) => `Demande de ${request.username} refusée`),
+      leave: thenBackToTournaments(toastAfter(base.leave, () => `Tu as quitté ${team.name}`)),
+      remove: thenBackToTournaments(toastAfter(base.remove, () => `${team.name} a été dissoute`)),
+    }
   }
 
   return (
@@ -74,7 +97,10 @@ export default function Teams() {
           recruitingOnly={recruitingOnly}
           onRecruitingOnlyChange={(recrute) => filterDirectory({ recrute })}
           onManage={(entry) => showTeam(entry.tournament.id)}
-          onRequest={(entry) => requestToJoin(entry.tournament.id, entry.team)}
+          onRequest={toastAfter(
+            (entry) => requestToJoin(entry.tournament.id, entry.team),
+            (entry) => `Demande envoyée à ${entry.team.name}`,
+          )}
         />
       )}
 
@@ -105,11 +131,7 @@ export default function Teams() {
               team={current.team}
               tournament={current.tournament}
               userId={userId}
-              actions={{
-                ...actionsFor(current),
-                leave: thenBackToTournaments(actionsFor(current).leave),
-                remove: thenBackToTournaments(actionsFor(current).remove),
-              }}
+              actions={teamActions(current)}
             />
             <TeamChat
               key={`chat-${current.team.id}`}

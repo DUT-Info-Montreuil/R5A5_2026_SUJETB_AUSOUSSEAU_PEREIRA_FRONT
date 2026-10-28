@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react'
 import { onTeamLost } from '../services/chat'
 import * as myTeamApi from '../services/myTeam'
+import type { IncomingRequest } from '../types/team'
 import type { Tournament, TournamentTeam } from '../types/tournament'
 import { findMyTeam } from '../utils/tournaments'
 import { useTournaments } from './useTournaments'
@@ -11,8 +12,8 @@ export type TeamActions = {
   setRole: (userId: number, roleId: number | null) => Promise<void>
   transferCaptaincy: (userId: number) => Promise<void>
   kick: (userId: number) => Promise<void>
-  accept: (requestId: number) => Promise<void>
-  reject: (requestId: number) => Promise<void>
+  accept: (request: IncomingRequest) => Promise<void>
+  reject: (request: IncomingRequest) => Promise<void>
   leave: () => Promise<void>
   remove: () => Promise<void>
 }
@@ -65,8 +66,8 @@ export function useMyTeams() {
         setRole: (userId, roleId) => then(myTeamApi.setMemberRole(team.id, userId, roleId)),
         transferCaptaincy: (userId) => then(myTeamApi.transferCaptaincy(team.id, userId)),
         kick: (userId) => then(myTeamApi.kickMember(team.id, userId)),
-        accept: (requestId) => then(myTeamApi.acceptJoinRequest(requestId)),
-        reject: (requestId) => then(myTeamApi.rejectJoinRequest(requestId)),
+        accept: (request) => then(myTeamApi.acceptJoinRequest(request.id)),
+        reject: (request) => then(myTeamApi.rejectJoinRequest(request.id)),
         leave: () => then(myTeamApi.leaveTeam(team.id)),
         remove: () => then(myTeamApi.deleteTeam(team.id)),
       }

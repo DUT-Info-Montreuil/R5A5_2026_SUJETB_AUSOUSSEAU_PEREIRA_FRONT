@@ -3,6 +3,7 @@ import Tabs from '../../../components/layout/Tabs/Tabs'
 import NextMatchBanner from '../../../components/tournaments/NextMatchBanner/NextMatchBanner'
 import TournamentCard from '../../../components/tournaments/TournamentCard/TournamentCard'
 import { useAuth } from '../../../hooks/useAuth'
+import { useToastAfter } from '../../../hooks/useToast'
 import { useTournaments } from '../../../hooks/useTournaments'
 import { pickNextMatch } from '../../../utils/bracket'
 import {
@@ -18,6 +19,7 @@ export default function Tournaments() {
   const { user } = useAuth()
   const { tournaments, status, userId, requests, createTeam, requestToJoin, cancelRequest } =
     useTournaments()
+  const toastAfter = useToastAfter()
 
   // Onglet et recherche vivent dans l'URL : ils survivent à F5 et se partagent.
   const [params, setParams] = useSearchParams()
@@ -88,9 +90,14 @@ export default function Tournaments() {
               tournament={t}
               userId={userId}
               request={requests[t.id] ?? null}
-              onCreateTeam={createTeam}
-              onRequestToJoin={requestToJoin}
-              onCancelRequest={cancelRequest}
+              onCreateTeam={toastAfter(createTeam, (_id, name) => `Bannière « ${name} » levée !`)}
+              onRequestToJoin={toastAfter(
+                requestToJoin,
+                (_id, team) => `Demande envoyée à ${team.name}`,
+              )}
+              onCancelRequest={toastAfter(cancelRequest, (id) =>
+                requests[id] ? `Demande à ${requests[id].teamName} annulée` : 'Demande annulée',
+              )}
             />
           ))}
           {visible.length === 0 && <p className={styles.empty}>Aucun tournoi ne correspond.</p>}
