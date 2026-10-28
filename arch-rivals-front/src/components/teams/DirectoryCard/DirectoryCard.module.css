@@ -1,0 +1,187 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 1px solid var(--color-card-border);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--color-gold);
+}
+
+/* Équipe du joueur : bordure et lueur dorées. */
+.mine {
+  background: linear-gradient(180deg, var(--team-winner-bg), #1a1510);
+  border-color: var(--color-gold);
+  box-shadow: 0 0 24px rgba(217, 178, 92, 0.18);
+}
+
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 14px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+}
+
+.role {
+  letter-spacing: 0.12em;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Écu de la bannière */
+.shield {
+  width: 48px;
+  height: 58px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 10px;
+  background: linear-gradient(180deg, #5a4318, #2a1f0c);
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 17px;
+  color: var(--color-gold-hover);
+}
+
+.identity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--color-text-strong);
+}
+
+.tournament {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.facts {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.captain {
+  color: var(--color-text);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.count {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  color: var(--color-text);
+}
+
+.badge {
+  padding: 2px 8px;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  border: 1px solid currentColor;
+}
+
+.recrute {
+  color: var(--color-success);
+}
+
+.complete {
+  color: var(--color-bronze-light);
+}
+
+.figee {
+  color: var(--color-silver);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: auto;
+  padding: 0 14px;
+  background: transparent;
+  color: var(--color-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.action:hover:not(:disabled),
+.action:focus-visible {
+  border-color: var(--color-gold-hover);
+}
+
+.action:disabled {
+  cursor: default;
+}
+
+.primary {
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  border-color: var(--color-gold-hover);
+}
+
+.primary:hover:not(:disabled),
+.primary:focus-visible {
+  background: var(--color-gold-hover);
+}
+
+.dim {
+  color: var(--color-text-faint);
+  border-color: var(--color-track);
+}
+
+.error {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-danger);
+}

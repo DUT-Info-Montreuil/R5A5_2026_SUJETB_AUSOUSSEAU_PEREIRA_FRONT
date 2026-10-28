@@ -1,0 +1,163 @@
+.sheet {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(18px, 3vw, 28px);
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 4px double var(--color-gold-dark);
+}
+
+/* En-tête : bannière et nom */
+.head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.shield {
+  width: 72px;
+  height: 86px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 14px;
+  background: linear-gradient(180deg, #5a4318, #2a1f0c);
+  clip-path: polygon(0 0, 100% 0, 100% 75%, 50% 100%, 0 75%);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 26px;
+  color: var(--color-gold-hover);
+}
+
+.identity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.tournament {
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.tournament:hover,
+.tournament:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+/* Verrou des inscriptions */
+.lock {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--team-loser-bg);
+  border: 1px solid;
+  font-size: 15px;
+}
+
+.lockOpen {
+  color: var(--color-success-soft);
+  border-color: var(--color-success-line);
+}
+
+.lockClosed {
+  color: var(--color-bronze-light);
+  border-color: var(--color-locked-line);
+}
+
+.lockTag {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.warning {
+  margin: 0;
+  padding: 12px 14px;
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-line);
+  font-size: 16px;
+  color: var(--color-warning-text);
+}
+
+/* Effectif */
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rosterHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.rosterTitle {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+}
+
+.rosterCount {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.members {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.free {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px dashed #4a4044;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.freeAvatar {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #4a4044;
+  font-family: var(--font-ui);
+  font-style: normal;
+}
+
+.note {
+  margin: 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+/* Quitter / supprimer l'équipe */
+.exits {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}

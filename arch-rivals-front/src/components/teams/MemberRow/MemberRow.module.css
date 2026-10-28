@@ -1,0 +1,97 @@
+.member {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 12px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-card-border);
+}
+
+.captainRow {
+  background: var(--team-winner-bg);
+}
+
+.meRow {
+  border-color: var(--color-gold);
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--team-pending-bg);
+  border: 1px solid var(--color-gold-dark);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--color-gold-hover);
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 120px;
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text-strong);
+}
+
+.captainTag {
+  padding: 1px 7px;
+  font-family: var(--font-ui);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--color-on-gold);
+  background: var(--color-gold);
+}
+
+.meTag {
+  font-size: 14px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.role {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.noRole {
+  font-style: italic;
+  color: var(--color-danger);
+}
+
+.select {
+  align-self: flex-start;
+  min-height: 32px;
+  padding: 0 8px;
+  background: var(--team-loser-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}

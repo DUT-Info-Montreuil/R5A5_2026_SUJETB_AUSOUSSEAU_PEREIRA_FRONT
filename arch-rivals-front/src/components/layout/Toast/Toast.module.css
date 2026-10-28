@@ -1,0 +1,40 @@
+.region {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  z-index: 50;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.toast {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  background: var(--team-winner-bg);
+  border: 1px solid var(--color-gold);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  font-size: 17px;
+  color: var(--color-text-strong);
+  animation: rise 0.2s ease-out;
+}
+
+.mark {
+  color: var(--color-gold);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}

@@ -1,0 +1,103 @@
+.back {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+}
+
+.back:hover,
+.back:focus-visible {
+  color: var(--color-gold-hover);
+}
+
+.message {
+  margin: 32px 0;
+  font-size: 18px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin-top: 20px;
+}
+
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(28px, 4.5vw, 48px);
+  line-height: 1.05;
+  color: var(--color-text-strong);
+  text-shadow: var(--title-shadow);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 18px;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.sep {
+  color: var(--color-separator);
+}
+
+.live {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-live);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: glint 1.4s ease-in-out infinite;
+}
+
+.note {
+  margin: 14px 0 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.waiting {
+  margin-top: 28px;
+  padding: 40px 24px;
+  text-align: center;
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 4px double var(--color-gold-dark);
+}
+
+.waitingTitle {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text-strong);
+}
+
+.waitingText {
+  margin: 10px 0 0;
+  font-size: 17px;
+  color: var(--color-text-muted);
+}

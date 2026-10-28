@@ -1,0 +1,77 @@
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { ApiError, setAuthToken } from '../services/api'
+import * as authApi from '../services/auth'
+import { listen, reconnectRealtime } from '../services/realtime'
+import { tokenStorage } from '../services/tokenStorage'
+import type { AuthStatus, LoginPayload, RegisterPayload, User } from '../types/auth'
+import { AuthContext, type AuthContextValue } from './authContext'
+
+function applyToken(token: string | null) {
+  setAuthToken(token)
+  if (token) tokenStorage.set(token)
+  else tokenStorage.clear()
+  // Le canal temps réel identifie le joueur à la connexion : on le rouvre avec le nouveau token.
+  reconnectRealtime()
+}
+
+export default function AuthProvider({ children }: { children: ReactNode }) {
+  const [initialToken] = useState(() => tokenStorage.get())
+  const [user, setUser] = useState<User | null>(null)
+  const [status, setStatus] = useState<AuthStatus>(initialToken ? 'loading' : 'anonymous')
+
+  // Au chargement : si un token est stocké, on restaure la session via GET /auth/me.
+  useEffect(() => {
+    if (!initialToken) return
+    let cancelled = false
+    setAuthToken(initialToken)
+
+    authApi
+      .me()
+      .then((me) => {
+        if (cancelled) return
+        setUser(me)
+        setStatus('authenticated')
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        // Token refusé → on l'oublie. Back injoignable → on garde le token pour la prochaine fois.
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) applyToken(null)
+        setStatus('anonymous')
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [initialToken])
+
+  const login = useCallback(async (payload: LoginPayload) => {
+    const { token, user } = await authApi.login(payload)
+    applyToken(token)
+    setUser(user)
+    setStatus('authenticated')
+  }, [])
+
+  const register = useCallback(async (payload: RegisterPayload) => {
+    const { token, user } = await authApi.register(payload)
+    applyToken(token)
+    setUser(user)
+    setStatus('authenticated')
+  }, [])
+
+  // Pas de route de déconnexion côté back pour l'instant : on oublie simplement le token.
+  const logout = useCallback(() => {
+    applyToken(null)
+    setUser(null)
+    setStatus('anonymous')
+  }, [])
+
+  // Jeton expiré : le back ferme le canal temps réel, et l'API refusera le token. On déconnecte.
+  useEffect(() => listen('session:expired', logout), [logout])
+
+  const value = useMemo<AuthContextValue>(
+    () => ({ user, status, login, register, logout }),
+    [user, status, login, register, logout],
+  )
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}

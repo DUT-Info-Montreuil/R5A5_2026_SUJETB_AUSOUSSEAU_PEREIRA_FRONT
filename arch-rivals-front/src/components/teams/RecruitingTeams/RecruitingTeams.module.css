@@ -1,0 +1,97 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 24px 20px;
+}
+
+.title {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 10px 14px;
+  background: var(--team-loser-bg);
+  border: 1px solid var(--color-track);
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  font-size: 16px;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--color-text-strong);
+}
+
+.count {
+  color: var(--color-text-muted);
+}
+
+.ask {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  white-space: nowrap;
+  background: transparent;
+  color: var(--color-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.ask:hover:not(:disabled),
+.ask:focus-visible {
+  border-color: var(--color-gold-hover);
+}
+
+.ask:disabled {
+  cursor: default;
+}
+
+.sent {
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  border-color: var(--color-gold);
+}
+
+.blocked {
+  color: var(--color-separator);
+  border-color: var(--color-track);
+}
+
+.note {
+  margin: 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.error {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-danger);
+}
+
+@media (max-width: 520px) {
+  .panel {
+    padding: 0 16px 18px;
+  }
+}

@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  html,body{margin:0;padding:0;background:#141215;color:#ece3cf;}
+  body{font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
+  a{color:#d9b25c;text-decoration:none;} a:hover{color:#f2d58a;}
+  *{box-sizing:border-box;}
+  a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #f2d58a;outline-offset:2px;}
+  input::placeholder{color:#8f8570;}
+  @keyframes glint{0%,100%{opacity:.3}50%{opacity:1}}
+</style>
+</helmet>
+
+<div data-screen-label="Espace joueur" style="min-height:100vh;display:flex;flex-direction:column;background:radial-gradient(ellipse at 50% -10%, #2a2226 0%, #141215 55%);background-color:#141215;color:#ece3cf;">
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:18px clamp(20px,5vw,72px);border-bottom:1px solid rgba(217,178,92,.25);">
+    <a href="Arch Rivals v2.dc.html" style="font-family:'Cinzel',serif;font-weight:700;letter-spacing:.14em;font-size:20px;color:#ece3cf;display:flex;align-items:center;gap:12px;">
+      <span style="display:inline-block;width:14px;height:14px;background:#d9b25c;transform:rotate(45deg);"></span>
+      ARCH RIVALS
+    </a>
+    <nav style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;font-family:'Cinzel',serif;font-size:14px;letter-spacing:.1em;">
+      <a href="#" onClick="{{ goTournois }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 12px;white-space:nowrap;color:{{ navTournoisColor }};border-bottom:2px solid {{ navTournoisLine }};" style-hover="color:#f2d58a;">Tournois</a>
+      <a href="#" onClick="{{ goTeam }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 12px;white-space:nowrap;color:{{ navTeamColor }};border-bottom:2px solid {{ navTeamLine }};" style-hover="color:#f2d58a;">Équipes<sc-if value="{{ hasTeamBadge }}" hint-placeholder-val="{{ false }}"><span title="{{ teamBadgeTitle }}" style="margin-left:8px;min-width:20px;height:20px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;background:#e8806a;color:#1a1410;font-size:11px;font-weight:700;">{{ teamBadge }}</span></sc-if></a>
+      <a href="#" onClick="{{ goProfil }}" style="display:inline-flex;align-items:center;gap:12px;min-height:44px;margin-left:8px;padding:4px 16px 4px 4px;white-space:nowrap;background:{{ navProfilBg }};border:1px solid #8a6b2c;color:#ece3cf;" style-hover="border-color:#f2d58a;">
+        <span style="width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:#2e2412;border:1px solid #d9b25c;font-family:'Cinzel',serif;font-weight:700;font-size:14px;color:#f2d58a;">LV</span>
+        <span style="display:flex;flex-direction:column;line-height:1.1;">
+          <span style="font-weight:700;font-size:14px;letter-spacing:.06em;">Lancelot_V</span>
+          <span style="font-family:'EB Garamond',serif;font-size:13px;letter-spacing:0;color:#bfb39a;">Voir mon profil</span>
+        </span>
+      </a>
+    </nav>
+  </header>
+
+  <main style="flex:1;width:100%;max-width:1160px;margin:0 auto;padding:clamp(36px,6vw,64px) clamp(20px,5vw,40px);">
+
+    <sc-if value="{{ isTournois }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;">
+        <div>
+          <p style="margin:0 0 10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.32em;color:#d9b25c;">✦ BIENVENUE, SIRE LANCELOT</p>
+          <h1 style="margin:0;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:clamp(32px,5vw,56px);line-height:1.05;color:#f4ead4;text-shadow:0 2px 0 #6b4f16, 0 6px 24px rgba(0,0,0,.6);">Tes tournois</h1>
+        </div>
+        <input value="{{ query }}" onChange="{{ setQuery }}" placeholder="Chercher un tournoi ou un jeu…" style="width:min(100%,340px);min-height:48px;padding:0 16px;background:#1b181b;border:1px solid #5a4a2a;color:#ece3cf;font-family:'EB Garamond',serif;font-size:17px;outline:none;" style-focus="border-color:#d9b25c;">
+      </div>
+
+      <sc-if value="{{ hasNext }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-top:32px;padding:18px 24px;background:linear-gradient(90deg,#2e2412,#1e1a1c);border:1px solid #d9b25c;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <span style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.24em;color:#d9b25c;">TON PROCHAIN MATCH</span>
+              <sc-if value="{{ next.hasCountdown }}" hint-placeholder-val="{{ false }}"><span style="padding:2px 10px;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.12em;color:#1a1410;background:#d9b25c;">{{ next.countdown }}</span></sc-if>
+            </span>
+            <span style="font-family:'Cinzel',serif;font-weight:700;font-size:clamp(17px,2vw,21px);color:#f4ead4;">{{ next.title }}</span>
+            <span style="font-size:16px;color:#bfb39a;">{{ next.sub }}</span>
+          </div>
+          <a href="#" onClick="{{ next.open }}" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;white-space:nowrap;background:#d9b25c;color:#1a1410;font-family:'Cinzel',serif;font-weight:700;font-size:13px;letter-spacing:.1em;border:2px solid #f2d58a;box-shadow:inset 0 0 0 2px #1a1410;" style-hover="background:#f2d58a;color:#1a1410;">Voir l'arbre</a>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:32px;border-bottom:1px solid rgba(217,178,92,.3);">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <a href="#" onClick="{{ t.select }}" style="display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;white-space:nowrap;margin-bottom:-1px;font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:{{ t.color }};background:{{ t.bg }};border:1px solid {{ t.border }};border-bottom-color:{{ t.bottom }};" style-hover="color:#f2d58a;">
+            {{ t.label }}
+            <span style="min-width:24px;height:22px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;background:{{ t.countBg }};color:{{ t.countColor }};">{{ t.count }}</span>
+          </a>
+        </sc-for>
+      </div>
+      <sc-if value="{{ isSearching }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:20px 0 0;font-size:16px;color:#bfb39a;font-style:italic;">{{ searchLabel }}</p>
+      </sc-if>
+
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:24px;">
+        <sc-for list="{{ list }}" as="tr" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;background:linear-gradient(180deg,#1e1a1c,#17141a);border:1px solid #3d3540;" style-hover="border-color:#8a6b2c;">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),auto));justify-content:space-between;align-items:center;gap:16px 24px;padding:20px 24px;">
+              <div style="display:flex;gap:18px;min-width:0;">
+              <div title="{{ tr.game }}" style="width:56px;height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#151316;border:1px solid {{ tr.gameColor }};font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.06em;color:{{ tr.gameColor }};">{{ tr.gameTag }}</div>
+              <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                  <span style="font-family:'Cinzel',serif;font-weight:700;font-size:19px;letter-spacing:.04em;color:#f4ead4;">{{ tr.name }}</span>
+                  <span style="padding:3px 10px;white-space:nowrap;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:{{ tr.badgeColor }};border:1px solid {{ tr.badgeColor }};">{{ tr.badge }}</span>
+                </div>
+                <div style="display:flex;gap:4px 18px;flex-wrap:wrap;font-size:16px;color:#bfb39a;">
+                  <span style="white-space:nowrap;">{{ tr.game }}</span>
+                  <span style="white-space:nowrap;"><span style="color:#5e5560;margin-right:12px;">◆</span>{{ tr.format }}</span>
+                  <span style="white-space:nowrap;"><span style="color:#5e5560;margin-right:12px;">◆</span>{{ tr.date }}</span>
+                </div>
+                <div style="display:flex;gap:4px 18px;flex-wrap:wrap;font-size:16px;">
+                  <span style="color:{{ tr.myColor }};">{{ tr.myLine }}</span>
+                  <span style="color:#d9b25c;font-style:italic;">{{ tr.info }}</span>
+                </div>
+                <sc-if value="{{ tr.showProgress }}" hint-placeholder-val="{{ false }}">
+                  <div style="width:min(100%,280px);height:4px;background:#2b262a;"><div style="height:100%;width:{{ tr.pct }};background:#8fc98a;"></div></div>
+                </sc-if>
+              </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <sc-for list="{{ tr.actions }}" as="ac" hint-placeholder-count="2">
+                  <a href="#" onClick="{{ ac.onClick }}" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 20px;white-space:nowrap;font-family:'Cinzel',serif;font-weight:700;font-size:13px;letter-spacing:.1em;color:{{ ac.color }};background:{{ ac.bg }};border:1px solid {{ ac.border }};" style-hover="border-color:#f2d58a;">{{ ac.label }}</a>
+                </sc-for>
+              </div>
+            </div>
+            <sc-if value="{{ tr.showJoin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px;padding:0 24px 20px;">
+                <span style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.2em;color:#d9b25c;">ÉQUIPES QUI RECRUTENT</span>
+                <sc-for list="{{ tr.openTeams }}" as="ot" hint-placeholder-count="3">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 14px;background:#151316;border:1px solid #2b262a;">
+                    <span style="display:flex;gap:14px;flex-wrap:wrap;font-size:16px;"><span style="font-family:'Cinzel',serif;font-weight:700;color:#f4ead4;">{{ ot.name }}</span><span style="color:#bfb39a;">{{ ot.count }}</span></span>
+                    <a href="#" onClick="{{ ot.request }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;white-space:nowrap;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.1em;color:{{ ot.color }};border:1px solid {{ ot.border }};">{{ ot.label }}</a>
+                  </div>
+                </sc-for>
+                <span style="font-size:15px;color:#8f8570;font-style:italic;">Une seule équipe par tournoi : une seule demande à la fois.</span>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ isEmpty }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:24px 0;text-align:center;font-size:18px;color:#8f8570;font-style:italic;">Aucun tournoi ne correspond.</p>
+        </sc-if>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ isTournoi }}" hint-placeholder-val="{{ false }}">
+      <a href="#" onClick="{{ goTournois }}" style="font-family:'Cinzel',serif;font-size:13px;letter-spacing:.14em;color:#bfb39a;" style-hover="color:#f2d58a;">← TOUS LES TOURNOIS</a>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-top:20px;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <h1 style="margin:0;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:clamp(28px,4.5vw,48px);line-height:1.05;color:#f4ead4;text-shadow:0 2px 0 #6b4f16, 0 6px 24px rgba(0,0,0,.6);">{{ bt.name }}</h1>
+          <div style="display:flex;gap:12px 18px;flex-wrap:wrap;align-items:center;font-size:16px;color:#bfb39a;">
+            <span style="padding:3px 10px;white-space:nowrap;font-family:'Cinzel',serif;font-size:11px;letter-spacing:.18em;color:{{ bt.color }};border:1px solid {{ bt.color }};">{{ bt.badge }}</span>
+            <span>{{ bt.game }}</span>
+            <span style="color:#5e5560;">◆</span>
+            <span>{{ bt.date }}</span>
+          </div>
+        </div>
+        <sc-if value="{{ bt.isLive }}" hint-placeholder-val="{{ false }}">
+          <span style="display:inline-flex;align-items:center;gap:10px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.2em;color:#e8806a;">{{ liveDot }} EN DIRECT · MISE À JOUR AUTOMATIQUE</span>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ bt.hasBracket }}" hint-placeholder-val="{{ true }}">
+        <div style="margin-top:28px;padding:clamp(16px,3vw,32px);background:linear-gradient(180deg,#1e1a1c,#17141a);border:4px double #8a6b2c;overflow-x:auto;">
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:clamp(8px,1.5vw,20px);min-width:640px;">
+            <sc-for list="{{ bt.rounds }}" as="rd" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+                <span style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.22em;color:#d9b25c;text-align:center;">{{ rd.label }}</span>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:space-around;gap:14px;">
+                  <sc-for list="{{ rd.matches }}" as="m" hint-placeholder-count="2">
+                    <div style="display:flex;flex-direction:column;gap:3px;">
+                      <sc-for list="{{ m.rows }}" as="r" hint-placeholder-count="2">
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:0 10px;background:{{ r.bg }};border:1px solid {{ r.border }};font-size:15px;color:{{ r.color }};">
+                          <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ r.name }}</span>
+                          <span style="font-family:'Cinzel',serif;font-weight:700;font-size:13px;color:#d9b25c;">{{ r.score }}</span>
+                        </div>
+                      </sc-for>
+                      <span style="font-family:'Cinzel',serif;font-size:11px;letter-spacing:.12em;color:{{ m.statusColor }};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ m.status }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:12px;min-width:0;">
+              <span style="font-family:'Cinzel',serif;font-size:12px;letter-spacing:.22em;color:#d9b25c;text-align:center;">CHAMPION</span>
+              <div style="flex:1;display:flex;align-items:center;">
+                <div style="width:100%;min-height:64px;display:flex;align-items:center;justify-content:center;padding:0 10px;background:linear-gradient(180deg,#3a2c12,#231a0c);border:2px solid #d9b25c;box-shadow:0 0 30px rgba(217,178,92,.2);font-family:'Cinzel',serif;font-weight:700;font-size:14px;color:#f2d58a;text-align:center;">{{ bt.champion }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p style="margin:14px 0 0;font-size:15px;color:#8f8570;font-style:italic;">Ton équipe est encadrée d'or. Un match ne se joue qu'une fois ses deux équipes connues ; seuls les arbitres saisissent les résultats.</p>
+      </sc-if>
+      <sc-if value="{{ bt.noBracket }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:28px;padding:40px 24px;text-align:center;background:linear-gradient(180deg,#1e1a1c,#17141a);border:4px double #8a6b2c;">
+          <p style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:#f4ead4;">L'arbre sera tiré à la clôture des inscriptions</p>
+          <p style="margin:10px 0 0;font-size:17px;color:#bfb39a;">{{ bt.waiting }}</p>
+        </div>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isTeam }}" hint-placeholder-val="{{ false }}">
+      <p style="margin:0 0 10px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.32em;color:#d9b25c;">✦ UNE BANNIÈRE PAR TOURNOI</p>
+      <h1 style="margin:0;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:clamp(32px,5vw,56px);line-height:1.05;color:#f4ead4;text-shadow:0 2px 0 #6b4f16, 0 6px 24px rgba(0,0,0,.6);">Équipes</h1>
+
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:28px;border-bottom:1px solid rgba(217,178,92,.3);">
+        <sc-for list="{{ teamTabs }}" as="t" hint-placeholder-count="2">
+          <a href="#" onClick="{{ t.select }}" style="display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:0 22px;white-space:nowrap;margin-bottom:-1px;font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:{{ t.color }};background:{{ t.bg }};border:1px solid {{ t.border }};border-bottom-color:{{ t.bottom }};" style-hover="color:#f2d58a;">
+            {{ t.label }}
+            <span style="min-width:24px;height:22px;padding:0 6px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;background:{{ t.countBg }};color:{{ t.countColor }};">{{ t.count }}</span>
+          </a>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ hasTeams }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:28px;">
+          <sc-for list="{{ teamChips }}" as="c" hint-placeholder-count="4">
+            <a href="#" onClick="{{ c.select }}" style="display:flex;flex-direction:column;gap:2px;min-height:44px;padding:10px 16px;background:{{ c.bg }};border:1px solid {{ c.border }};" style-hover="border-color:#f2d58a;">
+              <span style="display:flex;align-items:center;gap:8px;"><span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;color:{{ c.color }};">{{ c.team }}</span><sc-if value="{{ c.hasUnread }}" hint-placeholder-val="{{ false }}"><span style="min-width:18px;height:18px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;background:#e8806a;color:#1a1410;font-size:11px;font-weight:700;">{{ c.unread }}</span></sc-if></span>
+              <span style="font-size:14px;color:#bfb39a;">{{ c.tournament }}</span>
+            </a>
+          </sc-for>
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:20px;margin-top:24px;align-items:start;">
+          <div style="display:flex;flex-direction:column;gap:20px;padding:clamp(18px,3vw,28px);background:linear-gradient(180deg,#1e1a1c,#17141a);border:4px double #8a6b2c;">
+            <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+              <div style="width:72px;height:86px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-bottom:14px;background:linear-gradient(180deg,#5a4318,#2a1f0c);clip-path:polygon(0 0,100% 0,100% 75%,50% 100%,0 75%);font-family:'Cinzel Decorative',serif;font-weight:900;font-size:26px;color:#f2d58a;">{{ tm.initials }}</div>
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;flex:1;">
+                <sc-if value="{{ tm.notRenaming }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                    <span style="font-family:'Cinzel',serif;font-weight:700;font-size:clamp(20px,2.4vw,26px);color:#f4ead4;">{{ tm.name }}</span>
+                    <sc-if value="{{ tm.editable }}" hint-placeholder-val="{{ false }}">
+                      <a href="#" onClick="{{ startRename }}" style="font-size:15px;color:#d9b25c;font-style:italic;">Renommer</a>
+                    </sc-if>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ renaming }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                    <input value="{{ renameDraft }}" onChange="{{ setRenameDraft }}" onKeyDown="{{ renameKey }}" placeholder="Nom de l'équipe" style="flex:1;min-width:160px;min-height:44px;padding:0 12px;background:#151316;border:1px solid #d9b25c;color:#ece3cf;font-family:'Cinzel',serif;font-size:16px;outline:none;">
+                    <a href="#" onClick="{{ confirmRename }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 16px;background:#d9b25c;color:#1a1410;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.1em;">Valider</a>
+                  </div>
+                </sc-if>
+                <a href="#" onClick="{{ tm.openTournament }}" style="font-size:16px;color:#bfb39a;" style-hover="color:#f2d58a;">{{ tm.tournament }} · {{ tm.game }} →</a>
+              </div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:#151316;border:1px solid {{ tm.lockBorder }};font-size:15px;color:{{ tm.lockColor }};">
+              <span style="font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.14em;white-space:nowrap;">{{ tm.lockTag }}</span>
+              <span>{{ tm.lockLabel }}</span>
+            </div>
+            <sc-if value="{{ tm.hasWarning }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:12px 14px;background:#2a1714;border:1px solid #a4503f;font-size:16px;color:#f0c2b6;">{{ tm.warning }}</div>
+            </sc-if>
+
+            <div style="display:flex;align-items:center;gap:14px;">
+              <a href="#" onClick="{{ tm.toggleVis }}" title="{{ tm.visTitle }}" style="width:44px;height:44px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:{{ tm.visBg }};border:1px solid {{ tm.visColor }};color:{{ tm.visColor }};cursor:{{ tm.visCursor }};">
+                <sc-if value="{{ tm.isOpenVis }}" hint-placeholder-val="{{ true }}"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.5" width="10" height="6.5"></rect><path d="M5.5 7.5V5a2.7 2.7 0 0 1 5.2-1"></path></svg></sc-if>
+                <sc-if value="{{ tm.isClosedVis }}" hint-placeholder-val="{{ false }}"><svg width="20" height="20" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.5" width="10" height="6.5"></rect><path d="M5.5 7.5V5a2.5 2.5 0 0 1 5 0v2.5"></path></svg></sc-if>
+              </a>
+              <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.14em;color:{{ tm.visColor }};">{{ tm.visLabel }}</span>
+                <span style="font-size:15px;color:#bfb39a;">{{ tm.visHint }}</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                <span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.2em;color:#d9b25c;">EFFECTIF</span>
+                <span style="font-family:'Cinzel',serif;font-size:14px;color:#bfb39a;">{{ tm.count }} / 5</span>
+              </div>
+              <sc-for list="{{ tm.members }}" as="mb" hint-placeholder-count="5">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 12px;background:{{ mb.bg }};border:1px solid {{ mb.border }};">
+                  <span style="width:40px;height:40px;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#221e22;border:1px solid #8a6b2c;font-family:'Cinzel',serif;font-weight:700;font-size:13px;color:#f2d58a;">{{ mb.initials }}</span>
+                  <div style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:120px;">
+                    <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+                      <span style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;color:#f4ead4;">{{ mb.name }}</span>
+                      <sc-if value="{{ mb.isCap }}" hint-placeholder-val="{{ false }}"><span style="padding:1px 7px;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.16em;color:#1a1410;background:#d9b25c;">CAPITAINE</span></sc-if>
+                      <sc-if value="{{ mb.isMe }}" hint-placeholder-val="{{ false }}"><span style="font-size:14px;color:#8f8570;font-style:italic;">toi</span></sc-if>
+                    </span>
+                    <sc-if value="{{ mb.readOnlyRole }}" hint-placeholder-val="{{ true }}">
+                      <span style="font-size:15px;color:#bfb39a;">{{ mb.role }}</span>
+                    </sc-if>
+                    <sc-if value="{{ mb.canEditRole }}" hint-placeholder-val="{{ false }}">
+                      <select value="{{ mb.role }}" onChange="{{ mb.setRole }}" style="align-self:flex-start;min-height:32px;padding:0 8px;background:#151316;border:1px solid #5a4a2a;color:#ece3cf;font-family:'EB Garamond',serif;font-size:15px;">
+                        <sc-for list="{{ mb.roles }}" as="ro" hint-placeholder-count="5"><option value="{{ ro }}">{{ ro }}</option></sc-for>
+                      </select>
+                    </sc-if>
+                  </div>
+                  <sc-if value="{{ mb.showActions }}" hint-placeholder-val="{{ false }}">
+                    <sc-if value="{{ mb.notConfirming }}" hint-placeholder-val="{{ true }}">
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <a href="#" onClick="{{ mb.askCap }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 10px;white-space:nowrap;font-size:14px;color:#d9b25c;border:1px solid #5a4a2a;" style-hover="border-color:#d9b25c;">Passer capitaine</a>
+                      <a href="#" onClick="{{ mb.askKick }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 10px;white-space:nowrap;font-size:14px;color:#e8a090;border:1px solid #5a2e28;" style-hover="border-color:#e8806a;">Exclure</a>
+                    </div>
+                    </sc-if>
+                    <sc-if value="{{ mb.confirming }}" hint-placeholder-val="{{ false }}">
+                      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;width:100%;padding-top:8px;border-top:1px solid #3d3540;">
+                        <span style="flex:1;min-width:160px;font-size:15px;color:#ece3cf;">{{ mb.confirmText }}</span>
+                        <a href="#" onClick="{{ mb.confirmYes }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 14px;white-space:nowrap;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.08em;color:#1a1410;background:{{ mb.confirmBg }};">{{ mb.confirmLabel }}</a>
+                        <a href="#" onClick="{{ mb.confirmNo }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 12px;white-space:nowrap;font-size:14px;color:#bfb39a;border:1px solid #3d3540;">Annuler</a>
+                      </div>
+                    </sc-if>
+                  </sc-if>
+                </div>
+              </sc-for>
+              <sc-for list="{{ tm.empty }}" as="e" hint-placeholder-count="0">
+                <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px dashed #4a4044;color:#8f8570;font-size:15px;font-style:italic;">
+                  <span style="width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:1px dashed #4a4044;font-family:'Cinzel',serif;">?</span>
+                  Place libre
+                </div>
+              </sc-for>
+            </div>
+
+            <sc-if value="{{ tm.hasRequests }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.2em;color:#d9b25c;">DEMANDES À REJOINDRE</span>
+                <sc-for list="{{ tm.requests }}" as="rq" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:10px 12px;background:#151316;border:1px solid #3d3540;">
+                    <span style="display:flex;flex-direction:column;"><span style="font-family:'Cinzel',serif;font-weight:700;font-size:15px;color:#f4ead4;">{{ rq.name }}</span><span style="font-size:15px;color:#bfb39a;">{{ rq.note }}</span></span>
+                    <div style="display:flex;gap:6px;">
+                      <a href="#" onClick="{{ rq.accept }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 12px;white-space:nowrap;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.08em;color:{{ rq.acceptColor }};background:{{ rq.acceptBg }};">{{ rq.acceptLabel }}</a>
+                      <a href="#" onClick="{{ rq.refuse }}" style="display:inline-flex;align-items:center;min-height:36px;padding:0 12px;white-space:nowrap;font-size:14px;color:#bfb39a;border:1px solid #3d3540;">Refuser</a>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ tm.showLeave }}" hint-placeholder-val="{{ false }}">
+              <sc-if value="{{ leaveAsk }}" hint-placeholder-val="{{ true }}">
+                <a href="#" onClick="{{ askLeave }}" style="align-self:flex-start;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:#e8a090;border:1px solid #5a2e28;" style-hover="border-color:#e8806a;">Quitter l'équipe</a>
+              </sc-if>
+              <sc-if value="{{ leaveConfirming }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 14px;background:#2a1714;border:1px solid #a4503f;">
+                  <span style="flex:1;min-width:180px;font-size:16px;color:#f0c2b6;">Quitter {{ tm.name }} ? Tu perdras l'accès au conseil.</span>
+                  <a href="#" onClick="{{ leaveTeam }}" style="display:inline-flex;align-items:center;min-height:40px;padding:0 14px;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.08em;color:#1a1410;background:#e8806a;">Quitter</a>
+                  <a href="#" onClick="{{ cancelConfirm }}" style="display:inline-flex;align-items:center;min-height:40px;padding:0 12px;font-size:14px;color:#bfb39a;border:1px solid #3d3540;">Annuler</a>
+                </div>
+              </sc-if>
+            </sc-if>
+            <sc-if value="{{ tm.showCapNote }}" hint-placeholder-val="{{ false }}">
+              <p style="margin:0;font-size:15px;color:#8f8570;font-style:italic;">Pour quitter l'équipe, passe d'abord le rôle de capitaine à un autre membre.</p>
+            </sc-if>
+          </div>
+
+          <div style="display:flex;flex-direction:column;min-height:520px;background:#17141a;border:1px solid #3d3540;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid #3d3540;">
+              <span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.2em;color:#d9b25c;">SALLE DU CONSEIL</span>
+              <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#bfb39a;">{{ chatDot }} {{ tm.chatStatus }}</span>
+            </div>
+            <sc-if value="{{ tm.chatOpen }}" hint-placeholder-val="{{ true }}">
+              <div ref="{{ chatRef }}" style="flex:1;max-height:440px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:20px;">
+                <sc-for list="{{ tm.messages }}" as="msg" hint-placeholder-count="3">
+                  <div style="display:flex;flex-direction:column;gap:3px;max-width:82%;align-self:{{ msg.align }};">
+                    <span style="font-size:13px;color:#8f8570;text-align:{{ msg.textAlign }};">{{ msg.from }} · {{ msg.time }}</span>
+                    <span style="padding:10px 14px;font-size:16px;line-height:1.4;background:{{ msg.bg }};border:1px solid {{ msg.border }};color:#ece3cf;">{{ msg.text }}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{ tm.noMessages }}" hint-placeholder-val="{{ false }}">
+                  <p style="margin:auto;font-size:16px;color:#8f8570;font-style:italic;text-align:center;">Le conseil est silencieux. Lance la première discussion.</p>
+                </sc-if>
+              </div>
+              <div style="display:flex;gap:8px;padding:14px;border-top:1px solid #3d3540;">
+                <input value="{{ draft }}" onChange="{{ setDraft }}" onKeyDown="{{ draftKey }}" placeholder="Écrire à ton équipe…" style="flex:1;min-width:0;min-height:44px;padding:0 14px;background:#1b181b;border:1px solid #5a4a2a;color:#ece3cf;font-family:'EB Garamond',serif;font-size:16px;outline:none;" style-focus="border-color:#d9b25c;">
+                <a href="#" onClick="{{ send }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 18px;background:#d9b25c;color:#1a1410;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.1em;" style-hover="background:#f2d58a;color:#1a1410;">Envoyer</a>
+              </div>
+            </sc-if>
+            <sc-if value="{{ tm.chatClosed }}" hint-placeholder-val="{{ false }}">
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:32px;text-align:center;">
+                <span style="font-family:'Cinzel',serif;font-weight:700;font-size:18px;color:#f4ead4;">Les portes sont closes</span>
+                <span style="max-width:36ch;font-size:16px;color:#bfb39a;">Ton équipe a été éliminée : cet espace d'échange est fermé.</span>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noTeams }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:28px;padding:40px 24px;text-align:center;background:linear-gradient(180deg,#1e1a1c,#17141a);border:4px double #8a6b2c;">
+          <p style="margin:0;font-family:'Cinzel',serif;font-weight:700;font-size:20px;color:#f4ead4;">Tu ne portes encore aucune bannière</p>
+          <a href="#" onClick="{{ goTournois }}" style="display:inline-flex;margin-top:16px;align-items:center;min-height:44px;padding:0 22px;background:#d9b25c;color:#1a1410;font-family:'Cinzel',serif;font-weight:700;font-size:13px;letter-spacing:.1em;">Trouver un tournoi</a>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAllTeams }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px 20px;flex-wrap:wrap;margin-top:24px;">
+          <input value="{{ teamQuery }}" onChange="{{ setTeamQuery }}" placeholder="Chercher une équipe, un tournoi, un jeu…" style="width:min(100%,420px);min-height:48px;padding:0 16px;background:#1b181b;border:1px solid #5a4a2a;color:#ece3cf;font-family:'EB Garamond',serif;font-size:17px;outline:none;" style-focus="border-color:#d9b25c;">
+          <a href="#" onClick="{{ toggleRecruit }}" style="display:inline-flex;align-items:center;gap:10px;min-height:44px;padding:0 16px;white-space:nowrap;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.1em;color:{{ recruitColor }};background:{{ recruitBg }};border:1px solid {{ recruitBorder }};">
+            <span style="width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;border:1px solid {{ recruitBorder }};font-size:11px;">{{ recruitMark }}</span>
+            Qui recrutent
+          </a>
+        </div>
+        <p style="margin:14px 0 0;font-size:16px;color:#bfb39a;font-style:italic;">{{ allTeamsLabel }}</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px;margin-top:16px;">
+          <sc-for list="{{ allTeams }}" as="at" hint-placeholder-count="6">
+            <div style="display:flex;flex-direction:column;background:{{ at.cardBg }};border:1px solid {{ at.border }};box-shadow:{{ at.glow }};" style-hover="border-color:#d9b25c;">
+              <sc-if value="{{ at.mine }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 14px;background:#d9b25c;color:#1a1410;font-family:'Cinzel',serif;font-weight:700;font-size:11px;letter-spacing:.22em;">
+                  <span>✦ TA BANNIÈRE</span>
+                  <span style="letter-spacing:.12em;">{{ at.myRole }}</span>
+                </div>
+              </sc-if>
+              <div style="display:flex;flex-direction:column;gap:14px;padding:18px;flex:1;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <div style="width:48px;height:58px;flex-shrink:0;display:flex;align-items:center;justify-content:center;padding-bottom:10px;background:linear-gradient(180deg,#5a4318,#2a1f0c);clip-path:polygon(0 0,100% 0,100% 75%,50% 100%,0 75%);font-family:'Cinzel Decorative',serif;font-weight:900;font-size:17px;color:#f2d58a;">{{ at.initials }}</div>
+                  <div style="display:flex;flex-direction:column;gap:2px;min-width:0;flex:1;">
+                    <span style="font-family:'Cinzel',serif;font-weight:700;font-size:16px;color:#f4ead4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ at.name }}</span>
+                    <span style="font-size:15px;color:#bfb39a;">{{ at.tournament }} · {{ at.game }}</span>
+                  </div>
+                  <span title="{{ at.lockLabel }}" style="width:32px;height:32px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid {{ at.lockColor }};color:{{ at.lockColor }};">
+                    <sc-if value="{{ at.isOpen }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.5" width="10" height="6.5"></rect><path d="M5.5 7.5V5a2.7 2.7 0 0 1 5.2-1"></path></svg></sc-if>
+                    <sc-if value="{{ at.isClosed }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7.5" width="10" height="6.5"></rect><path d="M5.5 7.5V5a2.5 2.5 0 0 1 5 0v2.5"></path></svg></sc-if>
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:15px;color:#bfb39a;">
+                  <span>Capitaine : <span style="color:#ece3cf;">{{ at.captain }}</span></span>
+                  <span style="display:flex;align-items:center;gap:8px;">
+                    <span style="font-family:'Cinzel',serif;font-size:13px;color:#ece3cf;">{{ at.count }} / 5</span>
+                    <span style="padding:2px 8px;white-space:nowrap;font-family:'Cinzel',serif;font-size:10px;letter-spacing:.16em;color:{{ at.badgeColor }};border:1px solid {{ at.badgeColor }};">{{ at.badge }}</span>
+                  </span>
+                </div>
+                <sc-if value="{{ at.hasAction }}" hint-placeholder-val="{{ true }}">
+                  <a href="#" onClick="{{ at.action }}" style="display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 14px;margin-top:auto;font-family:'Cinzel',serif;font-weight:700;font-size:12px;letter-spacing:.1em;color:{{ at.actColor }};background:{{ at.actBg }};border:1px solid {{ at.actBorder }};">{{ at.actLabel }}</a>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ allTeamsEmpty }}" hint-placeholder-val="{{ false }}">
+          <p style="margin:24px 0;text-align:center;font-size:18px;color:#8f8570;font-style:italic;">Aucune équipe ne correspond.</p>
+        </sc-if>
+      </sc-if>
+    </sc-if>
+
+    <sc-if value="{{ isProfil }}" hint-placeholder-val="{{ false }}">
+      <div style="display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+        <div style="width:120px;height:120px;display:flex;align-items:center;justify-content:center;background:#2e2412;border:4px double #d9b25c;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:42px;color:#f2d58a;">LV</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <p style="margin:0;font-family:'Cinzel',serif;font-size:13px;letter-spacing:.32em;color:#d9b25c;">JOUEUR · IUT DE LANNION</p>
+          <h1 style="margin:0;font-family:'Cinzel Decorative',serif;font-weight:900;font-size:clamp(30px,5vw,52px);line-height:1.05;color:#f4ead4;text-shadow:0 2px 0 #6b4f16, 0 6px 24px rgba(0,0,0,.6);">Lancelot_V</h1>
+          <a href="#" onClick="{{ goTeam }}" style="font-size:17px;color:#d9b25c;">{{ profileTeams }} →</a>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:40px;">
+        <sc-for list="{{ stats }}" as="s" hint-placeholder-count="3">
+          <div style="padding:22px;text-align:center;background:linear-gradient(180deg,#1e1a1c,#17141a);border:1px solid #3d3540;">
+            <div style="font-family:'Cinzel',serif;font-weight:700;font-size:clamp(28px,4vw,40px);color:#f2d58a;">{{ s.value }}</div>
+            <div style="margin-top:4px;font-family:'Cinzel',serif;font-size:12px;letter-spacing:.2em;color:#bfb39a;">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+      <h2 style="margin:48px 0 16px;font-family:'Cinzel',serif;font-weight:700;font-size:16px;letter-spacing:.2em;color:#d9b25c;">DERNIERS FAITS D'ARMES</h2>
+      <div style="display:flex;flex-direction:column;border-top:1px solid #3d3540;">
+        <sc-for list="{{ history }}" as="h" hint-placeholder-count="3">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 4px;border-bottom:1px solid #3d3540;font-size:17px;">
+            <span style="color:#ece3cf;">{{ h.name }}</span>
+            <span style="font-family:'Cinzel',serif;font-weight:700;font-size:14px;letter-spacing:.1em;color:{{ h.color }};">{{ h.result }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </main>
+
+  <footer style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:28px clamp(20px,5vw,72px);border-top:1px solid rgba(217,178,92,.25);font-size:14px;color:#8f8570;">
+    <span>Tous droits réservés à Footnament</span>
+    <span style="font-family:'Cinzel',serif;letter-spacing:.14em;font-size:12px;color:#d9b25c;">♥ FOOT</span>
+  </footer>
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position:fixed;left:50%;bottom:28px;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);padding:14px 22px;background:#2e2412;border:1px solid #d9b25c;box-shadow:0 16px 40px rgba(0,0,0,.6);font-size:17px;color:#f4ead4;">
+      <span style="color:#d9b25c;">✦</span>{{ toast }}
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTab&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;cours&quot;,&quot;options&quot;:[&quot;cours&quot;,&quot;avenir&quot;,&quot;termines&quot;],&quot;tsType&quot;:&quot;'cours'|'avenir'|'termines'&quot;,&quot;section&quot;:&quot;Tournois&quot;},&quot;liveUpdates&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Démo&quot;}}">
+const ME = 'Lancelot_V';
+const ROLES = {
+  'Valorant': ['Duelliste', 'Initiateur', 'Contrôleur', 'Sentinelle', 'Flex'],
+  'League of Legends': ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
+  'Counter-Strike 2': ['Entry', 'AWPer', 'Lurker', 'Support', 'IGL'],
+  'Overwatch 2': ['Tank', 'DPS', 'Soutien'],
+};
+const STATES = {
+  ouvertes: { label: 'INSCRIPTIONS OUVERTES', color: '#8fc98a' },
+  closes: { label: 'INSCRIPTIONS CLOSES', color: '#d9a37a' },
+  cours: { label: 'EN COURS', color: '#e8806a' },
+  termine: { label: 'TERMINÉ', color: '#9a9aa3' },
+};
+const ROUND_NAMES = ['Quart de finale', 'Quart de finale', 'Quart de finale', 'Quart de finale', 'Demi-finale', 'Demi-finale', 'Finale'];
+const T = [
+  { id: 't1', name: 'Tournoi de la Table Ronde', game: 'Valorant', state: 'cours', date: 'Depuis le 18 oct.', teams: ["Chevaliers d'Avalon", 'Bannière Noire', 'Ordre du Griffon', 'Les Templiers', 'Garde de Fer', 'Loups de Camelot', "Dragons d'Écosse", 'Lions de Bretagne'] },
+  { id: 't2', name: "Joute d'Automne", game: 'League of Legends', state: 'cours', date: 'Depuis le 12 oct.', teams: ["Lames d'Argent", 'Sang Royal', 'Hallebardes', 'Vikings du Nord', 'Épées Brisées', 'Fils du Roc', 'Croisés du Sud', 'Héraut Pourpre'] },
+  { id: 't3', name: 'Siège de Camelot', game: 'Counter-Strike 2', state: 'ouvertes', date: 'Début le 2 nov. · 19h00', registered: 6, closing: 'Clôture le 30 oct.' },
+  { id: 't4', name: 'Coupe du Griffon', game: 'Overwatch 2', state: 'closes', date: '15 nov. · 20h00', teams: ['Les Croisés', 'Faucons de Lyon', 'Ordre du Griffon', 'Garde de Fer', 'Héraut Pourpre', 'Loups de Camelot', 'Épées Brisées', 'Fils du Roc'] },
+  { id: 't5', name: "Grand Tournoi d'Hiver", game: 'Valorant', state: 'ouvertes', date: '6 déc. · 18h00', registered: 5, closing: 'Clôture le 1er déc.',
+    openTeams: [{ name: 'Bannière Noire', count: 3 }, { name: 'Faucons de Lyon', count: 4 }, { name: 'Hallebardes', count: 2, private: true }] },
+  { id: 't6', name: "Bataille d'Été", game: 'Valorant', state: 'termine', date: '24 août', myTeam: "Chevaliers d'Avalon", teams: ["Chevaliers d'Avalon", 'Les Templiers', 'Sang Royal', 'Faucons de Lyon', 'Lions de Bretagne', 'Vikings du Nord', 'Garde de Fer', 'Hallebardes'] },
+  { id: 't7', name: 'Ordalie de Septembre', game: 'Counter-Strike 2', state: 'termine', date: '21 sept.', myTeam: "Chevaliers d'Avalon", teams: ["Chevaliers d'Avalon", "Dragons d'Écosse", 'Ordre du Griffon', 'Bannière Noire', 'Les Templiers', 'Lions de Bretagne', 'Sang Royal', 'Fils du Roc'] },
+];
+const GAME_TAG = { 'Valorant': ['VAL', '#e8806a'], 'League of Legends': ['LOL', '#d9b25c'], 'Counter-Strike 2': ['CS2', '#d9a37a'], 'Overwatch 2': ['OW2', '#9ab8d9'] };
+const ALL_TEAMS = [
+  { name: 'Bannière Noire', tid: 't5', captain: 'Gareth', count: 3 },
+  { name: 'Faucons de Lyon', tid: 't5', captain: 'Hugo_LY', count: 4 },
+  { name: 'Hallebardes', tid: 't5', captain: 'Sire_Hal', count: 2, private: true },
+  { name: 'Lions de Bretagne', tid: 't5', captain: 'Brennus', count: 5 },
+  { name: 'Sang Royal', tid: 't3', captain: 'Uther', count: 4 },
+  { name: "Dragons d'Écosse", tid: 't3', captain: 'Wallace', count: 3, private: true },
+  { name: 'Les Templiers', tid: 't3', captain: 'Jacques_M', count: 5 },
+  { name: 'Fils du Roc', tid: 't3', captain: 'Rocco', count: 5 },
+  { name: 'Ordre du Griffon', tid: 't1', captain: 'Griffith', count: 5 },
+  { name: 'Loups de Camelot', tid: 't1', captain: 'Akela', count: 5 },
+  { name: 'Sang Royal', tid: 't2', captain: 'Uther', count: 5 },
+  { name: 'Faucons de Lyon', tid: 't4', captain: 'Hugo_LY', count: 5 },
+];
+const CHAT_POOL = [
+  ['Gauvain', 'Les Lions mènent 10 à 8, on affrontera sûrement eux en finale.'],
+  ['Morgane', "Je prépare les setups B pour ce soir, je vous envoie ça."],
+  ['Bohort', 'Je suis dispo en remplaçant si quelqu’un a un souci de connexion.'],
+  ['Perceval.exe', 'Vocal ouvert, je suis déjà dedans.'],
+];
+
+class Component extends DCLogic {
+  state = {
+    view: 'tournois', tab: null, query: '', tournId: 't1', teamTid: 't1',
+    teamsTab: 'mine', teamQuery: '', recruitOnly: false, draft: '', renaming: false, renameDraft: '', joinOpen: null, sent: {}, tick: 0, seen: { t1: 3, t3: 2, t4: 1 }, confirm: null, toast: null, nowTs: Date.now(),
+    res: {
+      t1: { 0: { s: [13, 7] }, 1: { s: [13, 10] }, 2: { s: [9, 13] }, 3: { live: [8, 6] }, 4: { time: 'Ce soir · 21h00' }, 5: { time: 'Demain · 19h00' }, 6: { time: 'Sam. 25 oct. · 20h00' } },
+      t2: { 0: { s: [0, 2] }, 1: { ff: 1 }, 2: { s: [2, 0] }, 3: { s: [1, 2] }, 4: { live: [1, 0] }, 5: { time: 'Jeu. 23 oct. · 20h00' }, 6: { time: 'Sam. 25 oct. · 21h00' } },
+      t4: { 0: { time: '15 nov. · 20h00' }, 1: { time: '15 nov. · 20h00' }, 2: { time: '15 nov. · 21h30' }, 3: { time: '15 nov. · 21h30' }, 4: { time: '16 nov. · 20h00' }, 5: { time: '16 nov. · 21h30' }, 6: { time: '17 nov. · 20h00' } },
+      t6: { 0: { s: [13, 5] }, 1: { s: [11, 13] }, 2: { s: [13, 8] }, 3: { s: [13, 11] }, 4: { s: [13, 9] }, 5: { s: [10, 13] }, 6: { s: [13, 11] } },
+      t7: { 0: { s: [13, 6] }, 1: { s: [13, 10] }, 2: { s: [7, 13] }, 3: { s: [13, 4] }, 4: { s: [8, 13] }, 5: { s: [13, 11] }, 6: { s: [13, 9] } },
+    },
+    teams: {
+      t1: { name: "Chevaliers d'Avalon", captain: ME, members: [{ n: ME, r: 'Duelliste' }, { n: 'Gauvain', r: 'Initiateur' }, { n: 'Perceval.exe', r: 'Contrôleur' }, { n: 'Morgane', r: 'Sentinelle' }, { n: 'Bohort', r: 'Flex' }], requests: [], visibility: 'open' },
+      t2: { name: "Lames d'Argent", captain: 'Galaad', members: [{ n: 'Galaad', r: 'Top' }, { n: 'Yvain', r: 'Jungle' }, { n: 'Kay', r: 'Mid' }, { n: 'Lucan', r: 'ADC' }, { n: ME, r: 'Support' }], requests: [] },
+      t3: { name: "Chevaliers d'Avalon", captain: ME, members: [{ n: ME, r: 'Entry' }, { n: 'Gauvain', r: 'AWPer' }, { n: 'Perceval.exe', r: 'IGL' }, { n: 'Morgane', r: 'Support' }], visibility: 'open', requests: [{ n: 'Tristan', note: 'Lurker · IUT de Vannes' }, { n: 'Iseult', note: 'Support · IUT de Brest' }] },
+      t4: { name: 'Les Croisés', captain: 'Arthur_P', members: [{ n: 'Arthur_P', r: 'Tank' }, { n: ME, r: 'DPS' }, { n: 'Merlin', r: 'DPS' }, { n: 'Viviane', r: 'Soutien' }, { n: 'Élaine', r: 'Soutien' }], requests: [] },
+    },
+    chats: {
+      t1: [{ f: 'Gauvain', t: "On se retrouve à 20h30 sur le vocal pour l'échauffement ?", h: '18:02' }, { f: ME, t: 'Oui. Perceval, tu gardes Viper sur Bind.', h: '18:05' }, { f: 'Perceval.exe', t: 'Reçu, chef.', h: '18:06' }],
+      t3: [{ f: 'Morgane', t: 'Il nous manque un cinquième avant la clôture du 30.', h: 'Hier' }, { f: ME, t: 'Tristan a postulé, je regarde son profil.', h: 'Hier' }],
+      t4: [{ f: 'Arthur_P', t: 'Effectif figé, on est prêts pour le 15.', h: 'Lun.' }],
+    },
+  };
+  chatRef = React.createRef();
+  componentDidMount() {
+    this.timer = setInterval(() => { if (this.props.liveUpdates !== false) this.tickLive(); }, 5000);
+    this.scrollChat();
+  }
+  componentWillUnmount() { clearInterval(this.timer); }
+  componentDidUpdate() {
+    this.scrollChat();
+    const S = this.state;
+    if (S.view === 'team' && S.teamsTab === 'mine') {
+      const ids = T.filter(t => S.teams[t.id]).map(t => t.id); const tid = ids.includes(S.teamTid) ? S.teamTid : ids[0];
+      const len = (S.chats[tid] || []).length;
+      if (tid && S.seen[tid] !== len) this.setState(s => ({ seen: { ...s.seen, [tid]: len } }));
+    }
+  }
+  toast(text) { clearTimeout(this.tt); this.setState({ toast: text }); this.tt = setTimeout(() => this.setState({ toast: null }), 2800); }
+  scrollChat() { const el = this.chatRef.current; if (el) el.scrollTop = el.scrollHeight; }
+  now() { const d = new Date(); return d.getHours().toString().padStart(2, '0') + ':' + d.getMinutes().toString().padStart(2, '0'); }
+  tickLive() {
+    this.setState(s => {
+      const res = { ...s.res, t1: { ...s.res.t1 } };
+      const m = res.t1[3];
+      if (m && m.live) {
+        const sc = [...m.live]; sc[Math.random() < 0.55 ? 0 : 1]++;
+        res.t1[3] = (sc[0] >= 13 || sc[1] >= 13) ? { s: sc } : { live: sc };
+      }
+      const tick = s.tick + 1; let chats = s.chats;
+      if (tick % 3 === 0 && CHAT_POOL[(tick / 3) - 1] && s.teams.t1) {
+        const [f, t] = CHAT_POOL[(tick / 3) - 1];
+        chats = { ...s.chats, t1: [...(s.chats.t1 || []), { f, t, h: this.now() }] };
+      }
+      return { res, tick, chats, nowTs: Date.now() };
+    });
+  }
+  bracket(t) {
+    const r = this.state.res[t.id] || {};
+    const M = [];
+    const win = (k) => { const m = M[k]; if (!m || !m.a || !m.b) return null; const x = r[k]; if (!x) return null;
+      if (x.ff != null) return x.ff === 0 ? m.b : m.a; if (x.s) return x.s[0] > x.s[1] ? m.a : m.b; return null; };
+    for (let i = 0; i < 4; i++) M[i] = { a: t.teams[2 * i], b: t.teams[2 * i + 1] };
+    M[4] = { a: win(0), b: win(1) }; M[5] = { a: win(2), b: win(3) }; M[6] = { a: win(4), b: win(5) };
+    M.forEach((m, k) => { m.r = (m.a && m.b) ? r[k] : null; m.w = win(k); m.k = k; });
+    return M;
+  }
+  myTeamName(t) { return this.state.teams[t.id]?.name ?? t.myTeam ?? null; }
+  eliminatedAt(t) {
+    if (!t.teams) return null; const me = this.myTeamName(t); if (!me) return null;
+    const lost = this.bracket(t).find(m => m.w && (m.a === me || m.b === me) && m.w !== me);
+    return lost ? ROUND_NAMES[lost.k] : null;
+  }
+  nextMatch(t) {
+    if (!t.teams || !['cours', 'closes'].includes(t.state)) return null; const me = this.myTeamName(t); if (!me) return null;
+    const m = this.bracket(t).find(m => (m.a === me || m.b === me) && !m.w);
+    if (!m || !m.a || !m.b) return null;
+    return { round: ROUND_NAMES[m.k], opp: m.a === me ? m.b : m.a, time: m.r?.live ? 'En cours' : m.r?.time ?? 'À planifier' };
+  }
+  renderVals() {
+    const S = this.state; const v = S.view;
+    const tab = S.tab ?? this.props.defaultTab ?? 'cours';
+    const go = (view, extra = {}) => (e) => { e && e.preventDefault(); this.setState({ view, renaming: false, ...extra }); window.scrollTo({ top: 0 }); };
+    const groups = { cours: ['cours'], avenir: ['ouvertes', 'closes'], termines: ['termine'] };
+    const q = S.query.trim().toLowerCase();
+    const searching = q.length > 0;
+    const tabs = [['cours', 'En cours'], ['avenir', 'À venir'], ['termines', 'Terminés']].map(([id, label]) => {
+      const on = !searching && id === tab;
+      return { label, count: T.filter(t => groups[id].includes(t.state)).length,
+        select: (e) => { e.preventDefault(); this.setState({ tab: id, query: '' }); },
+        color: on ? '#f2d58a' : '#bfb39a', bg: on ? '#1e1a1c' : 'transparent', border: on ? 'rgba(217,178,92,.5)' : 'transparent',
+        bottom: on ? '#1e1a1c' : 'transparent', countBg: on ? '#d9b25c' : '#2b262a', countColor: on ? '#1a1410' : '#bfb39a' };
+    });
+    const btn = (label, onClick, primary) => ({ label, onClick, color: primary ? '#1a1410' : '#ece3cf', bg: primary ? '#d9b25c' : 'transparent', border: primary ? '#f2d58a' : 'rgba(217,178,92,.6)' });
+    const filtered = searching ? T.filter(t => (t.name + ' ' + t.game).toLowerCase().includes(q)) : T.filter(t => groups[tab].includes(t.state));
+    const list = filtered.map(t => {
+      const st = STATES[t.state]; const team = S.teams[t.id]; const myName = this.myTeamName(t);
+      const elim = this.eliminatedAt(t); const nm = this.nextMatch(t);
+      let info = '';
+      if (t.state === 'ouvertes') info = `${t.registered} / 8 équipes · ${t.closing}`;
+      else if (elim) info = `Éliminés en ${elim.toLowerCase()}`;
+      else if (t.state === 'termine') info = 'Vainqueurs';
+      else if (nm) info = `${nm.round} vs ${nm.opp} · ${nm.time}`;
+      let myLine = 'Tu n’as pas encore d’équipe', myColor = '#8f8570';
+      if (myName) { myColor = '#ece3cf'; myLine = team ? `${myName} · ${team.captain === ME ? 'Capitaine' : team.members.find(m => m.n === ME)?.r}` : myName; }
+      else if (S.sent[t.id]) { myLine = `Demande envoyée à ${S.sent[t.id]}`; myColor = '#d9b25c'; }
+      const openT = (e) => { e.preventDefault(); this.setState({ view: 'tournoi', tournId: t.id }); window.scrollTo({ top: 0 }); };
+      const openTeam = (e) => { e.preventDefault(); this.setState({ view: 'team', teamsTab: 'mine', teamTid: t.id, renaming: false }); window.scrollTo({ top: 0 }); };
+      const actions = [];
+      actions.push(btn(t.teams ? 'Voir l’arbre' : 'Détails', openT, !team && t.state !== 'ouvertes'));
+      if (team) actions.push(btn('Mon équipe', openTeam, true));
+      else if (t.state === 'ouvertes' && !S.sent[t.id]) {
+        actions.push(btn('Créer une équipe', (e) => { e.preventDefault(); this.createTeam(t); }, true));
+        actions.push(btn(S.joinOpen === t.id ? 'Fermer' : 'Rejoindre une équipe', (e) => { e.preventDefault(); this.setState({ joinOpen: S.joinOpen === t.id ? null : t.id }); }, false));
+      }
+      const openTeams = (t.openTeams || []).filter(ot => !ot.private).map(ot => {
+        const sentHere = S.sent[t.id] === ot.name; const blocked = !!S.sent[t.id];
+        return { name: ot.name, count: `${ot.count} / 5 joueurs`, label: sentHere ? 'Demande envoyée' : 'Demander à rejoindre',
+          color: sentHere ? '#1a1410' : blocked ? '#5e5560' : '#d9b25c', border: sentHere ? '#d9b25c' : blocked ? '#2b262a' : '#5a4a2a',
+          request: (e) => { e.preventDefault(); if (blocked) return; this.setState(s => ({ sent: { ...s.sent, [t.id]: ot.name } })); this.toast(`Demande envoyée à ${ot.name}`); } };
+      });
+      const [gameTag, gameColor] = GAME_TAG[t.game];
+      return { gameTag, gameColor, showProgress: t.state === 'ouvertes', pct: `${((t.registered || 0) / 8) * 100}%`, name: t.name, game: t.game, format: '8 équipes de 5 · Élim. directe', date: t.date, badge: st.label, badgeColor: st.color,
+        myLine, myColor, info, actions, showJoin: S.joinOpen === t.id && !team, openTeams };
+    });
+    const nexts = T.map(t => [t, this.nextMatch(t)]).filter(x => x[1]);
+    let countdown = '';
+    if (nexts.length) { const nm0 = nexts[0][1]; const mt = /Ce soir · (\d{1,2})h(\d{2})/.exec(nm0.time);
+      if (mt) { const d = new Date(S.nowTs); const tg = new Date(d); tg.setHours(+mt[1], +mt[2], 0, 0); const diff = Math.round((tg - d) / 60000);
+        countdown = diff > 0 ? `Dans ${Math.floor(diff / 60)} h ${String(diff % 60).padStart(2, '0')}` : 'Imminent'; }
+      else if (nm0.time === 'En cours') countdown = 'En cours'; }
+    const next = nexts.length ? { countdown, hasCountdown: !!countdown, title: `${nexts[0][1].round} · ${nexts[0][1].time}`, sub: `${nexts[0][0].name} — ${this.myTeamName(nexts[0][0])} contre ${nexts[0][1].opp}`,
+      open: (e) => { e.preventDefault(); this.setState({ view: 'tournoi', tournId: nexts[0][0].id }); window.scrollTo({ top: 0 }); } } : {};
+
+    // Bracket view
+    const bt0 = T.find(t => t.id === S.tournId) || T[0]; const me = this.myTeamName(bt0);
+    let bt = { name: bt0.name, game: bt0.game, date: bt0.date, badge: STATES[bt0.state].label, color: STATES[bt0.state].color, isLive: bt0.state === 'cours', hasBracket: !!bt0.teams, noBracket: !bt0.teams,
+      waiting: `${bt0.registered ?? 0} / 8 équipes engagées · ${bt0.closing ?? ''}`, rounds: [], champion: 'À déterminer' };
+    if (bt0.teams) {
+      const M = this.bracket(bt0);
+      const mk = (m) => {
+        const x = m.r; const sc = x?.s || x?.live;
+        const rows = [m.a, m.b].map((n, i) => {
+          const isW = m.w && m.w === n; const isL = m.w && m.w !== n; const mine = n && n === me;
+          return { name: n ?? '—', score: x?.ff != null ? (x.ff === i ? 'F' : '') : sc ? sc[i] : '',
+            bg: isW ? '#2e2412' : isL ? '#151316' : '#221e22', color: isL ? '#8f8570' : '#ece3cf', border: mine ? '#f2d58a' : isW ? '#8a6b2c' : '#3d3540' };
+        });
+        let status = 'EN ATTENTE DES ÉQUIPES', statusColor = '#8f8570';
+        if (m.a && m.b) {
+          if (x?.ff != null) { status = 'FORFAIT'; statusColor = '#e8a090'; }
+          else if (x?.s) { status = 'TERMINÉ'; statusColor = '#9a9aa3'; }
+          else if (x?.live) { status = '● EN DIRECT'; statusColor = '#e8806a'; }
+          else { status = (x?.time ?? 'À PLANIFIER').toUpperCase(); statusColor = '#d9b25c'; }
+        }
+        return { rows, status, statusColor };
+      };
+      bt.rounds = [{ label: 'QUARTS', matches: M.slice(0, 4).map(mk) }, { label: 'DEMIES', matches: M.slice(4, 6).map(mk) }, { label: 'FINALE', matches: [mk(M[6])] }];
+      bt.champion = M[6].w ?? 'À déterminer';
+    }
+
+    // Team view
+    const myTids = T.filter(t => S.teams[t.id]).map(t => t.id);
+    const tid = myTids.includes(S.teamTid) ? S.teamTid : myTids[0];
+    let tm = {};
+    if (tid) {
+      const t = T.find(x => x.id === tid); const team = S.teams[tid]; const roles = ROLES[t.game];
+      const isCap = team.captain === ME; const open = t.state === 'ouvertes'; const editable = isCap && open;
+      const elim = this.eliminatedAt(t); const count = team.members.length; const full = count >= 5;
+      const upd = (fn) => this.setState(s => ({ teams: { ...s.teams, [tid]: fn({ ...s.teams[tid] }) } }));
+      const cf = S.confirm;
+      tm = {
+        name: team.name, initials: team.name.replace(/^(Les |L'|Le |La )/i, '').split(/\s+/).filter(w => !/^(d'|de|du|des)$/i.test(w)).slice(0, 2).map(w => w.replace(/^d'/i, '')[0]).join('').toUpperCase(),
+        tournament: t.name, game: t.game, editable, notRenaming: !S.renaming, count,
+        openTournament: (e) => { e.preventDefault(); this.setState({ view: 'tournoi', tournId: tid }); window.scrollTo({ top: 0 }); },
+        lockTag: open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ', lockColor: open ? '#a9d6a4' : '#d9a37a', lockBorder: open ? '#3e5a3b' : '#5a4030',
+        lockLabel: open ? `Effectif modifiable jusqu’au ${t.closing.replace('Clôture le ', '')}.` : 'Les inscriptions sont closes, plus aucun changement possible.',
+        isOpenVis: team.visibility !== 'private', isClosedVis: team.visibility === 'private',
+        visLabel: team.visibility === 'private' ? 'ÉQUIPE FERMÉE' : 'ÉQUIPE OUVERTE',
+        visColor: team.visibility === 'private' ? '#c9a0dc' : '#8fc98a', visBg: editable ? '#151316' : 'transparent', visCursor: editable ? 'pointer' : 'default',
+        visTitle: editable ? (team.visibility === 'private' ? 'Ouvrir l’équipe' : 'Fermer l’équipe') : '',
+        visHint: (team.visibility === 'private' ? 'Aucune demande possible : l’équipe n’apparaît plus parmi celles qui recrutent.' : 'Tout joueur sans équipe dans ce tournoi peut demander à rejoindre.') + (editable ? ' Clique sur le verrou pour ' + (team.visibility === 'private' ? 'ouvrir.' : 'fermer.') : ''),
+        toggleVis: (e) => { e.preventDefault(); if (!editable) return; const closing = team.visibility !== 'private'; upd(tt => ({ ...tt, visibility: closing ? 'private' : 'open' })); this.toast(closing ? 'Équipe fermée aux demandes' : 'Équipe ouverte aux demandes'); },
+        hasWarning: open && !full, warning: `Il manque ${5 - count} joueur${5 - count > 1 ? 's' : ''}. Une équipe incomplète au lancement du tournoi est déclarée forfait sur son premier match.`,
+        members: team.members.map(m => ({
+          name: m.n, initials: m.n.replace(/[^A-Za-zÀ-ÿ]/g, '').slice(0, 2).toUpperCase(), isMe: m.n === ME, isCap: m.n === team.captain, role: m.r, roles,
+          canEditRole: editable, readOnlyRole: !editable, showActions: editable && m.n !== ME,
+          bg: m.n === team.captain ? '#2e2412' : '#1b181b', border: m.n === ME ? '#d9b25c' : '#3d3540',
+          setRole: (e) => { const r = e.target.value; upd(tt => ({ ...tt, members: tt.members.map(x => x.n === m.n ? { ...x, r } : x) })); },
+          askCap: (e) => { e.preventDefault(); this.setState({ confirm: { tid, n: m.n, kind: 'cap' } }); },
+          askKick: (e) => { e.preventDefault(); this.setState({ confirm: { tid, n: m.n, kind: 'kick' } }); },
+          confirming: !!(cf && cf.tid === tid && cf.n === m.n), notConfirming: !(cf && cf.tid === tid && cf.n === m.n),
+          confirmText: cf && cf.n === m.n ? (cf.kind === 'kick' ? `Exclure ${m.n} ? Il perdra aussitôt l’accès au conseil.` : `Transmettre le commandement à ${m.n} ? Tu ne pourras plus gérer l’équipe.`) : '',
+          confirmLabel: cf && cf.kind === 'kick' ? 'Exclure' : 'Transmettre', confirmBg: cf && cf.kind === 'kick' ? '#e8806a' : '#d9b25c',
+          confirmYes: (e) => { e.preventDefault(); const kind = cf && cf.kind; this.setState({ confirm: null });
+            if (kind === 'kick') { upd(tt => ({ ...tt, members: tt.members.filter(x => x.n !== m.n) })); this.toast(`${m.n} a été exclu de l’équipe`); }
+            else { upd(tt => ({ ...tt, captain: m.n })); this.toast(`${m.n} est désormais capitaine`); } },
+          confirmNo: (e) => { e.preventDefault(); this.setState({ confirm: null }); },
+        })),
+        empty: Array.from({ length: Math.max(0, 5 - count) }, (_, i) => ({ i })),
+        hasRequests: editable && team.requests.length > 0,
+        requests: team.requests.map(rq => ({ name: rq.n, note: rq.note,
+          acceptLabel: full ? 'Équipe complète' : 'Accepter', acceptBg: full ? '#2b262a' : '#d9b25c', acceptColor: full ? '#8f8570' : '#1a1410',
+          accept: (e) => { e.preventDefault(); if (full) return; upd(tt => { const used = tt.members.map(x => x.r); const r = roles.find(x => !used.includes(x)) ?? roles[0];
+            return { ...tt, members: [...tt.members, { n: rq.n, r }], requests: tt.requests.filter(x => x.n !== rq.n) }; }); this.toast(`${rq.n} rejoint l’équipe`); },
+          refuse: (e) => { e.preventDefault(); upd(tt => ({ ...tt, requests: tt.requests.filter(x => x.n !== rq.n) })); this.toast(`Demande de ${rq.n} refusée`); } })),
+        showLeave: open && !isCap, showCapNote: open && isCap && count > 1,
+        chatOpen: !elim, chatClosed: !!elim, chatStatus: elim ? 'Fermée' : 'En direct · réservé à l’équipe',
+        messages: (S.chats[tid] || []).map(m => { const mine = m.f === ME; return { from: mine ? 'Toi' : m.f, time: m.h, text: m.t,
+          align: mine ? 'flex-end' : 'flex-start', textAlign: mine ? 'right' : 'left', bg: mine ? '#2e2412' : '#221e22', border: mine ? '#8a6b2c' : '#3d3540' }; }),
+        noMessages: !(S.chats[tid] || []).length,
+      };
+    }
+    const send = (e) => { e && e.preventDefault(); const txt = S.draft.trim(); if (!txt || !tid) return;
+      this.setState(s => ({ draft: '', chats: { ...s.chats, [tid]: [...(s.chats[tid] || []), { f: ME, t: txt, h: this.now() }] } })); };
+    const confirmRename = (e) => { e && e.preventDefault(); const n = S.renameDraft.trim(); if (!n) return;
+      this.setState(s => ({ renaming: false, teams: { ...s.teams, [tid]: { ...s.teams[tid], name: n } } })); this.toast('Bannière renommée'); };
+    const dot = (c, anim) => React.createElement('span', { style: { width: 8, height: 8, borderRadius: '50%', background: c, display: 'inline-block', animation: anim ? 'glint 1.4s ease-in-out infinite' : 'none' } });
+    const unreadOf = (id) => Math.max(0, (S.chats[id] || []).length - (S.seen[id] || 0));
+    const pending = myTids.reduce((n, id) => n + (S.teams[id].captain === ME && T.find(x => x.id === id).state === 'ouvertes' ? S.teams[id].requests.length : 0), 0);
+    const unreadTotal = myTids.reduce((n, id) => n + unreadOf(id), 0);
+    const chips = myTids.map(id => { const on = id === tid; const t = T.find(x => x.id === id); const unread = unreadOf(id);
+      return { unread, hasUnread: unread > 0 && !(on && v === 'team'), team: S.teams[id].name, tournament: t.name, select: (e) => { e.preventDefault(); this.setState({ teamTid: id, renaming: false, draft: '', confirm: null }); },
+        bg: on ? '#2e2412' : 'transparent', border: on ? '#d9b25c' : '#3d3540', color: on ? '#f2d58a' : '#ece3cf' }; });
+
+    return {
+      isTournois: v === 'tournois', isTournoi: v === 'tournoi', isTeam: v === 'team', isProfil: v === 'profil',
+      goTournois: go('tournois'), goTeam: go('team'), goProfil: go('profil'),
+      navTournoisColor: ['tournois', 'tournoi'].includes(v) ? '#f2d58a' : '#bfb39a', navTournoisLine: ['tournois', 'tournoi'].includes(v) ? '#d9b25c' : 'transparent',
+      navTeamColor: v === 'team' ? '#f2d58a' : '#bfb39a', navTeamLine: v === 'team' ? '#d9b25c' : 'transparent', navProfilBg: v === 'profil' ? '#2e2412' : 'transparent',
+      query: S.query, setQuery: (e) => this.setState({ query: e.target.value }),
+      isSearching: searching, searchLabel: `${list.length} résultat${list.length > 1 ? 's' : ''} pour « ${S.query.trim()} »`,
+      tabs, list, isEmpty: list.length === 0, hasNext: !!next.title, next,
+      bt, liveDot: dot('#e8806a', true),
+      hasTeams: S.teamsTab === 'mine' && !!tid, noTeams: S.teamsTab === 'mine' && !tid, teamChips: chips, tm,
+      ...this.allTeamsVals(myTids),
+      chatDot: dot(tm.chatClosed ? '#8f8570' : '#8fc98a', !tm.chatClosed), chatRef: this.chatRef,
+      draft: S.draft, setDraft: (e) => this.setState({ draft: e.target.value }), draftKey: (e) => { if (e.key === 'Enter') send(e); }, send,
+      renaming: S.renaming, renameDraft: S.renameDraft,
+      startRename: (e) => { e.preventDefault(); this.setState({ renaming: true, renameDraft: tm.name }); },
+      setRenameDraft: (e) => this.setState({ renameDraft: e.target.value }), renameKey: (e) => { if (e.key === 'Enter') confirmRename(e); }, confirmRename,
+      leaveTeam: (e) => { e.preventDefault(); const nm = tm.name; this.setState(s => { const teams = { ...s.teams }; delete teams[tid]; return { teams, confirm: null, view: 'tournois', tab: 'avenir', query: '' }; }); this.toast(`Tu as quitté ${nm}`); window.scrollTo({ top: 0 }); },
+      leaveConfirming: !!(S.confirm && S.confirm.kind === 'leave' && S.confirm.tid === tid), leaveAsk: !(S.confirm && S.confirm.kind === 'leave' && S.confirm.tid === tid),
+      askLeave: (e) => { e.preventDefault(); this.setState({ confirm: { tid, kind: 'leave' } }); }, cancelConfirm: (e) => { e.preventDefault(); this.setState({ confirm: null }); },
+      hasTeamBadge: pending + unreadTotal > 0, teamBadge: pending + unreadTotal,
+      teamBadgeTitle: `${pending} demande${pending > 1 ? 's' : ''} en attente · ${unreadTotal} message${unreadTotal > 1 ? 's' : ''} non lu${unreadTotal > 1 ? 's' : ''}`,
+      hasToast: !!S.toast, toast: S.toast || '',
+      profileTeams: `Membre de ${myTids.length} équipe${myTids.length > 1 ? 's' : ''} · voir mes équipes`,
+      stats: [{ value: '14', label: 'TOURNOIS' }, { value: '61 %', label: 'VICTOIRES' }, { value: '3', label: 'TITRES' }],
+      history: [{ name: "Bataille d'Été · Valorant", result: '1er', color: '#f2d58a' }, { name: 'Ordalie de Septembre · CS2', result: 'Demi-finale', color: '#d9a37a' }, { name: "Joute d'Automne · LoL", result: 'Quart', color: '#9a9aa3' }],
+    };
+  }
+  allTeamsVals(myTids) {
+    const S = this.state;
+    const initialsOf = (n) => n.replace(/^(Les |L'|Le |La )/i, '').split(/\s+/).filter(w => !/^(d'|de|du|des)$/i.test(w)).slice(0, 2).map(w => w.replace(/^d'/i, '')[0]).join('').toUpperCase();
+    const pool = [...myTids.map(tid => ({ name: S.teams[tid].name, tid, captain: S.teams[tid].captain, count: S.teams[tid].members.length, private: S.teams[tid].visibility === 'private', mine: true,
+      myRole: S.teams[tid].captain === ME ? '♛ CAPITAINE' : (S.teams[tid].members.find(m => m.n === ME)?.r || '').toUpperCase() })), ...ALL_TEAMS];
+    const q = S.teamQuery.trim().toLowerCase();
+    const rows = pool.map(x => {
+      const t = T.find(tt => tt.id === x.tid); const open = t.state === 'ouvertes'; const recruits = open && x.count < 5;
+      const badge = !open ? 'FIGÉE' : !recruits ? 'COMPLÈTE' : x.private ? 'INCOMPLÈTE' : 'RECRUTE';
+      const badgeColor = !open ? '#9a9aa3' : !recruits ? '#d9a37a' : x.private ? '#9a9aa3' : '#8fc98a';
+      let actLabel = null, action = null, primary = false, dim = false;
+      if (x.mine) { actLabel = 'Gérer mon équipe'; primary = true; action = (e) => { e.preventDefault(); this.setState({ teamsTab: 'mine', teamTid: x.tid, renaming: false }); window.scrollTo({ top: 0 }); }; }
+      else if (recruits && x.private) { actLabel = 'Équipe fermée'; dim = true; }
+      else if (recruits) {
+        if (S.teams[x.tid]) { actLabel = 'Déjà engagé dans ce tournoi'; dim = true; }
+        else if (S.sent[x.tid] === x.name) { actLabel = 'Demande envoyée'; primary = true; }
+        else if (S.sent[x.tid]) { actLabel = 'Demande déjà en cours'; dim = true; }
+        else { actLabel = 'Demander à rejoindre'; action = (e) => { e.preventDefault(); this.setState(s => ({ sent: { ...s.sent, [x.tid]: x.name } })); this.toast(`Demande envoyée à ${x.name}`); }; }
+      }
+      return { name: x.name, initials: initialsOf(x.name), tournament: t.name, game: t.game, captain: x.captain === ME ? 'Toi' : x.captain, count: x.count,
+        badge, badgeColor, recruits: recruits && !x.private, border: x.mine ? '#d9b25c' : '#3d3540', mine: !!x.mine, myRole: x.myRole || '',
+        cardBg: x.mine ? 'linear-gradient(180deg,#2e2412,#1a1510)' : 'linear-gradient(180deg,#1e1a1c,#17141a)', glow: x.mine ? '0 0 24px rgba(217,178,92,.18)' : 'none',
+        isOpen: !x.private, isClosed: !!x.private, lockLabel: x.private ? 'Équipe fermée' : 'Équipe ouverte', lockColor: x.private ? '#c9a0dc' : '#8fc98a',
+        hasAction: !!actLabel, actLabel, action: action || ((e) => e.preventDefault()),
+        actColor: primary ? '#1a1410' : dim ? '#8f8570' : '#d9b25c', actBg: primary ? '#d9b25c' : 'transparent', actBorder: primary ? '#f2d58a' : dim ? '#2b262a' : '#5a4a2a',
+        hay: (x.name + ' ' + t.name + ' ' + t.game + ' ' + x.captain).toLowerCase() };
+    }).filter(r => (!q || r.hay.includes(q)) && (!S.recruitOnly || r.recruits));
+    const tabDef = [['mine', 'Mes équipes', myTids.length], ['all', 'Toutes les équipes', pool.length]];
+    return {
+      teamTabs: tabDef.map(([id, label, count]) => { const on = S.teamsTab === id; return { label, count,
+        select: (e) => { e.preventDefault(); this.setState({ teamsTab: id, renaming: false }); },
+        color: on ? '#f2d58a' : '#bfb39a', bg: on ? '#1e1a1c' : 'transparent', border: on ? 'rgba(217,178,92,.5)' : 'transparent',
+        bottom: on ? '#1e1a1c' : 'transparent', countBg: on ? '#d9b25c' : '#2b262a', countColor: on ? '#1a1410' : '#bfb39a' }; }),
+      isAllTeams: S.teamsTab === 'all', allTeams: rows, allTeamsEmpty: rows.length === 0,
+      allTeamsLabel: `${rows.length} équipe${rows.length > 1 ? 's' : ''}${q ? ` pour « ${S.teamQuery.trim()} »` : ''}`,
+      teamQuery: S.teamQuery, setTeamQuery: (e) => this.setState({ teamQuery: e.target.value }),
+      toggleRecruit: (e) => { e.preventDefault(); this.setState(s => ({ recruitOnly: !s.recruitOnly })); },
+      recruitMark: S.recruitOnly ? '✓' : '', recruitColor: S.recruitOnly ? '#f2d58a' : '#bfb39a',
+      recruitBg: S.recruitOnly ? '#2e2412' : 'transparent', recruitBorder: S.recruitOnly ? '#d9b25c' : '#5a4a2a',
+    };
+  }
+  createTeam(t) {
+    this.setState(s => ({
+      teams: { ...s.teams, [t.id]: { name: 'Nouvelle bannière', captain: ME, members: [{ n: ME, r: ROLES[t.game][0] }], requests: [], visibility: 'open' } },
+      chats: { ...s.chats, [t.id]: [] }, seen: { ...s.seen, [t.id]: 0 }, view: 'team', teamsTab: 'mine', teamTid: t.id, renaming: true, renameDraft: '', joinOpen: null,
+    }));
+    this.toast('Bannière levée ! Donne-lui un nom.');
+    window.scrollTo({ top: 0 });
+  }
+}
+</script>
+</body>
+</html>

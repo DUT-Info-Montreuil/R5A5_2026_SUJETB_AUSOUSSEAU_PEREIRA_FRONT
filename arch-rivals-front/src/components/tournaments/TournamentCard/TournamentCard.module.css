@@ -1,0 +1,191 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 1px solid var(--color-card-border);
+}
+
+.card:hover,
+.card:focus-within {
+  border-color: var(--color-gold-dark);
+}
+
+.body {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 24px;
+  padding: 20px 24px;
+}
+
+.main {
+  flex: 1 1 320px;
+  display: flex;
+  gap: 18px;
+  min-width: 0;
+}
+
+/* Vignette du jeu */
+.game {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--team-loser-bg);
+  border: 1px solid currentColor;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+}
+
+.VAL {
+  color: var(--color-live);
+}
+
+.LOL {
+  color: var(--color-gold);
+}
+
+.CS2 {
+  color: var(--color-bronze-light);
+}
+
+.OW2 {
+  color: var(--color-game-ow2);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 19px;
+  letter-spacing: 0.04em;
+  color: var(--color-text-strong);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 18px;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.meta > span {
+  white-space: nowrap;
+}
+
+.sep {
+  margin-right: 12px;
+  color: var(--color-separator);
+}
+
+.mine {
+  color: var(--color-text);
+}
+
+.requested {
+  color: var(--color-gold);
+}
+
+.noTeam {
+  color: var(--color-text-faint);
+}
+
+.info {
+  font-style: italic;
+  color: var(--color-gold);
+}
+
+/* Remplissage des inscriptions */
+.track {
+  width: min(100%, 280px);
+  height: 4px;
+  background: var(--color-track);
+}
+
+.track::before {
+  content: '';
+  display: block;
+  width: var(--progress);
+  height: 100%;
+  background: var(--color-success);
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 20px;
+  white-space: nowrap;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  color: var(--color-text);
+  background: transparent;
+  border: 1px solid var(--color-gold-soft);
+}
+
+.action {
+  cursor: pointer;
+  border-radius: 0;
+}
+
+.action:hover,
+.action:focus-visible {
+  color: var(--color-text);
+  border-color: var(--color-gold-hover);
+}
+
+.primary,
+.primary:hover,
+.primary:focus-visible {
+  color: var(--color-on-gold);
+  background: var(--color-gold);
+  border-color: var(--color-gold-hover);
+}
+
+@media (max-width: 520px) {
+  .body {
+    padding: 18px 16px;
+  }
+
+  .meta > span {
+    white-space: normal;
+  }
+}
+
+.error {
+  margin: 0;
+  padding: 0 24px 16px;
+  font-size: 15px;
+  color: var(--color-danger);
+}
