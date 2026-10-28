@@ -1,6 +1,7 @@
 import type { IncomingRequest } from '../types/team'
 import { api } from './api'
 import { listOf, type JoinRequestDto } from './dto'
+import { listen } from './realtime'
 
 // Contrat du back (api-routes.md), actions sur l'équipe du joueur :
 //   PATCH  /teams/:id                       { name }      → { team }   capitaine (B-09)
@@ -59,4 +60,12 @@ export async function acceptJoinRequest(requestId: number): Promise<void> {
 
 export async function rejectJoinRequest(requestId: number): Promise<void> {
   await api.post(`/join-requests/${requestId}/reject`)
+}
+
+/**
+ * Équipe modifiée par un autre membre (arrivée, départ, rôle, capitaine), poussée sur le salon
+ * de l'équipe ; renvoie la fonction qui coupe l'écoute.
+ */
+export function onTeamUpdated(onUpdate: (tournamentId: number) => void): () => void {
+  return listen('team:updated', (team) => onUpdate(team.tournamentId))
 }

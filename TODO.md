@@ -34,7 +34,7 @@ Les noms exacts des champs JSON (tournoi, équipe, match, message) ne sont pas d
 les isoler dans des DTO + mappers (`services/…`), un fichier par ressource, comme dans le cours.
 `/openapi.json` du back qui tourne les donne (simple lecture).
 
-- [ ] **2. Tournois et arbre sur l'API**
+- [x] **2. Tournois et arbre sur l'API**
   - `GET /api/tournaments?search=&status=`, `GET /api/tournaments/:id`, `GET /api/tournaments/:id/matches`.
   - Statuts à traduire : `registration_open`, `registration_closed`, `in_progress`, `finished`.
   - Matchs : `round` 1 = quarts, 2 = demies, 3 = finale ; `position` ; statuts `pending` (équipes pas
@@ -42,11 +42,11 @@ les isoler dans des DTO + mappers (`services/…`), un fichier par ressource, co
   - Identifiants numériques (aujourd'hui des chaînes `t1`, `e1`… dans le mock).
   - Collections paginées : `{ "<liste>": [...], "pagination": { limit, offset, total } }`.
 
-- [ ] **3. Jeux et rôles depuis l'API**
+- [x] **3. Jeux et rôles depuis l'API**
   - `GET /api/games` (public) remplace `GAME_ROLES`, `GAME_TAGS` et le type `Game` codés en dur
     dans `utils/tournaments.ts` et `types/tournament.ts`.
 
-- [ ] **4. Équipes et demandes sur les vraies routes**
+- [x] **4. Équipes et demandes sur les vraies routes**
   - Créer : `POST /api/tournaments/:id/teams` ; renommer : `PATCH /api/teams/:id`.
   - Rôle : `PATCH /api/teams/:id/members/:userId` ; exclure : `DELETE /api/teams/:id/members/:userId`.
   - Capitaine : `POST /api/teams/:id/transfer-captaincy` ; quitter : `DELETE /api/teams/:id/members/me`.
@@ -63,7 +63,7 @@ les isoler dans des DTO + mappers (`services/…`), un fichier par ressource, co
     dans une équipe annule ses autres demandes du tournoi ; à la clôture les demandes en attente
     sont rejetées.
 
-- [ ] **5. Chat sur l'API + Socket.IO**
+- [x] **5. Chat sur l'API + Socket.IO**
   - `GET /api/teams/:id/messages` (du plus récent au plus ancien, paginé) et `POST /api/teams/:id/messages`.
   - Équipe éliminée : `409 TEAM_CHAT_CLOSED` en lecture comme en écriture.
   - Ajouter la dépendance `socket.io-client` ; `io(origine, { auth: { token } })`, puis
@@ -73,7 +73,7 @@ les isoler dans des DTO + mappers (`services/…`), un fichier par ressource, co
   - Remplacer `subscribeToMessages` de `services/chat.ts` (même signature, déjà utilisée par
     `hooks/useTeamChat.ts`).
 
-- [ ] **6. Suivi en direct du tournoi, puis suppression du faux back**
+- [x] **6. Suivi en direct du tournoi, puis suppression du faux back**
   - `emitWithAck('tournament:join', tournamentId)` (ouvert à tous) ; événements
     `tournament:updated` et `match:updated` (B-19).
   - Remplace le rechargement toutes les 15 s de `hooks/useTournament.ts`.

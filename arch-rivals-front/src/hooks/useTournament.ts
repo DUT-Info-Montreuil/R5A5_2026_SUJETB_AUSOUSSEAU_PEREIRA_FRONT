@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ApiError } from '../services/api'
-import { fetchTournament } from '../services/tournaments'
+import { fetchTournament, subscribeToTournament } from '../services/tournaments'
 import type { Tournament } from '../types/tournament'
 
 type Status = 'loading' | 'ready' | 'not-found' | 'error'
@@ -11,8 +11,8 @@ type Loaded = {
   status: Exclude<Status, 'loading'>
 }
 
-/** Intervalle de rafraîchissement d'un tournoi en cours (en attendant le temps réel). */
-const LIVE_REFRESH_MS = 15_000
+/** Un résultat pousse plusieurs événements (match, tournoi) : on les regroupe en une relecture. */
+const COALESCE_MS = 150
 
 export function useTournament(id: number) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
@@ -41,18 +41,31 @@ export function useTournament(id: number) {
     }
   }, [id])
 
-  // Tournoi en cours : on recharge l'arbre régulièrement, sans recharger la page.
+  // Suivi en direct (B-19) : chaque changement poussé par le back relit le tournoi.
   useEffect(() => {
-    if (!live) return
-    const timer = setInterval(() => {
+    let cancelled = false
+    let timer: ReturnType<typeof setTimeout> | undefined
+
+    const reload = () => {
       fetchTournament(id)
-        .then((data) => setLoaded({ id, tournament: data, status: 'ready' }))
+        .then((data) => {
+          if (!cancelled) setLoaded({ id, tournament: data, status: 'ready' })
+        })
         .catch(() => {
           /* on garde le dernier arbre connu */
         })
-    }, LIVE_REFRESH_MS)
-    return () => clearInterval(timer)
-  }, [id, live])
+    }
+    const unsubscribe = subscribeToTournament(id, () => {
+      clearTimeout(timer)
+      timer = setTimeout(reload, COALESCE_MS)
+    })
+
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+      unsubscribe()
+    }
+  }, [id])
 
   return { tournament, status, live }
 }

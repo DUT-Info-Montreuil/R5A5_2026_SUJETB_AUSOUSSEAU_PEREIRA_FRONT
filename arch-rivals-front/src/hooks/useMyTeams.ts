@@ -43,6 +43,15 @@ export function useMyTeams() {
     [tournaments, refresh],
   )
 
+  // Changement fait par un coéquipier : on relit son tournoi.
+  useEffect(
+    () =>
+      myTeamApi.onTeamUpdated((tournamentId) => {
+        refresh(tournamentId).catch(() => {})
+      }),
+    [refresh],
+  )
+
   const actionsFor = useCallback(
     ({ tournament, team }: MyTeamEntry): TeamActions => {
       /** Écrit, puis relit le tournoi : le back reste la seule source de vérité. */
