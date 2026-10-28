@@ -1,10 +1,10 @@
 import { ME, meMember } from '../data/myTeams'
 import type { MyTeam } from '../types/team'
 import type { TeamListing, TournamentDetail } from '../types/tournament'
-import { PLAYERS_PER_TEAM, TEAMS_PER_TOURNAMENT } from '../utils/tournaments'
+import { GAME_ROLES, PLAYERS_PER_TEAM, TEAMS_PER_TOURNAMENT } from '../utils/tournaments'
 import { validateTeamName } from '../utils/validation'
 import { ApiError } from './api'
-import { db, findTournament, GAME_ROLES, teamView, toDetail } from './mockBackend'
+import { db, findTournament, teamView, toDetail } from './mockBackend'
 
 // Contrat prévu avec le back (le joueur est identifié par son token) :
 //   GET  /me/teams                          → MyTeam[]  (tournois pas encore terminés)

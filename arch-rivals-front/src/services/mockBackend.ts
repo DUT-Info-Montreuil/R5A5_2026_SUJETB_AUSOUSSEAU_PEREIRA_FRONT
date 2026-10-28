@@ -10,14 +10,6 @@ import { ApiError } from './api'
 // à l'autre, jusqu'au rechargement de la page. Il disparaît quand les vraies routes arrivent :
 // seuls services/tournaments.ts et services/teams.ts l'utilisent.
 
-/** Rôles du faux back, par nom de jeu (le vrai back les sert sur GET /api/games). */
-export const GAME_ROLES: Record<string, readonly string[]> = {
-  Valorant: ['Duelliste', 'Initiateur', 'Contrôleur', 'Sentinelle', 'Flex'],
-  'League of Legends': ['Top', 'Jungle', 'Mid', 'ADC', 'Support'],
-  'Counter-Strike 2': ['Entry', 'AWPer', 'Lurker', 'Support', 'IGL'],
-  'Overwatch 2': ['Tank', 'DPS', 'Soutien'],
-}
-
 export const db = {
   tournaments: TOURNAMENTS.map((t) => ({ ...t })) as Tournament[],
   teams: TEAM_DIRECTORY.map((t) => ({ ...t })) as TeamListing[],

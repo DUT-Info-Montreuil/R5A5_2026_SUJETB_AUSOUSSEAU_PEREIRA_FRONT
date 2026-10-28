@@ -5,7 +5,7 @@ export type TeamVisibility = 'open' | 'closed'
 export type TeamMember = {
   id: string
   username: string
-  /** Rôle de jeu (voir GET /api/games). */
+  /** Rôle de jeu (voir GAME_ROLES). */
   role: string
 }
 
