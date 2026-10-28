@@ -93,3 +93,12 @@ export type JoinRequestDto = {
   createdAt: string
   decidedAt: string | null
 }
+
+/** Auteur à null : compte supprimé depuis. */
+export type MessageDto = {
+  id: number
+  teamId: number
+  author: { id: number; username: string } | null
+  content: string
+  createdAt: string
+}

@@ -67,9 +67,9 @@ export default function Teams() {
             />
             <TeamChat
               key={`chat-${current.team.id}`}
-              tournamentId={String(current.tournament.id)}
-              myMemberId={String(userId)}
-              closed={current.team.isEliminated}
+              teamId={current.team.id}
+              userId={userId}
+              eliminated={current.team.isEliminated}
             />
           </div>
         </>

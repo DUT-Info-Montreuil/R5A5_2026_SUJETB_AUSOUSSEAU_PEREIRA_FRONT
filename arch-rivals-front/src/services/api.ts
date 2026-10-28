@@ -35,6 +35,10 @@ export function setAuthToken(token: string | null) {
   authToken = token
 }
 
+export function getAuthToken() {
+  return authToken
+}
+
 async function parseBody(response: Response): Promise<unknown> {
   const text = await response.text()
   if (!text) return undefined

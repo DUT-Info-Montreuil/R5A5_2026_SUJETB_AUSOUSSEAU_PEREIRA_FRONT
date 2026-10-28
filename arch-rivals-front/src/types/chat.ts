@@ -1,7 +1,7 @@
 export type ChatMessage = {
-  id: string
-  /** Membre de l'équipe qui a écrit le message. */
-  authorId: string
+  id: number
+  /** Joueur qui a écrit le message (null : compte supprimé depuis). */
+  authorId: number | null
   author: string
   text: string
   /** Date d'envoi (ISO 8601), fixée par le serveur. */

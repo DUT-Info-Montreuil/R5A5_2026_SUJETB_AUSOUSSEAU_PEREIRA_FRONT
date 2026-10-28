@@ -1,4 +1,5 @@
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
+import { onTeamLost } from '../services/chat'
 import * as myTeamApi from '../services/myTeam'
 import type { Tournament, TournamentTeam } from '../types/tournament'
 import { findMyTeam } from '../utils/tournaments'
@@ -31,6 +32,16 @@ export function useMyTeams() {
       const team = findMyTeam(tournament, userId)
       return team ? [{ tournament, team }] : []
     })
+
+  // Exclu ou équipe supprimée par le capitaine : on relit le tournoi, l'équipe disparaît (B-17).
+  useEffect(
+    () =>
+      onTeamLost((teamId) => {
+        const tournament = tournaments.find((t) => t.teams.some((team) => team.id === teamId))
+        if (tournament) refresh(tournament.id).catch(() => {})
+      }),
+    [tournaments, refresh],
+  )
 
   const actionsFor = useCallback(
     ({ tournament, team }: MyTeamEntry): TeamActions => {

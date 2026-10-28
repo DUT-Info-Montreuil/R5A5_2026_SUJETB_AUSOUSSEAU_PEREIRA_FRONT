@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { ApiError, setAuthToken } from '../services/api'
 import * as authApi from '../services/auth'
+import { listen, reconnectRealtime } from '../services/realtime'
 import { tokenStorage } from '../services/tokenStorage'
 import type { AuthStatus, LoginPayload, RegisterPayload, User } from '../types/auth'
 import { AuthContext, type AuthContextValue } from './authContext'
@@ -9,6 +10,8 @@ function applyToken(token: string | null) {
   setAuthToken(token)
   if (token) tokenStorage.set(token)
   else tokenStorage.clear()
+  // Le canal temps réel identifie le joueur à la connexion : on le rouvre avec le nouveau token.
+  reconnectRealtime()
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -61,6 +64,9 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     setStatus('anonymous')
   }, [])
+
+  // Jeton expiré : le back ferme le canal temps réel, et l'API refusera le token. On déconnecte.
+  useEffect(() => listen('session:expired', logout), [logout])
 
   const value = useMemo<AuthContextValue>(
     () => ({ user, status, login, register, logout }),

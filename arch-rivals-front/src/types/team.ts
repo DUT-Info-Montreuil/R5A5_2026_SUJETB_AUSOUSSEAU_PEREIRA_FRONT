@@ -5,19 +5,3 @@ export type IncomingRequest = {
   username: string
   createdAt: string
 }
-
-// --- Faux back de la salle du conseil (services/chat.ts), retiré au commit suivant ---
-
-export type TeamMemberMock = {
-  id: string
-  username: string
-  role: string
-}
-
-export type MyTeam = {
-  tournamentId: string
-  name: string
-  captainId: string
-  members: TeamMemberMock[]
-  myMemberId: string
-}

@@ -1,96 +1,66 @@
-import { CHATS, INCOMING_POOL } from '../data/chats'
 import type { ChatMessage } from '../types/chat'
-import { ApiError } from './api'
-import { db, findTournament } from './mockBackend'
+import { api } from './api'
+import { listOf, type MessageDto } from './dto'
+import { follow, listen } from './realtime'
 
-// Contrat prévu avec le back (le joueur est identifié par son token) :
-//   GET  /teams/:id/messages            → ChatMessage[]   (403 si le joueur n'est pas membre)
-//   POST /teams/:id/messages  { text }  → 201 ChatMessage (409 si l'espace est fermé)
-//   Temps réel : WebSocket (ou SSE) sur /teams/:id/messages/stream, qui pousse chaque nouveau
-//   message, y compris ceux du joueur lui-même.
-// Un joueur exclu perd aussitôt l'accès (B-17) : le back refuse ses requêtes et coupe son flux.
-// L'espace d'une équipe éliminée est fermé (B-18) ; seul l'administrateur peut le relire.
-// Ici, le faux back simule l'arrivée de messages des coéquipiers avec un minuteur.
+// Contrat du back (api-routes.md), salle du conseil d'une équipe :
+//   GET  /teams/:id/messages              → { messages, pagination }  du plus récent au plus ancien
+//   POST /teams/:id/messages  { content } → 201 { message }
+//   Temps réel : salon `team:join` (mêmes droits que la lecture), événement `message:new`,
+//   qui pousse chaque nouveau message, y compris ceux du joueur lui-même.
+// L'espace d'une équipe éliminée est fermé en lecture et en écriture (409 TEAM_CHAT_CLOSED, B-18).
+// Un joueur exclu est retiré du salon côté serveur et reçoit `member:kicked` (B-17).
 
 export const MESSAGE_MAX = 500
+/** Historique chargé à l'ouverture. */
+const HISTORY_LIMIT = 100
 
-/** Délai entre deux messages simulés des coéquipiers. */
-const MOCK_INCOMING_MS = 8_000
+export const CHAT_CLOSED = 'TEAM_CHAT_CLOSED'
 
-const messages: Record<string, ChatMessage[]> = structuredClone(CHATS)
-const incoming = structuredClone(INCOMING_POOL)
-const listeners = new Map<string, Set<(message: ChatMessage) => void>>()
-const timers = new Map<string, ReturnType<typeof setInterval>>()
-let nextId = 1
-
-function assertMember(tournamentId: string) {
-  if (!db.myTeams.some((t) => t.tournamentId === tournamentId))
-    throw new ApiError(403, 'Cet espace est réservé aux membres de l’équipe.')
-}
-
-/** L'espace d'une équipe éliminée est fermé. */
-function isChatClosed(tournamentId: string) {
-  return findTournament(tournamentId).eliminated === true
-}
-
-function publish(tournamentId: string, message: ChatMessage) {
-  ;(messages[tournamentId] ??= []).push(message)
-  listeners.get(tournamentId)?.forEach((listener) => listener(structuredClone(message)))
-}
-
-export async function fetchMessages(tournamentId: string): Promise<ChatMessage[]> {
-  assertMember(tournamentId)
-  if (isChatClosed(tournamentId)) throw new ApiError(403, 'L’espace de ton équipe est fermé.')
-  return structuredClone(messages[tournamentId] ?? [])
-}
-
-export async function sendMessage(tournamentId: string, text: string): Promise<ChatMessage> {
-  assertMember(tournamentId)
-  if (isChatClosed(tournamentId)) throw new ApiError(409, 'L’espace de ton équipe est fermé.')
-  const body = text.trim()
-  if (!body) throw new ApiError(422, 'Le message est vide.')
-  if (body.length > MESSAGE_MAX) throw new ApiError(422, `${MESSAGE_MAX} caractères maximum.`)
-
-  const team = db.myTeams.find((t) => t.tournamentId === tournamentId)!
-  const me = team.members.find((m) => m.id === team.myMemberId)!
-  const message: ChatMessage = {
-    id: `sent-${nextId++}`,
-    authorId: me.id,
-    author: me.username,
-    text: body,
-    sentAt: new Date().toISOString(),
+function toMessage(dto: MessageDto): ChatMessage {
+  return {
+    id: dto.id,
+    authorId: dto.author?.id ?? null,
+    author: dto.author?.username ?? 'Ancien membre',
+    text: dto.content,
+    sentAt: dto.createdAt,
   }
-  publish(tournamentId, message)
-  return structuredClone(message)
+}
+
+/** Historique dans l'ordre de lecture (le back le renvoie du plus récent au plus ancien). */
+export async function fetchMessages(teamId: number): Promise<ChatMessage[]> {
+  const data = await api.get(`/teams/${teamId}/messages?limit=${HISTORY_LIMIT}`)
+  return listOf<MessageDto>(data, 'messages').map(toMessage).reverse()
+}
+
+export async function sendMessage(teamId: number, text: string): Promise<ChatMessage> {
+  const { message } = await api.post<{ message: MessageDto }>(`/teams/${teamId}/messages`, {
+    content: text.trim(),
+  })
+  return toMessage(message)
 }
 
 /** S'abonne aux nouveaux messages de l'équipe ; renvoie la fonction qui coupe l'abonnement. */
 export function subscribeToMessages(
-  tournamentId: string,
+  teamId: number,
   onMessage: (message: ChatMessage) => void,
 ): () => void {
-  const set = listeners.get(tournamentId) ?? new Set()
-  set.add(onMessage)
-  listeners.set(tournamentId, set)
-
-  // Un seul minuteur par équipe, quel que soit le nombre d'abonnés.
-  if (!timers.has(tournamentId) && incoming[tournamentId]?.length) {
-    const timer = setInterval(() => {
-      const next = incoming[tournamentId]?.shift()
-      if (!next) {
-        clearInterval(timer)
-        return
-      }
-      publish(tournamentId, { ...next, id: `in-${nextId++}`, sentAt: new Date().toISOString() })
-    }, MOCK_INCOMING_MS)
-    timers.set(tournamentId, timer)
-  }
-
+  const stopListening = listen('message:new', (dto) => {
+    if (dto.teamId === teamId) onMessage(toMessage(dto))
+  })
+  const leave = follow('team', teamId)
   return () => {
-    set.delete(onMessage)
-    if (set.size === 0) {
-      clearInterval(timers.get(tournamentId))
-      timers.delete(tournamentId)
-    }
+    stopListening()
+    leave()
+  }
+}
+
+/** Le joueur perd l'accès à l'équipe (exclusion ou suppression) ; renvoie la fonction qui coupe l'écoute. */
+export function onTeamLost(onLost: (teamId: number) => void): () => void {
+  const offKicked = listen('member:kicked', ({ teamId }) => onLost(teamId))
+  const offDeleted = listen('team:deleted', ({ teamId }) => onLost(teamId))
+  return () => {
+    offKicked()
+    offDeleted()
   }
 }

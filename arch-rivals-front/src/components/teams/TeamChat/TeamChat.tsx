@@ -7,16 +7,18 @@ import controls from '../controls.module.css'
 import styles from './TeamChat.module.css'
 
 type TeamChatProps = {
-  tournamentId: string
-  myMemberId: string
+  teamId: number
+  /** Joueur connecté. */
+  userId: number | null
   /** Équipe éliminée : l'espace est fermé (B-18). */
-  closed: boolean
+  eliminated: boolean
 }
 
 /** Salle du conseil : espace d'échange réservé aux membres de l'équipe (B-16). */
-export default function TeamChat({ tournamentId, myMemberId, closed }: TeamChatProps) {
+export default function TeamChat({ teamId, userId, eliminated }: TeamChatProps) {
   const inputId = useId()
-  const { messages, status, send } = useTeamChat(tournamentId, closed)
+  const { messages, status, send } = useTeamChat(teamId, eliminated)
+  const closed = status === 'closed'
   const [draft, setDraft] = useState('')
   const { pending, error, run } = useAsyncAction()
   const listRef = useRef<HTMLDivElement>(null)
@@ -65,7 +67,7 @@ export default function TeamChat({ tournamentId, myMemberId, closed }: TeamChatP
               </p>
             )}
             {messages.map((message) => {
-              const mine = message.authorId === myMemberId
+              const mine = userId !== null && message.authorId === userId
               return (
                 <div
                   key={message.id}
