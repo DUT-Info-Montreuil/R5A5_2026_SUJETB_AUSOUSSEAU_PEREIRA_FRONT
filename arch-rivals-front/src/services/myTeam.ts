@@ -1,126 +1,62 @@
-import type { MyTeam, TeamVisibility } from '../types/team'
-import { PLAYERS_PER_TEAM } from '../utils/tournaments'
-import { validateTeamName } from '../utils/validation'
-import { ApiError } from './api'
-import { db, findTournament, GAME_ROLES, teamView } from './mockBackend'
+import type { IncomingRequest } from '../types/team'
+import { api } from './api'
+import { listOf, type JoinRequestDto } from './dto'
 
-// Contrat prévu avec le back (le joueur est identifié par son token) :
-//   PATCH  /teams/:id                       { name } | { visibility }  → MyTeam
-//   PATCH  /teams/:id/members/:memberId      { role }                   → MyTeam
-//   POST   /teams/:id/captain                { memberId }               → MyTeam
-//   DELETE /teams/:id/members/:memberId                                 → MyTeam  (exclusion)
-//   POST   /teams/:id/requests/:requestId/accept                        → MyTeam
-//   DELETE /teams/:id/requests/:requestId                               → MyTeam  (refus)
-//   DELETE /teams/:id/members/me                                        → 204     (quitter)
-// Seul le capitaine touche à la composition (403 sinon), et seulement tant que les inscriptions
-// sont ouvertes (409 sinon) : B-09, B-10, B-11. Ici l'équipe est désignée par son tournoi,
-// puisqu'un joueur n'a qu'une équipe par tournoi.
+// Contrat du back (api-routes.md), actions sur l'équipe du joueur :
+//   PATCH  /teams/:id                       { name }      → { team }   capitaine (B-09)
+//   DELETE /teams/:id                                     → 204        capitaine (B-10)
+//   POST   /teams/:id/transfer-captaincy    { userId }    → { team }   capitaine (B-09)
+//   PATCH  /teams/:id/members/:userId       { roleId }    → { team }   capitaine (B-08, B-09)
+//   DELETE /teams/:id/members/:userId                     → { team }   capitaine (B-09, B-17)
+//   DELETE /teams/:id/members/me                          → 204        membre, capitaine compris (B-06)
+//   GET    /teams/:id/join-requests                       → { joinRequests, pagination }  capitaine
+//   POST   /join-requests/:id/accept | /reject            → { joinRequest }               capitaine
+// Toute modification est refusée (409) une fois les inscriptions closes (B-11). Si le capitaine
+// quitte l'équipe, le membre arrivé le plus tôt prend la main ; s'il était seul, l'équipe est
+// supprimée. Après une écriture, le front relit le tournoi (useMyTeams).
 
-export async function fetchMyTeams(): Promise<MyTeam[]> {
-  return db.myTeams
-    .filter((team) => findTournament(team.tournamentId).state !== 'termine')
-    .map(teamView)
+export async function renameTeam(teamId: number, name: string): Promise<void> {
+  await api.patch(`/teams/${teamId}`, { name })
 }
 
-function findMyTeam(tournamentId: string) {
-  const team = db.myTeams.find((t) => t.tournamentId === tournamentId)
-  if (!team) throw new ApiError(404, 'Tu n’es pas dans cette équipe.')
-  return team
+export async function deleteTeam(teamId: number): Promise<void> {
+  await api.delete(`/teams/${teamId}`)
 }
 
-function assertOpen(tournamentId: string) {
-  const tournament = findTournament(tournamentId)
-  if (tournament.state !== 'ouvertes')
-    throw new ApiError(409, 'Les inscriptions sont closes : l’effectif est figé.')
-  return tournament
-}
-
-/** Équipe modifiable par le joueur connecté : il en est le capitaine et les inscriptions sont ouvertes. */
-function managedTeam(tournamentId: string) {
-  const team = findMyTeam(tournamentId)
-  assertOpen(tournamentId)
-  if (team.captainId !== team.myMemberId)
-    throw new ApiError(403, 'Seul le capitaine peut modifier l’équipe.')
-  return team
-}
-
-function findMember(team: MyTeam, memberId: string) {
-  const member = team.members.find((m) => m.id === memberId)
-  if (!member) throw new ApiError(404, 'Ce joueur n’est pas dans l’équipe.')
-  return member
-}
-
-export async function renameTeam(tournamentId: string, name: string): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  const teamName = name.trim()
-  const invalid = validateTeamName(teamName)
-  if (invalid) throw new ApiError(422, invalid)
-  team.name = teamName
-  return teamView(team)
-}
-
-export async function setVisibility(
-  tournamentId: string,
-  visibility: TeamVisibility,
-): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  team.visibility = visibility
-  return teamView(team)
+export async function transferCaptaincy(teamId: number, userId: number): Promise<void> {
+  await api.post(`/teams/${teamId}/transfer-captaincy`, { userId })
 }
 
 export async function setMemberRole(
-  tournamentId: string,
-  memberId: string,
-  role: string,
-): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  const { game } = findTournament(tournamentId)
-  if (!GAME_ROLES[game].includes(role)) throw new ApiError(422, 'Rôle inconnu pour ce jeu.')
-  findMember(team, memberId).role = role
-  return teamView(team)
+  teamId: number,
+  userId: number,
+  roleId: number | null,
+): Promise<void> {
+  await api.patch(`/teams/${teamId}/members/${userId}`, { roleId })
 }
 
-export async function transferCaptain(tournamentId: string, memberId: string): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  findMember(team, memberId)
-  team.captainId = memberId
-  // Les demandes passent au nouveau capitaine : teamView les masque désormais au joueur.
-  return teamView(team)
+export async function kickMember(teamId: number, userId: number): Promise<void> {
+  await api.delete(`/teams/${teamId}/members/${userId}`)
 }
 
-export async function kickMember(tournamentId: string, memberId: string): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  if (memberId === team.myMemberId) throw new ApiError(409, 'Tu ne peux pas t’exclure toi-même.')
-  findMember(team, memberId)
-  team.members = team.members.filter((m) => m.id !== memberId)
-  return teamView(team)
+export async function leaveTeam(teamId: number): Promise<void> {
+  await api.delete(`/teams/${teamId}/members/me`)
 }
 
-export async function acceptRequest(tournamentId: string, requestId: string): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  const request = team.requests.find((r) => r.id === requestId)
-  if (!request) throw new ApiError(404, 'Demande introuvable.')
-  if (team.members.length >= PLAYERS_PER_TEAM) throw new ApiError(409, 'L’équipe est complète.')
-
-  // Le nouveau venu reçoit le premier rôle encore libre ; le capitaine pourra le changer.
-  const roles = GAME_ROLES[findTournament(tournamentId).game]
-  const used = new Set(team.members.map((m) => m.role))
-  const role = roles.find((r) => !used.has(r)) ?? roles[0]
-  team.members.push({ id: `m-${request.id}`, username: request.username, role })
-  team.requests = team.requests.filter((r) => r.id !== requestId)
-  return teamView(team)
+export async function fetchJoinRequests(teamId: number): Promise<IncomingRequest[]> {
+  const data = await api.get<unknown>(`/teams/${teamId}/join-requests?limit=100`)
+  return listOf<JoinRequestDto>(data, 'joinRequests').map((r) => ({
+    id: r.id,
+    userId: r.user.id,
+    username: r.user.username,
+    createdAt: r.createdAt,
+  }))
 }
 
-export async function refuseRequest(tournamentId: string, requestId: string): Promise<MyTeam> {
-  const team = managedTeam(tournamentId)
-  team.requests = team.requests.filter((r) => r.id !== requestId)
-  return teamView(team)
+export async function acceptJoinRequest(requestId: number): Promise<void> {
+  await api.post(`/join-requests/${requestId}/accept`)
 }
 
-export async function leaveTeam(tournamentId: string): Promise<void> {
-  const team = findMyTeam(tournamentId)
-  assertOpen(tournamentId)
-  if (team.captainId === team.myMemberId)
-    throw new ApiError(409, 'Passe d’abord le rôle de capitaine à un autre membre.')
-  db.myTeams = db.myTeams.filter((t) => t !== team)
+export async function rejectJoinRequest(requestId: number): Promise<void> {
+  await api.post(`/join-requests/${requestId}/reject`)
 }

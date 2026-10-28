@@ -1,65 +1,57 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import * as myTeamApi from '../services/myTeam'
-import type { MyTeam, TeamVisibility } from '../types/team'
-
-type Status = 'loading' | 'ready' | 'error'
+import type { Tournament, TournamentTeam } from '../types/tournament'
+import { findMyTeam } from '../utils/tournaments'
+import { useTournaments } from './useTournaments'
 
 /** Actions sur une équipe donnée ; les erreurs remontent à l'appelant, qui les affiche. */
 export type TeamActions = {
   rename: (name: string) => Promise<void>
-  setVisibility: (visibility: TeamVisibility) => Promise<void>
-  setRole: (memberId: string, role: string) => Promise<void>
-  transferCaptain: (memberId: string) => Promise<void>
-  kick: (memberId: string) => Promise<void>
-  accept: (requestId: string) => Promise<void>
-  refuse: (requestId: string) => Promise<void>
+  setRole: (userId: number, roleId: number | null) => Promise<void>
+  transferCaptaincy: (userId: number) => Promise<void>
+  kick: (userId: number) => Promise<void>
+  accept: (requestId: number) => Promise<void>
+  reject: (requestId: number) => Promise<void>
   leave: () => Promise<void>
+  remove: () => Promise<void>
 }
 
+export type MyTeamEntry = { tournament: Tournament; team: TournamentTeam }
+
+/**
+ * Équipes du joueur dans les tournois pas encore terminés. Le back n'a pas de route
+ * « mes équipes » : on les retrouve dans le détail des tournois, qui liste les membres.
+ */
 export function useMyTeams() {
-  const [teams, setTeams] = useState<MyTeam[]>([])
-  const [status, setStatus] = useState<Status>('loading')
+  const { tournaments, status, userId, refresh } = useTournaments()
 
-  useEffect(() => {
-    let cancelled = false
-
-    myTeamApi.fetchMyTeams()
-      .then((list) => {
-        if (cancelled) return
-        setTeams(list)
-        setStatus('ready')
-      })
-      .catch(() => {
-        if (!cancelled) setStatus('error')
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  /** Attend la réponse du serveur, puis remplace l'équipe par la version renvoyée. */
-  const apply = useCallback(async (call: Promise<MyTeam>) => {
-    const updated = await call
-    setTeams((list) => list.map((t) => (t.tournamentId === updated.tournamentId ? updated : t)))
-  }, [])
+  const entries: MyTeamEntry[] = tournaments
+    .filter((t) => t.state !== 'termine')
+    .flatMap((tournament) => {
+      const team = findMyTeam(tournament, userId)
+      return team ? [{ tournament, team }] : []
+    })
 
   const actionsFor = useCallback(
-    (tournamentId: string): TeamActions => ({
-      rename: (name) => apply(myTeamApi.renameTeam(tournamentId, name)),
-      setVisibility: (visibility) => apply(myTeamApi.setVisibility(tournamentId, visibility)),
-      setRole: (memberId, role) => apply(myTeamApi.setMemberRole(tournamentId, memberId, role)),
-      transferCaptain: (memberId) => apply(myTeamApi.transferCaptain(tournamentId, memberId)),
-      kick: (memberId) => apply(myTeamApi.kickMember(tournamentId, memberId)),
-      accept: (requestId) => apply(myTeamApi.acceptRequest(tournamentId, requestId)),
-      refuse: (requestId) => apply(myTeamApi.refuseRequest(tournamentId, requestId)),
-      leave: async () => {
-        await myTeamApi.leaveTeam(tournamentId)
-        setTeams((list) => list.filter((t) => t.tournamentId !== tournamentId))
-      },
-    }),
-    [apply],
+    ({ tournament, team }: MyTeamEntry): TeamActions => {
+      /** Écrit, puis relit le tournoi : le back reste la seule source de vérité. */
+      const then = async (write: Promise<void>) => {
+        await write
+        await refresh(tournament.id)
+      }
+      return {
+        rename: (name) => then(myTeamApi.renameTeam(team.id, name)),
+        setRole: (userId, roleId) => then(myTeamApi.setMemberRole(team.id, userId, roleId)),
+        transferCaptaincy: (userId) => then(myTeamApi.transferCaptaincy(team.id, userId)),
+        kick: (userId) => then(myTeamApi.kickMember(team.id, userId)),
+        accept: (requestId) => then(myTeamApi.acceptJoinRequest(requestId)),
+        reject: (requestId) => then(myTeamApi.rejectJoinRequest(requestId)),
+        leave: () => then(myTeamApi.leaveTeam(team.id)),
+        remove: () => then(myTeamApi.deleteTeam(team.id)),
+      }
+    },
+    [refresh],
   )
 
-  return { teams, status, actionsFor }
+  return { entries, status, userId, actionsFor }
 }

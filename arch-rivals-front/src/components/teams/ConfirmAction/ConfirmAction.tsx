@@ -1,15 +1,25 @@
 import { useState } from 'react'
 import { useAsyncAction } from '../../../hooks/useAsyncAction'
 import controls from '../controls.module.css'
-import styles from './LeaveTeam.module.css'
+import styles from './ConfirmAction.module.css'
 
-type LeaveTeamProps = {
-  teamName: string
-  onLeave: () => Promise<void>
+type ConfirmActionProps = {
+  /** Bouton de départ, ex. « Quitter l'équipe ». */
+  label: string
+  /** Question posée avant d'agir, ex. « Quitter X ? Tu perdras l'accès au conseil. » */
+  question: string
+  /** Bouton de confirmation, ex. « Quitter ». */
+  confirmLabel: string
+  onConfirm: () => Promise<void>
 }
 
-/** Un joueur peut quitter son équipe tant que les inscriptions sont ouvertes (B-06). */
-export default function LeaveTeam({ teamName, onLeave }: LeaveTeamProps) {
+/** Action destructrice confirmée sur place (quitter, supprimer l'équipe). */
+export default function ConfirmAction({
+  label,
+  question,
+  confirmLabel,
+  onConfirm,
+}: ConfirmActionProps) {
   const [confirming, setConfirming] = useState(false)
   const { pending, error, run } = useAsyncAction()
 
@@ -17,24 +27,24 @@ export default function LeaveTeam({ teamName, onLeave }: LeaveTeamProps) {
     return (
       <button
         type="button"
-        className={`${controls.btn} ${controls.danger} ${styles.leave}`}
+        className={`${controls.btn} ${controls.danger} ${styles.start}`}
         onClick={() => setConfirming(true)}
       >
-        Quitter l'équipe
+        {label}
       </button>
     )
   }
 
   return (
     <div className={styles.confirm} role="group" aria-label="Confirmation">
-      <span className={styles.text}>Quitter {teamName} ? Tu perdras l'accès au conseil.</span>
+      <span className={styles.text}>{question}</span>
       <button
         type="button"
         className={`${controls.btn} ${controls.dangerFilled}`}
-        onClick={() => run(onLeave)}
+        onClick={() => run(onConfirm)}
         disabled={pending}
       >
-        Quitter
+        {confirmLabel}
       </button>
       <button
         type="button"

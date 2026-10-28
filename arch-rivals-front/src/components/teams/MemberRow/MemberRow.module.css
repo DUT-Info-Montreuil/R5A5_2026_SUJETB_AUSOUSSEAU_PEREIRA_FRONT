@@ -73,6 +73,11 @@
   color: var(--color-text-muted);
 }
 
+.noRole {
+  font-style: italic;
+  color: var(--color-danger);
+}
+
 .select {
   align-self: flex-start;
   min-height: 32px;

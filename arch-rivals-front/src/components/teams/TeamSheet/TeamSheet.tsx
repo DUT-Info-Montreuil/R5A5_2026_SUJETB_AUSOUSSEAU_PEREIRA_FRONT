@@ -1,34 +1,35 @@
 import { Link } from 'react-router'
+import { useJoinRequests } from '../../../hooks/useJoinRequests'
 import type { TeamActions } from '../../../hooks/useMyTeams'
-import type { MyTeam } from '../../../types/team'
-import type { Tournament } from '../../../types/tournament'
+import type { Tournament, TournamentTeam } from '../../../types/tournament'
 import { bannerInitials } from '../../../utils/initials'
-import { isCaptain, missingPlayers } from '../../../utils/teams'
-import { useGames } from '../../../hooks/useGames'
+import { isCaptain, membersWithoutRole, missingPlayers } from '../../../utils/teams'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
+import ConfirmAction from '../ConfirmAction/ConfirmAction'
 import JoinRequests from '../JoinRequests/JoinRequests'
-import LeaveTeam from '../LeaveTeam/LeaveTeam'
 import MemberRow from '../MemberRow/MemberRow'
 import TeamNameEditor from '../TeamNameEditor/TeamNameEditor'
-import VisibilitySwitch from '../VisibilitySwitch/VisibilitySwitch'
 import styles from './TeamSheet.module.css'
 
 type TeamSheetProps = {
-  team: MyTeam
+  team: TournamentTeam
   tournament: Tournament
+  /** Joueur connecté. */
+  userId: number | null
   actions: TeamActions
 }
 
-export default function TeamSheet({ team, tournament, actions }: TeamSheetProps) {
+export default function TeamSheet({ team, tournament, userId, actions }: TeamSheetProps) {
   // L'effectif ne bouge que tant que les inscriptions sont ouvertes (B-11),
   // et seul le capitaine y touche (B-10).
   const open = tournament.state === 'ouvertes'
-  const captain = isCaptain(team)
+  const captain = isCaptain(team, userId)
   const editable = captain && open
   const missing = missingPlayers(team)
-  // Rôles du jeu du tournoi, servis par le back (GET /api/games).
-  const { games } = useGames()
-  const roles = games.find((g) => g.name === tournament.game)?.roles.map((r) => r.name) ?? []
+  const noRole = membersWithoutRole(team)
+  const alone = team.members.length === 1
+  // L'objet `team` change à chaque relecture du tournoi : les demandes sont alors relues.
+  const { requests, failed } = useJoinRequests(team.id, editable, team)
 
   return (
     <section className={styles.sheet} aria-label={`Équipe ${team.name}`}>
@@ -57,18 +58,14 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
         </span>
       </div>
 
-      {open && missing > 0 && (
+      {/* Au lancement, une équipe est incomplète s'il manque un joueur ou un rôle (B-04, B-08). */}
+      {open && (missing > 0 || noRole > 0) && (
         <p className={styles.warning} role="status">
-          Il manque {missing} joueur{missing > 1 ? 's' : ''}. Une équipe incomplète au lancement du
-          tournoi est déclarée forfait sur son premier match.
+          {missing > 0 && `Il manque ${missing} joueur${missing > 1 ? 's' : ''}. `}
+          {noRole > 0 && `${noRole} joueur${noRole > 1 ? 's' : ''} sans rôle. `}
+          Une équipe incomplète au lancement du tournoi est déclarée forfait sur son premier match.
         </p>
       )}
-
-      <VisibilitySwitch
-        visibility={team.visibility}
-        editable={editable}
-        onChange={actions.setVisibility}
-      />
 
       <div className={styles.roster}>
         <div className={styles.rosterHead}>
@@ -80,15 +77,15 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
         <ul className={styles.members}>
           {team.members.map((member) => (
             <MemberRow
-              key={member.id}
+              key={member.userId}
               member={member}
-              isCaptain={member.id === team.captainId}
-              isMe={member.id === team.myMemberId}
+              isCaptain={member.isCaptain}
+              isMe={member.userId === userId}
               editable={editable}
-              roles={roles}
-              onRoleChange={(role) => actions.setRole(member.id, role)}
-              onTransfer={() => actions.transferCaptain(member.id)}
-              onKick={() => actions.kick(member.id)}
+              roles={tournament.roles}
+              onRoleChange={(roleId) => actions.setRole(member.userId, roleId)}
+              onTransfer={() => actions.transferCaptaincy(member.userId)}
+              onKick={() => actions.kick(member.userId)}
             />
           ))}
           {Array.from({ length: missing }, (_, i) => (
@@ -102,20 +99,43 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
         </ul>
       </div>
 
-      {editable && team.requests.length > 0 && (
+      {editable && failed && (
+        <p className={styles.note} role="alert">
+          Impossible de charger les demandes à rejoindre.
+        </p>
+      )}
+      {editable && requests.length > 0 && (
         <JoinRequests
-          requests={team.requests}
+          requests={requests}
           full={missing === 0}
           onAccept={actions.accept}
-          onRefuse={actions.refuse}
+          onRefuse={actions.reject}
         />
       )}
 
-      {open && !captain && <LeaveTeam teamName={team.name} onLeave={actions.leave} />}
-      {open && captain && team.members.length > 1 && (
-        <p className={styles.note}>
-          Pour quitter l'équipe, passe d'abord le rôle de capitaine à un autre membre.
-        </p>
+      {open && (
+        <div className={styles.exits}>
+          <ConfirmAction
+            label="Quitter l'équipe"
+            question={
+              captain && !alone
+                ? `Quitter ${team.name} ? Le membre arrivé le plus tôt deviendra capitaine.`
+                : captain
+                  ? `Tu es seul : quitter ${team.name} la supprime.`
+                  : `Quitter ${team.name} ? Tu perdras l'accès au conseil.`
+            }
+            confirmLabel="Quitter"
+            onConfirm={actions.leave}
+          />
+          {captain && (
+            <ConfirmAction
+              label="Supprimer l'équipe"
+              question={`Supprimer ${team.name} ? Membres, demandes et messages seront effacés.`}
+              confirmLabel="Supprimer"
+              onConfirm={actions.remove}
+            />
+          )}
+        </div>
       )}
     </section>
   )

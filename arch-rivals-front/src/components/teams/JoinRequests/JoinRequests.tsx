@@ -7,8 +7,8 @@ type JoinRequestsProps = {
   requests: readonly IncomingRequest[]
   /** Effectif au complet : plus personne ne peut être accepté. */
   full: boolean
-  onAccept: (requestId: string) => Promise<void>
-  onRefuse: (requestId: string) => Promise<void>
+  onAccept: (requestId: number) => Promise<void>
+  onRefuse: (requestId: number) => Promise<void>
 }
 
 export default function JoinRequests({ requests, full, onAccept, onRefuse }: JoinRequestsProps) {
@@ -22,7 +22,13 @@ export default function JoinRequests({ requests, full, onAccept, onRefuse }: Joi
           <li key={request.id} className={styles.request}>
             <span className={styles.who}>
               <span className={styles.name}>{request.username}</span>
-              <span className={styles.note}>{request.note}</span>
+              <span className={styles.note}>
+                Demande du{' '}
+                {new Date(request.createdAt).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </span>
             </span>
             <span className={styles.actions}>
               <button

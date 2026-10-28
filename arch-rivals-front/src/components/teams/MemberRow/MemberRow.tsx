@@ -1,6 +1,7 @@
 import { useId, useState } from 'react'
 import { useAsyncAction } from '../../../hooks/useAsyncAction'
-import type { TeamMember } from '../../../types/team'
+import type { GameRole } from '../../../types/game'
+import type { TeamMember } from '../../../types/tournament'
 import { initials } from '../../../utils/initials'
 import controls from '../controls.module.css'
 import styles from './MemberRow.module.css'
@@ -11,8 +12,8 @@ type MemberRowProps = {
   isMe: boolean
   /** Capitaine et inscriptions ouvertes : rôles et actions modifiables. */
   editable: boolean
-  roles: readonly string[]
-  onRoleChange: (role: string) => Promise<void>
+  roles: readonly GameRole[]
+  onRoleChange: (roleId: number | null) => Promise<void>
   onTransfer: () => Promise<void>
   onKick: () => Promise<void>
 }
@@ -62,21 +63,25 @@ export default function MemberRow({
             <select
               id={roleId}
               className={styles.select}
-              value={member.role}
-              onChange={(e) => run(() => onRoleChange(e.target.value))}
+              value={member.role?.id ?? ''}
+              onChange={(e) =>
+                run(() => onRoleChange(e.target.value === '' ? null : Number(e.target.value)))
+              }
               disabled={pending}
             >
-              {/* Un rôle qui n'existe plus pour ce jeu reste affiché tel quel. */}
-              {!roles.includes(member.role) && <option value={member.role}>{member.role}</option>}
+              {/* Sans rôle, l'équipe compte comme incomplète au lancement (B-08). */}
+              <option value="">Aucun rôle</option>
               {roles.map((role) => (
-                <option key={role} value={role}>
-                  {role}
+                <option key={role.id} value={role.id}>
+                  {role.name}
                 </option>
               ))}
             </select>
           </>
         ) : (
-          <span className={styles.role}>{member.role}</span>
+          <span className={member.role ? styles.role : `${styles.role} ${styles.noRole}`}>
+            {member.role?.name ?? 'Aucun rôle'}
+          </span>
         )}
       </span>
 

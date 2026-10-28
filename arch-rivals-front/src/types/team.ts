@@ -1,32 +1,23 @@
-import type { Team } from './tournament'
+/** Demande reçue par l'équipe (GET /api/teams/:id/join-requests, réservée au capitaine). */
+export type IncomingRequest = {
+  id: number
+  userId: number
+  username: string
+  createdAt: string
+}
 
-export type TeamVisibility = 'open' | 'closed'
+// --- Faux back de la salle du conseil (services/chat.ts), retiré au commit suivant ---
 
-export type TeamMember = {
+export type TeamMemberMock = {
   id: string
   username: string
-  /** Rôle de jeu (voir GET /api/games). */
   role: string
 }
 
-/** Demande d'un joueur pour rejoindre l'équipe, que seul le capitaine voit et traite. */
-export type IncomingRequest = {
-  id: string
-  username: string
-  /** Présentation libre : rôle visé, IUT… */
-  note: string
-}
-
-/** Équipe du joueur connecté dans un tournoi, vue de l'intérieur. */
 export type MyTeam = {
   tournamentId: string
-  name: Team
+  name: string
   captainId: string
-  members: TeamMember[]
-  /** Une équipe fermée n'accepte aucune demande et n'apparaît pas parmi celles qui recrutent. */
-  visibility: TeamVisibility
-  /** Demandes en attente (vides si le joueur n'est pas capitaine). */
-  requests: IncomingRequest[]
-  /** Le membre qui correspond au joueur connecté (fourni par le serveur). */
+  members: TeamMemberMock[]
   myMemberId: string
 }

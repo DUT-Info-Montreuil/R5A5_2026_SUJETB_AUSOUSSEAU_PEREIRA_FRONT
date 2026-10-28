@@ -153,3 +153,11 @@
   font-style: italic;
   color: var(--color-text-faint);
 }
+
+/* Quitter / supprimer l'équipe */
+.exits {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}

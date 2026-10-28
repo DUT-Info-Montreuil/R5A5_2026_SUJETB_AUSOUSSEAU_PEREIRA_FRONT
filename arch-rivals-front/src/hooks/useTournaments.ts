@@ -108,5 +108,14 @@ export function useTournaments() {
     [requests, refresh, saveRequests],
   )
 
-  return { tournaments, status, userId, requests, createTeam, requestToJoin, cancelRequest }
+  return {
+    tournaments,
+    status,
+    userId,
+    requests,
+    refresh,
+    createTeam,
+    requestToJoin,
+    cancelRequest,
+  }
 }

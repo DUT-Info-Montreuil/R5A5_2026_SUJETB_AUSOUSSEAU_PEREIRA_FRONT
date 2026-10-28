@@ -1,15 +1,15 @@
 import styles from './TeamChips.module.css'
 
 export type TeamChip = {
-  tournamentId: string
+  tournamentId: number
   teamName: string
   tournamentName: string
 }
 
 type TeamChipsProps = {
   chips: readonly TeamChip[]
-  selected: string
-  onSelect: (tournamentId: string) => void
+  selected: number
+  onSelect: (tournamentId: number) => void
 }
 
 /** Une pastille par équipe du joueur (une seule équipe par tournoi). */
