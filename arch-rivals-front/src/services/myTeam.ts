@@ -1,8 +1,8 @@
 import type { MyTeam, TeamVisibility } from '../types/team'
-import { GAME_ROLES, PLAYERS_PER_TEAM } from '../utils/tournaments'
+import { PLAYERS_PER_TEAM } from '../utils/tournaments'
 import { validateTeamName } from '../utils/validation'
 import { ApiError } from './api'
-import { db, findTournament, teamView } from './mockBackend'
+import { db, findTournament, GAME_ROLES, teamView } from './mockBackend'
 
 // Contrat prévu avec le back (le joueur est identifié par son token) :
 //   PATCH  /teams/:id                       { name } | { visibility }  → MyTeam
