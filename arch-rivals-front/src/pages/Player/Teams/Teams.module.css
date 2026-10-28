@@ -23,7 +23,7 @@
   color: var(--color-text-faint);
 }
 
-/* Fiche d'équipe, puis la salle du conseil à côté (feature suivante). */
+/* Fiche d'équipe et salle du conseil, côte à côte quand la place le permet. */
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));

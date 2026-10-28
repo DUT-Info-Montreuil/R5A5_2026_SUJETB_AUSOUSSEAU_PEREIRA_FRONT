@@ -1,0 +1,190 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 520px;
+  background: var(--color-surface-deep);
+  border: 1px solid var(--color-card-border);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--color-card-border);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.dotLive,
+.dotOff {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dotLive {
+  background: var(--color-success);
+  animation: glint 1.4s ease-in-out infinite;
+}
+
+.dotOff {
+  background: var(--color-text-faint);
+}
+
+/* Fil des messages */
+.messages {
+  flex: 1;
+  max-height: 440px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
+.empty {
+  margin: auto;
+  font-size: 16px;
+  font-style: italic;
+  text-align: center;
+  color: var(--color-text-faint);
+}
+
+.msg {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 82%;
+  align-self: flex-start;
+}
+
+.mine {
+  align-self: flex-end;
+  text-align: right;
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--color-text-faint);
+}
+
+.bubble {
+  padding: 10px 14px;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: left;
+  color: var(--color-text);
+  background: var(--team-pending-bg);
+  border: 1px solid var(--color-card-border);
+  overflow-wrap: anywhere;
+}
+
+.mine .bubble {
+  background: var(--team-winner-bg);
+  border-color: var(--color-gold-dark);
+}
+
+/* Saisie */
+.form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px;
+  border-top: 1px solid var(--color-card-border);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0 14px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+}
+
+.input::placeholder {
+  color: var(--color-text-faint);
+}
+
+.input:focus {
+  border-color: var(--color-gold);
+  outline: none;
+}
+
+.input:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.send {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.send:hover:not(:disabled),
+.send:focus-visible {
+  background: var(--color-gold-hover);
+}
+
+.send:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Équipe éliminée */
+.closed {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px;
+  text-align: center;
+}
+
+.closedTitle {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-text-strong);
+}
+
+.closedText {
+  max-width: 36ch;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}

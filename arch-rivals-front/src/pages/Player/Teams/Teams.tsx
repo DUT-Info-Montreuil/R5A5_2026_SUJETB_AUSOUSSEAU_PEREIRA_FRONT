@@ -1,8 +1,10 @@
 import { Link, useNavigate, useSearchParams } from 'react-router'
+import TeamChat from '../../../components/teams/TeamChat/TeamChat'
 import TeamChips from '../../../components/teams/TeamChips/TeamChips'
 import TeamSheet from '../../../components/teams/TeamSheet/TeamSheet'
 import { useMyTeams } from '../../../hooks/useMyTeams'
 import { useTournaments } from '../../../hooks/useTournaments'
+import { playerProgress } from '../../../utils/bracket'
 import styles from './Teams.module.css'
 
 export default function Teams() {
@@ -74,6 +76,12 @@ export default function Teams() {
                   navigate('/joueur/tournois?onglet=avenir')
                 },
               }}
+            />
+            <TeamChat
+              key={`chat-${current.tournament.id}`}
+              tournamentId={current.tournament.id}
+              myMemberId={current.team.myMemberId}
+              closed={playerProgress(current.tournament).kind === 'eliminated'}
             />
           </div>
         </>
