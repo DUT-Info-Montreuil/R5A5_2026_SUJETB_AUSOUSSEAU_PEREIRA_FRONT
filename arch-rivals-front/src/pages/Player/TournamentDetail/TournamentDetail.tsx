@@ -1,14 +1,17 @@
 import { Link, useParams } from 'react-router'
 import StateBadge from '../../../components/tournaments/StateBadge/StateBadge'
 import TournamentBracket from '../../../components/tournaments/TournamentBracket/TournamentBracket'
+import { useAuth } from '../../../hooks/useAuth'
 import { useTournament } from '../../../hooks/useTournament'
 import { tournamentBracket } from '../../../utils/bracket'
-import { TEAMS_PER_TOURNAMENT } from '../../../utils/tournaments'
+import { dateLabel, findMyTeam, TEAMS_PER_TOURNAMENT } from '../../../utils/tournaments'
 import styles from './TournamentDetail.module.css'
 
 export default function TournamentDetail() {
   const { id = '' } = useParams()
-  const { tournament, status, live } = useTournament(id)
+  const { user } = useAuth()
+  // Identifiant mal formé (« /joueur/tournois/abc ») : traité comme un tournoi introuvable.
+  const { tournament, status, live } = useTournament(Number(id) || 0)
 
   const back = (
     <Link to="/joueur/tournois" className={styles.back}>
@@ -43,7 +46,7 @@ export default function TournamentDetail() {
             <span className={styles.sep} aria-hidden="true">
               ◆
             </span>
-            <span>{tournament.date}</span>
+            <span>{dateLabel(tournament)}</span>
           </div>
         </div>
         {live && (
@@ -59,7 +62,7 @@ export default function TournamentDetail() {
           <TournamentBracket
             rounds={bracket.rounds}
             champion={bracket.champion}
-            myTeam={tournament.myTeam?.name ?? null}
+            myTeamId={findMyTeam(tournament, user?.id ?? null)?.id ?? null}
           />
           <p className={styles.note}>
             Ton équipe est encadrée d'or. Un match ne se joue qu'une fois ses deux équipes connues ;
@@ -70,8 +73,7 @@ export default function TournamentDetail() {
         <div className={styles.waiting}>
           <p className={styles.waitingTitle}>L'arbre sera tiré à la clôture des inscriptions</p>
           <p className={styles.waitingText}>
-            {tournament.registeredTeams} / {TEAMS_PER_TOURNAMENT} équipes engagées
-            {tournament.closing && ` · ${tournament.closing}`}
+            {tournament.teams.length} / {TEAMS_PER_TOURNAMENT} équipes engagées
           </p>
         </div>
       )}

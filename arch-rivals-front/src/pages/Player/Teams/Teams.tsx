@@ -24,11 +24,11 @@ export default function Teams() {
 
   // On n'affiche que les équipes dont le tournoi est connu.
   const entries = teams.flatMap((team) => {
-    const tournament = tournaments.find((t) => t.id === team.tournamentId)
+    const tournament = tournaments.find((t) => String(t.id) === team.tournamentId)
     return tournament ? [{ team, tournament }] : []
   })
   const requested = params.get('tournoi')
-  const current = entries.find((e) => e.tournament.id === requested) ?? entries[0]
+  const current = entries.find((e) => String(e.tournament.id) === requested) ?? entries[0]
 
   return (
     <>
@@ -55,11 +55,11 @@ export default function Teams() {
         <>
           <TeamChips
             chips={entries.map(({ team, tournament }) => ({
-              tournamentId: tournament.id,
+              tournamentId: String(tournament.id),
               teamName: team.name,
               tournamentName: tournament.name,
             }))}
-            selected={current.tournament.id}
+            selected={String(current.tournament.id)}
             onSelect={(id) => setParams({ tournoi: id })}
           />
           <div className={styles.grid}>
@@ -69,19 +69,19 @@ export default function Teams() {
               team={current.team}
               tournament={current.tournament}
               actions={{
-                ...actionsFor(current.tournament.id),
+                ...actionsFor(String(current.tournament.id)),
                 // Après un départ, retour aux tournois à venir pour trouver une autre équipe.
                 leave: async () => {
-                  await actionsFor(current.tournament.id).leave()
+                  await actionsFor(String(current.tournament.id)).leave()
                   navigate('/joueur/tournois?onglet=avenir')
                 },
               }}
             />
             <TeamChat
               key={`chat-${current.tournament.id}`}
-              tournamentId={current.tournament.id}
+              tournamentId={String(current.tournament.id)}
               myMemberId={current.team.myMemberId}
-              closed={playerProgress(current.tournament).kind === 'eliminated'}
+              closed={playerProgress(current.tournament, null).kind === 'eliminated'}
             />
           </div>
         </>

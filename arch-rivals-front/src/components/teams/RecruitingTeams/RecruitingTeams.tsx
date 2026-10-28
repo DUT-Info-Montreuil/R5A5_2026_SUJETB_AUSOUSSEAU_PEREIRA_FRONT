@@ -1,31 +1,27 @@
 import { useState } from 'react'
-import { useRecruitingTeams } from '../../../hooks/useRecruitingTeams'
-import type { JoinRequest } from '../../../types/tournament'
+import type { MyJoinRequest, TournamentTeam } from '../../../types/tournament'
 import { teamErrorMessage } from '../../../utils/teamErrors'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
 import styles from './RecruitingTeams.module.css'
 
 type RecruitingTeamsProps = {
-  tournamentId: string
+  /** Équipes du tournoi : seules celles qui ont une place libre sont proposées. */
+  teams: readonly TournamentTeam[]
   /** Demande déjà envoyée dans ce tournoi : les autres boutons sont bloqués. */
-  request: JoinRequest | null
-  onRequest: (teamId: string) => Promise<void>
+  request: MyJoinRequest | null
+  onRequest: (team: TournamentTeam) => Promise<void>
 }
 
-export default function RecruitingTeams({
-  tournamentId,
-  request,
-  onRequest,
-}: RecruitingTeamsProps) {
-  const { teams, status } = useRecruitingTeams(tournamentId)
-  const [pendingId, setPendingId] = useState<string | null>(null)
+export default function RecruitingTeams({ teams, request, onRequest }: RecruitingTeamsProps) {
+  const [pendingId, setPendingId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const recruiting = teams.filter((t) => t.members.length < PLAYERS_PER_TEAM)
 
-  async function ask(teamId: string) {
-    setPendingId(teamId)
+  async function ask(team: TournamentTeam) {
+    setPendingId(team.id)
     setError(null)
     try {
-      await onRequest(teamId)
+      await onRequest(team)
     } catch (err) {
       setError(teamErrorMessage(err))
     } finally {
@@ -37,17 +33,11 @@ export default function RecruitingTeams({
     <div className={styles.panel}>
       <span className={styles.title}>ÉQUIPES QUI RECRUTENT</span>
 
-      {status === 'loading' && <p className={styles.note}>Chargement des équipes…</p>}
-      {status === 'error' && (
-        <p className={styles.error} role="alert">
-          Impossible de charger les équipes.
-        </p>
-      )}
-      {status === 'ready' && teams.length === 0 && (
+      {recruiting.length === 0 && (
         <p className={styles.note}>Aucune équipe ne recrute pour l'instant. Crée la tienne !</p>
       )}
 
-      {teams.map((team) => {
+      {recruiting.map((team) => {
         const sentHere = request?.teamId === team.id
         const blocked = request !== null && !sentHere
         const className = sentHere
@@ -61,13 +51,13 @@ export default function RecruitingTeams({
             <span className={styles.info}>
               <span className={styles.name}>{team.name}</span>
               <span className={styles.count}>
-                {team.memberCount} / {PLAYERS_PER_TEAM} joueurs
+                {team.members.length} / {PLAYERS_PER_TEAM} joueurs
               </span>
             </span>
             <button
               type="button"
               className={className}
-              onClick={() => ask(team.id)}
+              onClick={() => ask(team)}
               disabled={request !== null || pendingId !== null}
             >
               {sentHere

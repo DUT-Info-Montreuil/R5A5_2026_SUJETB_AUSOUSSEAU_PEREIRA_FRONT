@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
 import * as myTeamApi from '../services/myTeam'
-import { fetchMyTeams } from '../services/teams'
 import type { MyTeam, TeamVisibility } from '../types/team'
 
 type Status = 'loading' | 'ready' | 'error'
@@ -24,7 +23,7 @@ export function useMyTeams() {
   useEffect(() => {
     let cancelled = false
 
-    fetchMyTeams()
+    myTeamApi.fetchMyTeams()
       .then((list) => {
         if (cancelled) return
         setTeams(list)

@@ -1,27 +1,21 @@
-import type { Team } from '../../../types/tournament'
-import type { BracketMatch, BracketRound, MatchStatus } from '../../../utils/bracket'
+import type { BracketRound, MatchView } from '../../../utils/bracket'
 import styles from './TournamentBracket.module.css'
 
 type TournamentBracketProps = {
   rounds: BracketRound[]
-  champion: Team | null
+  champion: string | null
   /** Équipe du joueur connecté, encadrée d'or. */
-  myTeam: Team | null
+  myTeamId: number | null
 }
 
-const STATUS_LABELS: Record<Exclude<MatchStatus, 'scheduled'>, string> = {
+const STATUS_LABELS: Record<MatchView, string> = {
   waiting: 'EN ATTENTE DES ÉQUIPES',
-  live: '● EN DIRECT',
+  ready: 'À JOUER',
   done: 'TERMINÉ',
   forfeit: 'FORFAIT',
 }
 
-function statusLabel({ status, time }: BracketMatch) {
-  if (status === 'scheduled') return (time ?? 'À planifier').toUpperCase()
-  return STATUS_LABELS[status]
-}
-
-export default function TournamentBracket({ rounds, champion, myTeam }: TournamentBracketProps) {
+export default function TournamentBracket({ rounds, champion, myTeamId }: TournamentBracketProps) {
   return (
     <div className={styles.frame}>
       <div className={styles.grid}>
@@ -37,7 +31,7 @@ export default function TournamentBracket({ rounds, champion, myTeam }: Tourname
                       className={[
                         styles.row,
                         styles[row.outcome],
-                        row.team && row.team === myTeam && styles.mine,
+                        row.teamId !== null && row.teamId === myTeamId && styles.mine,
                       ]
                         .filter(Boolean)
                         .join(' ')}
@@ -47,7 +41,7 @@ export default function TournamentBracket({ rounds, champion, myTeam }: Tourname
                     </div>
                   ))}
                   <span className={`${styles.status} ${styles[match.status]}`}>
-                    {statusLabel(match)}
+                    {STATUS_LABELS[match.status]}
                   </span>
                 </div>
               ))}

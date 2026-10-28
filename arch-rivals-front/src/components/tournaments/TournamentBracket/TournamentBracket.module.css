@@ -100,12 +100,8 @@
   color: var(--color-text-faint);
 }
 
-.scheduled {
+.ready {
   color: var(--color-gold);
-}
-
-.live {
-  color: var(--color-live);
 }
 
 .done {

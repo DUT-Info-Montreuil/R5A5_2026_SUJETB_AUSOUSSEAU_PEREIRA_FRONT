@@ -1,20 +1,20 @@
 import { useEffect, useState } from 'react'
 import { ApiError } from '../services/api'
 import { fetchTournament } from '../services/tournaments'
-import type { TournamentDetail } from '../types/tournament'
+import type { Tournament } from '../types/tournament'
 
 type Status = 'loading' | 'ready' | 'not-found' | 'error'
 
 type Loaded = {
-  id: string
-  tournament: TournamentDetail | null
+  id: number
+  tournament: Tournament | null
   status: Exclude<Status, 'loading'>
 }
 
 /** Intervalle de rafraîchissement d'un tournoi en cours (en attendant le temps réel). */
 const LIVE_REFRESH_MS = 15_000
 
-export function useTournament(id: string) {
+export function useTournament(id: number) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
 
   // Tant que la réponse pour cet id n'est pas arrivée, on est en chargement.

@@ -29,8 +29,6 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
   // Rôles du jeu du tournoi, servis par le back (GET /api/games).
   const { games } = useGames()
   const roles = games.find((g) => g.name === tournament.game)?.roles.map((r) => r.name) ?? []
-  // « Clôture le 30 oct. » → « 30 oct ».
-  const closingDate = tournament.closing?.replace(/^Clôture le /, '').replace(/\.$/, '')
 
   return (
     <section className={styles.sheet} aria-label={`Équipe ${team.name}`}>
@@ -54,9 +52,7 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
         <span className={styles.lockTag}>{open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ'}</span>
         <span>
           {open
-            ? closingDate
-              ? `Effectif modifiable jusqu’au ${closingDate}.`
-              : 'Effectif modifiable jusqu’à la clôture des inscriptions.'
+            ? 'Effectif modifiable jusqu’à la clôture des inscriptions.'
             : 'Les inscriptions sont closes, plus aucun changement possible.'}
         </span>
       </div>

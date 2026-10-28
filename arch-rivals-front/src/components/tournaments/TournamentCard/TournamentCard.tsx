@@ -1,10 +1,13 @@
 import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
-import type { TournamentDetail } from '../../../types/tournament'
+import { useAsyncAction } from '../../../hooks/useAsyncAction'
+import type { MyJoinRequest, Tournament, TournamentTeam } from '../../../types/tournament'
 import { playerProgress, type PlayerProgress } from '../../../utils/bracket'
 import { gameTag } from '../../../utils/games'
 import {
   canJoinOrCreate,
+  dateLabel,
+  findMyTeam,
   TEAMS_PER_TOURNAMENT,
   TOURNAMENT_FORMAT,
 } from '../../../utils/tournaments'
@@ -14,9 +17,14 @@ import StateBadge from '../StateBadge/StateBadge'
 import styles from './TournamentCard.module.css'
 
 type TournamentCardProps = {
-  tournament: TournamentDetail
-  onCreateTeam: (tournamentId: string, name: string) => Promise<void>
-  onRequestToJoin: (tournamentId: string, teamId: string) => Promise<void>
+  tournament: Tournament
+  /** Joueur connecté. */
+  userId: number | null
+  /** Demande en attente du joueur dans ce tournoi. */
+  request: MyJoinRequest | null
+  onCreateTeam: (tournamentId: number, name: string) => Promise<void>
+  onRequestToJoin: (tournamentId: number, team: TournamentTeam) => Promise<void>
+  onCancelRequest: (tournamentId: number) => Promise<void>
 }
 
 /** Panneau ouvert sous la carte (état d'interface, propre à la carte). */
@@ -26,7 +34,9 @@ type Panel = 'none' | 'create' | 'join'
 function progressLine(progress: PlayerProgress): string {
   switch (progress.kind) {
     case 'next':
-      return `${progress.match.round} vs ${progress.match.opponent} · ${progress.match.time}`
+      return `${progress.match.round} vs ${progress.match.opponent} · à jouer`
+    case 'waiting':
+      return `${progress.round} · en attente de l'adversaire`
     case 'eliminated':
       return `Éliminés en ${progress.round.toLowerCase()}`
     case 'champion':
@@ -38,12 +48,18 @@ function progressLine(progress: PlayerProgress): string {
 
 export default function TournamentCard({
   tournament,
+  userId,
+  request,
   onCreateTeam,
   onRequestToJoin,
+  onCancelRequest,
 }: TournamentCardProps) {
-  const { id, name, game, state, date, registeredTeams, closing, myTeam, myRequest } = tournament
+  const { id, name, game, state, teams } = tournament
   const [panel, setPanel] = useState<Panel>('none')
-  const canJoin = canJoinOrCreate(tournament)
+  const cancel = useAsyncAction()
+  const myTeam = findMyTeam(tournament, userId)
+  const me = myTeam?.members.find((m) => m.userId === userId)
+  const canJoin = canJoinOrCreate(tournament, userId, request !== null)
   const tag = gameTag(game)
   const open = state === 'ouvertes'
   // L'arbre n'existe qu'une fois les inscriptions closes.
@@ -51,17 +67,17 @@ export default function TournamentCard({
   const detailPrimary = !myTeam && !open
 
   const myLine = myTeam
-    ? `${myTeam.name} · ${myTeam.isCaptain ? 'Capitaine' : myTeam.role}`
-    : myRequest
-      ? `Demande envoyée à ${myRequest.teamName}`
+    ? `${myTeam.name} · ${me?.isCaptain ? 'Capitaine' : (me?.role?.name ?? 'Sans rôle')}`
+    : request
+      ? `Demande envoyée à ${request.teamName}`
       : 'Tu n’as pas encore d’équipe'
-  const myLineClass = myTeam ? styles.mine : myRequest ? styles.requested : styles.noTeam
+  const myLineClass = myTeam ? styles.mine : request ? styles.requested : styles.noTeam
   const toggle = (next: Panel) => setPanel((current) => (current === next ? 'none' : next))
   const info = open
-    ? `${registeredTeams} / ${TEAMS_PER_TOURNAMENT} équipes · ${closing}`
-    : progressLine(playerProgress(tournament))
+    ? `${teams.length} / ${TEAMS_PER_TOURNAMENT} équipes`
+    : progressLine(playerProgress(tournament, userId))
   const progress = {
-    '--progress': `${(registeredTeams / TEAMS_PER_TOURNAMENT) * 100}%`,
+    '--progress': `${(teams.length / TEAMS_PER_TOURNAMENT) * 100}%`,
   } as CSSProperties
 
   return (
@@ -88,7 +104,7 @@ export default function TournamentCard({
                 <span className={styles.sep} aria-hidden="true">
                   ◆
                 </span>
-                {date}
+                {dateLabel(tournament)}
               </span>
             </div>
             <div className={styles.meta}>
@@ -103,7 +119,7 @@ export default function TournamentCard({
                 aria-label="Équipes engagées"
                 aria-valuemin={0}
                 aria-valuemax={TEAMS_PER_TOURNAMENT}
-                aria-valuenow={registeredTeams}
+                aria-valuenow={teams.length}
               />
             )}
           </div>
@@ -122,6 +138,16 @@ export default function TournamentCard({
             >
               Mon équipe
             </Link>
+          )}
+          {request && open && !myTeam && (
+            <button
+              type="button"
+              className={styles.action}
+              onClick={() => cancel.run(() => onCancelRequest(id))}
+              disabled={cancel.pending}
+            >
+              {cancel.pending ? 'Annulation…' : 'Annuler ma demande'}
+            </button>
           )}
           {canJoin && (
             <>
@@ -145,6 +171,11 @@ export default function TournamentCard({
           )}
         </div>
       </div>
+      {cancel.error && (
+        <p className={styles.error} role="alert">
+          {cancel.error}
+        </p>
+      )}
       {panel === 'create' && canJoin && (
         <CreateTeamForm
           onCreate={(teamName) => onCreateTeam(id, teamName)}
@@ -152,11 +183,11 @@ export default function TournamentCard({
         />
       )}
       {/* Après l'envoi, le panneau reste ouvert pour montrer la demande partie. */}
-      {panel === 'join' && !myTeam && (
+      {panel === 'join' && !myTeam && open && (
         <RecruitingTeams
-          tournamentId={id}
-          request={myRequest}
-          onRequest={(teamId) => onRequestToJoin(id, teamId)}
+          teams={teams}
+          request={request}
+          onRequest={(team) => onRequestToJoin(id, team)}
         />
       )}
     </article>

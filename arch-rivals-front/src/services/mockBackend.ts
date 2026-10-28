@@ -1,14 +1,10 @@
-import { BRACKETS } from '../data/brackets'
 import { MY_TEAMS } from '../data/myTeams'
-import { TEAM_DIRECTORY } from '../data/teamDirectory'
-import { TOURNAMENTS } from '../data/tournaments'
 import type { MyTeam } from '../types/team'
-import type { TeamListing, Tournament, TournamentDetail } from '../types/tournament'
+import type { TournamentState } from '../types/tournament'
 import { ApiError } from './api'
 
-// Faux back en mémoire : les écritures (création d'équipe, demandes…) survivent d'une requête
-// à l'autre, jusqu'au rechargement de la page. Il disparaît quand les vraies routes arrivent :
-// seuls services/tournaments.ts et services/teams.ts l'utilisent.
+// Reste du faux back en mémoire : seules la page Équipes (services/myTeam.ts) et la salle du
+// conseil (services/chat.ts) l'utilisent encore. Il disparaît quand elles passent sur l'API.
 
 /** Rôles du faux back, par nom de jeu (le vrai back les sert sur GET /api/games). */
 export const GAME_ROLES: Record<string, readonly string[]> = {
@@ -18,20 +14,18 @@ export const GAME_ROLES: Record<string, readonly string[]> = {
   'Overwatch 2': ['Tank', 'DPS', 'Soutien'],
 }
 
-export const db = {
-  tournaments: TOURNAMENTS.map((t) => ({ ...t })) as Tournament[],
-  teams: TEAM_DIRECTORY.map((t) => ({ ...t })) as TeamListing[],
-  myTeams: structuredClone(MY_TEAMS) as MyTeam[],
+const MOCK_TOURNAMENTS: Record<
+  string,
+  { state: TournamentState; game: string; eliminated?: boolean }
+> = {
+  t1: { state: 'cours', game: 'Valorant' },
+  t2: { state: 'cours', game: 'League of Legends', eliminated: true },
+  t3: { state: 'ouvertes', game: 'Counter-Strike 2' },
+  t4: { state: 'closes', game: 'Overwatch 2' },
 }
 
-/** Copie renvoyée au front, comme le ferait une réponse JSON. */
-export function toDetail(tournament: Tournament): TournamentDetail {
-  const bracket = BRACKETS[tournament.id]
-  return structuredClone({
-    ...tournament,
-    teams: bracket?.teams ?? null,
-    results: bracket?.results ?? {},
-  })
+export const db = {
+  myTeams: structuredClone(MY_TEAMS) as MyTeam[],
 }
 
 /** L'équipe telle que le joueur connecté la voit : les demandes ne sont visibles que du capitaine. */
@@ -40,8 +34,8 @@ export function teamView(team: MyTeam): MyTeam {
   return team.captainId === team.myMemberId ? copy : { ...copy, requests: [] }
 }
 
-export function findTournament(id: string): Tournament {
-  const tournament = db.tournaments.find((t) => t.id === id)
+export function findTournament(id: string) {
+  const tournament = MOCK_TOURNAMENTS[id]
   if (!tournament) throw new ApiError(404, 'Tournoi introuvable.')
   return tournament
 }

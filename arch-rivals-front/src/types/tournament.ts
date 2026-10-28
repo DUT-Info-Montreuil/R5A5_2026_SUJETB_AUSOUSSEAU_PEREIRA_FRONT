@@ -1,3 +1,6 @@
+import type { GameRole } from './game'
+
+/** Nom d'équipe (arbre interactif de la page d'accueil). */
 export type Team = string
 
 export type BracketSize = 4 | 8 | 16
@@ -13,58 +16,62 @@ export type Podium = {
 /** Les quatre états d'un tournoi : ce qui est permis dépend de l'état. */
 export type TournamentState = 'ouvertes' | 'closes' | 'cours' | 'termine'
 
-/** Place du joueur connecté dans un tournoi (null s'il n'a pas d'équipe). */
-export type MyTeamSummary = {
-  name: Team
-  role: string
+export type TeamMember = {
+  userId: number
+  username: string
+  /** null tant que le capitaine n'a pas attribué de rôle (équipe incomplète au lancement). */
+  role: GameRole | null
   isCaptain: boolean
+  joinedAt: string
+}
+
+export type TournamentTeam = {
+  id: number
+  tournamentId: number
+  name: string
+  isEliminated: boolean
+  createdAt: string
+  members: TeamMember[]
+}
+
+/** pending : équipes pas encore connues ; ready : jouable ; finished : résultat validé. */
+export type MatchStatus = 'pending' | 'ready' | 'finished'
+
+export type Match = {
+  id: number
+  /** 1 = quarts, 2 = demies, 3 = finale. */
+  round: number
+  position: number
+  teamAId: number | null
+  teamBId: number | null
+  scoreA: number | null
+  scoreB: number | null
+  winnerId: number | null
+  isForfeit: boolean
+  status: MatchStatus
 }
 
 export type Tournament = {
-  id: string
+  id: number
   name: string
-  /** Nom du jeu (voir GET /api/games). */
+  gameId: number
   game: string
+  /** Rôles de jeu proposés dans les équipes de ce tournoi (GET /api/games). */
+  roles: GameRole[]
   state: TournamentState
-  /** Date affichée telle quelle (« Depuis le 18 oct. », « 6 déc. · 18h00 »…). */
-  date: string
-  /** Nombre d'équipes engagées (sur 8). */
-  registeredTeams: number
-  /** Fin des inscriptions, uniquement tant qu'elles sont ouvertes. */
-  closing?: string
-  myTeam: MyTeamSummary | null
-  /** Demande en attente du joueur (une seule par tournoi), null s'il n'en a pas. */
-  myRequest: JoinRequest | null
+  createdAt: string
+  closedAt: string | null
+  startedAt: string | null
+  finishedAt: string | null
+  teams: TournamentTeam[]
+  /** Vide tant que les inscriptions sont ouvertes : l'arbre est tiré à la clôture. */
+  matches: Match[]
 }
 
-export type JoinRequest = {
-  teamId: string
-  teamName: Team
-}
-
-/** Équipe telle qu'on la voit de l'extérieur (annuaire, équipes qui recrutent). */
-export type TeamListing = {
-  id: string
-  name: Team
-  tournamentId: string
-  captain: string
-  memberCount: number
-  /** Une équipe fermée n'accepte aucune demande et n'apparaît pas parmi celles qui recrutent. */
-  visibility: 'open' | 'closed'
-}
-
-/** Résultat (ou programmation) d'un match, saisi par l'administrateur. */
-export type MatchResult =
-  /** `time` est affiché tel quel ; `startsAt` (ISO 8601) sert au compte à rebours. */
-  | { kind: 'scheduled'; time: string; startsAt?: string }
-  | { kind: 'live'; score: [number, number] }
-  | { kind: 'done'; score: [number, number] }
-  /** `forfeit` : côté de l'équipe déclarée forfait, son adversaire est qualifié. */
-  | { kind: 'forfeit'; forfeit: Side }
-
-export type TournamentDetail = Tournament & {
-  /** Les 8 équipes dans l'ordre du tirage, absentes tant que les inscriptions sont ouvertes. */
-  teams: Team[] | null
-  /** Clé "tour-match" (ex. "0-3" = 4e quart, "2-0" = finale), comme dans useBracket. */
-  results: Record<string, MatchResult>
+/** Demande d'adhésion envoyée par le joueur connecté (une seule par tournoi). */
+export type MyJoinRequest = {
+  id: number
+  tournamentId: number
+  teamId: number
+  teamName: string
 }

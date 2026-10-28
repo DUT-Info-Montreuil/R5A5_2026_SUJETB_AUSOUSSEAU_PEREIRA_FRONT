@@ -1,4 +1,4 @@
-import type { Tournament, TournamentState } from '../types/tournament'
+import type { Tournament, TournamentState, TournamentTeam } from '../types/tournament'
 
 export const TEAMS_PER_TOURNAMENT = 8
 export const PLAYERS_PER_TEAM = 5
@@ -12,9 +12,38 @@ export const STATE_LABELS: Record<TournamentState, string> = {
   termine: 'TERMINÉ',
 }
 
+/** Équipe du joueur dans ce tournoi (un joueur n'a qu'une équipe par tournoi, B-07). */
+export function findMyTeam(tournament: Tournament, userId: number | null): TournamentTeam | null {
+  if (userId === null) return null
+  return tournament.teams.find((t) => t.members.some((m) => m.userId === userId)) ?? null
+}
+
 /** Le joueur peut créer ou rejoindre une équipe : inscriptions ouvertes, sans équipe ni demande. */
-export function canJoinOrCreate(tournament: Tournament) {
-  return tournament.state === 'ouvertes' && !tournament.myTeam && !tournament.myRequest
+export function canJoinOrCreate(
+  tournament: Tournament,
+  userId: number | null,
+  hasRequest: boolean,
+) {
+  return tournament.state === 'ouvertes' && !hasRequest && !findMyTeam(tournament, userId)
+}
+
+const shortDate = (iso: string) => {
+  const date = new Date(iso)
+  const sameYear = date.getFullYear() === new Date().getFullYear()
+  return date.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    ...(!sameYear && { year: 'numeric' }),
+  })
+}
+
+/** Date la plus parlante selon l'état : le back ne fournit pas de date de début ni de clôture prévue. */
+export function dateLabel(tournament: Tournament) {
+  const { state, createdAt, closedAt, startedAt, finishedAt } = tournament
+  if (state === 'termine' && finishedAt) return `Terminé le ${shortDate(finishedAt)}`
+  if (state === 'cours' && startedAt) return `Lancé le ${shortDate(startedAt)}`
+  if (state === 'closes' && closedAt) return `Inscriptions closes le ${shortDate(closedAt)}`
+  return `Ouvert le ${shortDate(createdAt)}`
 }
 
 export type TournamentTab = 'cours' | 'avenir' | 'termines'

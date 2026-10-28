@@ -1,8 +1,7 @@
 import { CHATS, INCOMING_POOL } from '../data/chats'
 import type { ChatMessage } from '../types/chat'
-import { playerProgress } from '../utils/bracket'
 import { ApiError } from './api'
-import { db, findTournament, toDetail } from './mockBackend'
+import { db, findTournament } from './mockBackend'
 
 // Contrat prévu avec le back (le joueur est identifié par son token) :
 //   GET  /teams/:id/messages            → ChatMessage[]   (403 si le joueur n'est pas membre)
@@ -31,7 +30,7 @@ function assertMember(tournamentId: string) {
 
 /** L'espace d'une équipe éliminée est fermé. */
 function isChatClosed(tournamentId: string) {
-  return playerProgress(toDetail(findTournament(tournamentId))).kind === 'eliminated'
+  return findTournament(tournamentId).eliminated === true
 }
 
 function publish(tournamentId: string, message: ChatMessage) {

@@ -16,7 +16,8 @@ import styles from './Tournaments.module.css'
 
 export default function Tournaments() {
   const { user } = useAuth()
-  const { tournaments, status, createTeam, requestToJoin } = useTournaments()
+  const { tournaments, status, userId, requests, createTeam, requestToJoin, cancelRequest } =
+    useTournaments()
 
   // Onglet et recherche vivent dans l'URL : ils survivent à F5 et se partagent.
   const [params, setParams] = useSearchParams()
@@ -29,7 +30,7 @@ export default function Tournaments() {
     ? tournaments.filter((t) => matchesQuery(t, query))
     : tournaments.filter((t) => inTab(t, tab))
 
-  const next = pickNextMatch(tournaments)
+  const next = pickNextMatch(tournaments, userId)
 
   const tabs = TOURNAMENT_TABS.map(({ id, label }) => ({
     id,
@@ -80,8 +81,11 @@ export default function Tournaments() {
             <TournamentCard
               key={t.id}
               tournament={t}
+              userId={userId}
+              request={requests[t.id] ?? null}
               onCreateTeam={createTeam}
               onRequestToJoin={requestToJoin}
+              onCancelRequest={cancelRequest}
             />
           ))}
           {visible.length === 0 && <p className={styles.empty}>Aucun tournoi ne correspond.</p>}

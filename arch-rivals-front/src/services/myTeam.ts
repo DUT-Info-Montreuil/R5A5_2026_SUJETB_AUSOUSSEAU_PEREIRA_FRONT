@@ -16,6 +16,12 @@ import { db, findTournament, GAME_ROLES, teamView } from './mockBackend'
 // sont ouvertes (409 sinon) : B-09, B-10, B-11. Ici l'équipe est désignée par son tournoi,
 // puisqu'un joueur n'a qu'une équipe par tournoi.
 
+export async function fetchMyTeams(): Promise<MyTeam[]> {
+  return db.myTeams
+    .filter((team) => findTournament(team.tournamentId).state !== 'termine')
+    .map(teamView)
+}
+
 function findMyTeam(tournamentId: string) {
   const team = db.myTeams.find((t) => t.tournamentId === tournamentId)
   if (!team) throw new ApiError(404, 'Tu n’es pas dans cette équipe.')
@@ -44,25 +50,13 @@ function findMember(team: MyTeam, memberId: string) {
   return member
 }
 
-/** Garde le résumé affiché sur la carte du tournoi (nom, rôle, capitaine) en phase avec l'équipe. */
-function syncSummary(team: MyTeam) {
-  const tournament = findTournament(team.tournamentId)
-  const me = findMember(team, team.myMemberId)
-  tournament.myTeam = { name: team.name, role: me.role, isCaptain: team.captainId === me.id }
-  return teamView(team)
-}
-
 export async function renameTeam(tournamentId: string, name: string): Promise<MyTeam> {
   const team = managedTeam(tournamentId)
   const teamName = name.trim()
   const invalid = validateTeamName(teamName)
   if (invalid) throw new ApiError(422, invalid)
-  const taken = db.teams.some(
-    (t) => t.tournamentId === tournamentId && t.name.toLowerCase() === teamName.toLowerCase(),
-  )
-  if (taken) throw new ApiError(409, 'Ce nom est déjà pris dans ce tournoi.')
   team.name = teamName
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function setVisibility(
@@ -71,7 +65,7 @@ export async function setVisibility(
 ): Promise<MyTeam> {
   const team = managedTeam(tournamentId)
   team.visibility = visibility
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function setMemberRole(
@@ -83,7 +77,7 @@ export async function setMemberRole(
   const { game } = findTournament(tournamentId)
   if (!GAME_ROLES[game].includes(role)) throw new ApiError(422, 'Rôle inconnu pour ce jeu.')
   findMember(team, memberId).role = role
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function transferCaptain(tournamentId: string, memberId: string): Promise<MyTeam> {
@@ -91,7 +85,7 @@ export async function transferCaptain(tournamentId: string, memberId: string): P
   findMember(team, memberId)
   team.captainId = memberId
   // Les demandes passent au nouveau capitaine : teamView les masque désormais au joueur.
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function kickMember(tournamentId: string, memberId: string): Promise<MyTeam> {
@@ -99,7 +93,7 @@ export async function kickMember(tournamentId: string, memberId: string): Promis
   if (memberId === team.myMemberId) throw new ApiError(409, 'Tu ne peux pas t’exclure toi-même.')
   findMember(team, memberId)
   team.members = team.members.filter((m) => m.id !== memberId)
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function acceptRequest(tournamentId: string, requestId: string): Promise<MyTeam> {
@@ -114,20 +108,19 @@ export async function acceptRequest(tournamentId: string, requestId: string): Pr
   const role = roles.find((r) => !used.has(r)) ?? roles[0]
   team.members.push({ id: `m-${request.id}`, username: request.username, role })
   team.requests = team.requests.filter((r) => r.id !== requestId)
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function refuseRequest(tournamentId: string, requestId: string): Promise<MyTeam> {
   const team = managedTeam(tournamentId)
   team.requests = team.requests.filter((r) => r.id !== requestId)
-  return syncSummary(team)
+  return teamView(team)
 }
 
 export async function leaveTeam(tournamentId: string): Promise<void> {
   const team = findMyTeam(tournamentId)
-  const tournament = assertOpen(tournamentId)
+  assertOpen(tournamentId)
   if (team.captainId === team.myMemberId)
     throw new ApiError(409, 'Passe d’abord le rôle de capitaine à un autre membre.')
   db.myTeams = db.myTeams.filter((t) => t !== team)
-  tournament.myTeam = null
 }
