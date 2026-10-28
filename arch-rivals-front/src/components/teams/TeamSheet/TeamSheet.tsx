@@ -4,7 +4,8 @@ import type { MyTeam } from '../../../types/team'
 import type { Tournament } from '../../../types/tournament'
 import { bannerInitials } from '../../../utils/initials'
 import { isCaptain, missingPlayers } from '../../../utils/teams'
-import { GAME_ROLES, PLAYERS_PER_TEAM } from '../../../utils/tournaments'
+import { useGames } from '../../../hooks/useGames'
+import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
 import JoinRequests from '../JoinRequests/JoinRequests'
 import LeaveTeam from '../LeaveTeam/LeaveTeam'
 import MemberRow from '../MemberRow/MemberRow'
@@ -25,6 +26,9 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
   const captain = isCaptain(team)
   const editable = captain && open
   const missing = missingPlayers(team)
+  // Rôles du jeu du tournoi, servis par le back (GET /api/games).
+  const { games } = useGames()
+  const roles = games.find((g) => g.name === tournament.game)?.roles.map((r) => r.name) ?? []
   // « Clôture le 30 oct. » → « 30 oct ».
   const closingDate = tournament.closing?.replace(/^Clôture le /, '').replace(/\.$/, '')
 
@@ -85,7 +89,7 @@ export default function TeamSheet({ team, tournament, actions }: TeamSheetProps)
               isCaptain={member.id === team.captainId}
               isMe={member.id === team.myMemberId}
               editable={editable}
-              roles={GAME_ROLES[tournament.game]}
+              roles={roles}
               onRoleChange={(role) => actions.setRole(member.id, role)}
               onTransfer={() => actions.transferCaptain(member.id)}
               onKick={() => actions.kick(member.id)}

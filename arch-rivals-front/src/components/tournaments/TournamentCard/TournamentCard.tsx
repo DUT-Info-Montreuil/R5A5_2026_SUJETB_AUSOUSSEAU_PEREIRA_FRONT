@@ -2,9 +2,9 @@ import { useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import type { TournamentDetail } from '../../../types/tournament'
 import { playerProgress, type PlayerProgress } from '../../../utils/bracket'
+import { gameTag } from '../../../utils/games'
 import {
   canJoinOrCreate,
-  GAME_TAGS,
   TEAMS_PER_TOURNAMENT,
   TOURNAMENT_FORMAT,
 } from '../../../utils/tournaments'
@@ -44,7 +44,7 @@ export default function TournamentCard({
   const { id, name, game, state, date, registeredTeams, closing, myTeam, myRequest } = tournament
   const [panel, setPanel] = useState<Panel>('none')
   const canJoin = canJoinOrCreate(tournament)
-  const tag = GAME_TAGS[game]
+  const tag = gameTag(game)
   const open = state === 'ouvertes'
   // L'arbre n'existe qu'une fois les inscriptions closes.
   const detailLabel = open ? 'Détails' : 'Voir l’arbre'
@@ -68,7 +68,7 @@ export default function TournamentCard({
     <article className={styles.card}>
       <div className={styles.body}>
         <div className={styles.main}>
-          <div className={`${styles.game} ${styles[tag]}`} title={game} aria-hidden="true">
+          <div className={`${styles.game} ${styles[tag] ?? ''}`} title={game} aria-hidden="true">
             {tag}
           </div>
           <div className={styles.details}>
