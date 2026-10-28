@@ -20,12 +20,13 @@ Un petit commit par point, dans l'ordre de ton choix.
     plutôt que de rappeler `GET /api/tournaments/:id/teams` pour chaque tournoi.
   - Pas de verrou équipe ouverte / fermée : le back n'a pas cette notion.
 
-- [ ] **Feature 8 : profil et notifications**
+- [x] **Feature 8 : profil et notifications**
   - Page profil (`/joueur/profil`) : avatar, pseudo, lien vers mes équipes, statistiques
     (tournois, victoires, titres), « Derniers faits d'armes ».
   - Pastille de l'en-tête cliquable (« Voir mon profil ») + déconnexion.
   - Toasts de confirmation (« Demande envoyée à X », « Bannière renommée »…).
   - Badge sur « Équipes » : demandes en attente + messages non lus.
+  - Ce qui manque au back pour aller plus loin : voir `BACK-ATTENDU.md`.
 
 ## Branchement sur le vrai back
 

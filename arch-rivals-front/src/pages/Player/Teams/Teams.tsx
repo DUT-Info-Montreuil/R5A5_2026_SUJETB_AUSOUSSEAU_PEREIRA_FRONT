@@ -1,9 +1,11 @@
+import { useEffect } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import Tabs from '../../../components/layout/Tabs/Tabs'
 import TeamChat from '../../../components/teams/TeamChat/TeamChat'
 import TeamChips from '../../../components/teams/TeamChips/TeamChips'
 import TeamDirectory from '../../../components/teams/TeamDirectory/TeamDirectory'
 import TeamSheet from '../../../components/teams/TeamSheet/TeamSheet'
+import { useNotifications } from '../../../hooks/useNotifications'
 import { useMyTeams, type MyTeamEntry, type TeamActions } from '../../../hooks/useMyTeams'
 import { useToastAfter } from '../../../hooks/useToast'
 import { matchesTeamQuery, teamDirectory } from '../../../utils/teamDirectory'
@@ -15,6 +17,7 @@ export default function Teams() {
   const { entries, status, userId, actionsFor, tournaments, requests, requestToJoin } = useMyTeams()
   const navigate = useNavigate()
   const toastAfter = useToastAfter()
+  const { unread, setActiveTeam } = useNotifications()
 
   // Onglet, équipe affichée (?tournoi=12), recherche et filtre vivent dans l'URL :
   // « Mon équipe » y mène directement, et F5 garde la vue.
@@ -24,6 +27,13 @@ export default function Teams() {
   const current = entries.find((e) => e.tournament.id === requested) ?? entries[0]
   const query = params.get('q') ?? ''
   const recruitingOnly = params.get('recrute') === '1'
+
+  // La salle du conseil affichée est lue : ses messages ne comptent pas dans le badge.
+  const chatTeamId = view === 'miennes' && current ? current.team.id : null
+  useEffect(() => {
+    setActiveTeam(chatTeamId)
+    return () => setActiveTeam(null)
+  }, [chatTeamId, setActiveTeam])
 
   const directory = teamDirectory(tournaments, userId, requests)
   const visible = directory.filter(
@@ -120,6 +130,7 @@ export default function Teams() {
               tournamentId: tournament.id,
               teamName: team.name,
               tournamentName: tournament.name,
+              unread: unread[team.id] ?? 0,
             }))}
             selected={current.tournament.id}
             onSelect={showTeam}

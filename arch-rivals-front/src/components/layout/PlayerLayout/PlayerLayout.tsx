@@ -1,4 +1,5 @@
 import { Outlet } from 'react-router'
+import NotificationsProvider from '../../../context/NotificationsProvider'
 import ToastProvider from '../../../context/ToastProvider'
 import TournamentsProvider from '../../../context/TournamentsProvider'
 import { useAuth } from '../../../hooks/useAuth'
@@ -13,15 +14,17 @@ export default function PlayerLayout() {
   return (
     // key : un autre compte repart de données vides.
     <TournamentsProvider key={user?.id ?? 'visiteur'}>
-      <ToastProvider>
-        <div className={styles.page}>
-          <PlayerHeader />
-          <main className={styles.main}>
-            <Outlet />
-          </main>
-          <Footer />
-        </div>
-      </ToastProvider>
+      <NotificationsProvider>
+        <ToastProvider>
+          <div className={styles.page}>
+            <PlayerHeader />
+            <main className={styles.main}>
+              <Outlet />
+            </main>
+            <Footer />
+          </div>
+        </ToastProvider>
+      </NotificationsProvider>
     </TournamentsProvider>
   )
 }

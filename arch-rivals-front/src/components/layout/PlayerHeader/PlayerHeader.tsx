@@ -1,5 +1,6 @@
 import { Link, NavLink } from 'react-router'
 import { useAuth } from '../../../hooks/useAuth'
+import { useNotifications } from '../../../hooks/useNotifications'
 import { initials } from '../../../utils/initials'
 import styles from './PlayerHeader.module.css'
 
@@ -9,6 +10,8 @@ const navClass = ({ isActive }: { isActive: boolean }) =>
 export default function PlayerHeader() {
   const { user } = useAuth()
   const username = user?.username ?? ''
+  const { pendingRequests, unreadTotal, total } = useNotifications()
+  const badgeTitle = `${pendingRequests} demande${pendingRequests > 1 ? 's' : ''} en attente · ${unreadTotal} message${unreadTotal > 1 ? 's' : ''} non lu${unreadTotal > 1 ? 's' : ''}`
 
   return (
     <header className={styles.header}>
@@ -22,6 +25,12 @@ export default function PlayerHeader() {
         </NavLink>
         <NavLink to="/joueur/equipes" className={navClass}>
           Équipes
+          {total > 0 && (
+            <span className={styles.badge} title={badgeTitle}>
+              {total > 99 ? '99+' : total}
+              <span className="sr-only"> ({badgeTitle})</span>
+            </span>
+          )}
         </NavLink>
         <NavLink
           to="/joueur/profil"

@@ -69,3 +69,11 @@ export async function rejectJoinRequest(requestId: number): Promise<void> {
 export function onTeamUpdated(onUpdate: (tournamentId: number) => void): () => void {
   return listen('team:updated', (team) => onUpdate(team.tournamentId))
 }
+
+/** Nombre de demandes en attente (badge « Équipes » du capitaine). */
+export async function countJoinRequests(teamId: number): Promise<number> {
+  const data = await api.get<{ pagination?: { total?: number } }>(
+    `/teams/${teamId}/join-requests?limit=1`,
+  )
+  return data.pagination?.total ?? 0
+}
