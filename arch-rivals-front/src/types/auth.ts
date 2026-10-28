@@ -1,5 +1,6 @@
+/** Le back identifie le compte par son email (POST /api/auth/login). */
 export type LoginPayload = {
-  username: string
+  email: string
   password: string
 }
 
@@ -10,15 +11,15 @@ export type RegisterPayload = {
 }
 
 /**
- * Utilisateur tel que renvoyé par le back (table users, colonnes en snake_case).
- * `password_hash` ne doit jamais sortir du back : il n'existe pas côté front.
+ * Utilisateur public tel que renvoyé par le back (camelCase, voir api-routes.md du back).
+ * Le hash du mot de passe ne sort jamais du back : il n'existe pas côté front.
  */
 export type User = {
   id: number
   username: string
   email: string
-  is_admin: boolean
-  created_at: string
+  isAdmin: boolean
+  createdAt: string
 }
 
 export type AuthResponse = {

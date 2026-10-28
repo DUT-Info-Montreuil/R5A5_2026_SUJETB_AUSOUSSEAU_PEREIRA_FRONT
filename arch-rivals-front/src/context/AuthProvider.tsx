@@ -48,20 +48,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     setStatus('authenticated')
   }, [])
 
-  const register = useCallback(
-    async (payload: RegisterPayload) => {
-      const res = await authApi.register(payload)
-      // Si l'inscription ne renvoie pas de token, on enchaîne sur une connexion classique.
-      if (!res?.token || !res.user) {
-        await login({ username: payload.username, password: payload.password })
-        return
-      }
-      applyToken(res.token)
-      setUser(res.user)
-      setStatus('authenticated')
-    },
-    [login],
-  )
+  const register = useCallback(async (payload: RegisterPayload) => {
+    const { token, user } = await authApi.register(payload)
+    applyToken(token)
+    setUser(user)
+    setStatus('authenticated')
+  }, [])
 
   // Pas de route de déconnexion côté back pour l'instant : on oublie simplement le token.
   const logout = useCallback(() => {

@@ -10,6 +10,8 @@ export function teamErrorMessage(err: unknown): string {
       return 'Serveur injoignable. Réessaie dans un instant.'
     case err.status === 401:
       return 'Ta session a expiré. Reconnecte-toi.'
+    case err.status === 429:
+      return 'Trop de requêtes. Réessaie dans un instant.'
     case err.status >= 500:
       return 'Le serveur a rencontré une erreur. Réessaie dans un instant.'
     // 403, 404, 409, 422 : le back explique la règle métier refusée.

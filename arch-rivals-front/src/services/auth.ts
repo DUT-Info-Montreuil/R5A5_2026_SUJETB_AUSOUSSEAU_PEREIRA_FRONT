@@ -1,20 +1,21 @@
 import type { AuthResponse, LoginPayload, RegisterPayload, User } from '../types/auth'
 import { api } from './api'
 
-// Contrat supposé avec le back (Express, http://localhost:3000/api en dev) :
-//   POST /auth/login     { username, password }         → { token, user }
-//   POST /auth/register  { email, username, password }  → { token, user }  (ou juste { user })
-//   GET  /auth/me        Authorization: Bearer <token>  → user  (ou { user })
-// avec user = { id, username, email, is_admin, created_at } — jamais password_hash.
-// Le mot de passe part en clair (HTTPS en prod) : le hachage bcrypt + salt est fait côté back.
-// Si le back renvoie d'autres formes, c'est ici (et seulement ici) qu'il faut adapter.
+// Contrat du back (api-routes.md, http://localhost:3000/api en dev) :
+//   POST /auth/login     { email, password }            → 200 { token, user }
+//   POST /auth/register  { email, username, password }  → 201 { token, user }
+//   GET  /auth/me        Authorization: Bearer <token>  → 200 { user }
+// avec user = { id, username, email, isAdmin, createdAt }, jamais le mot de passe.
+// Erreurs : 401 INVALID_CREDENTIALS, 409 EMAIL_TAKEN / USERNAME_TAKEN,
+// 429 TOO_MANY_ATTEMPTS (header Retry-After), 400 VALIDATION_ERROR.
+// Le mot de passe part en clair (HTTPS en prod) : le hachage bcrypt est fait côté back.
 
 export const login = (payload: LoginPayload) => api.post<AuthResponse>('/auth/login', payload)
 
 export const register = (payload: RegisterPayload) =>
-  api.post<Partial<AuthResponse>>('/auth/register', payload)
+  api.post<AuthResponse>('/auth/register', payload)
 
 export async function me(): Promise<User> {
-  const data = await api.get<User | { user: User }>('/auth/me')
-  return 'user' in data ? data.user : data
+  const { user } = await api.get<{ user: User }>('/auth/me')
+  return user
 }

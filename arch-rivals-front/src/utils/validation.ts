@@ -4,7 +4,8 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const USERNAME_RE = /^[A-Za-z0-9_.-]+$/
 
 export const USERNAME_MIN = 3
-export const USERNAME_MAX = 20
+/** Bornes du schéma du back (users.username : 3 à 32 caractères). */
+export const USERNAME_MAX = 32
 export const PASSWORD_MIN = 8
 /** bcrypt ignore tout ce qui dépasse 72 octets : on refuse plutôt que de tronquer en silence. */
 export const PASSWORD_MAX_BYTES = 72

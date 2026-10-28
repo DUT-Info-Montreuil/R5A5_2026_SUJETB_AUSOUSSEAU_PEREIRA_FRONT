@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import type { LoginPayload } from '../../types/auth'
-import { required } from '../../utils/validation'
+import { required, validateEmail } from '../../utils/validation'
 import styles from './AuthForm.module.css'
 import Field from './Field'
 
@@ -13,13 +13,13 @@ type LoginFormProps = {
 
 function validate(values: LoginPayload): Errors {
   return {
-    username: required(values.username, "Le nom d'utilisateur"),
+    email: validateEmail(values.email),
     password: required(values.password, 'Le mot de passe'),
   }
 }
 
 export default function LoginForm({ onSubmit, onSwitchToRegister }: LoginFormProps) {
-  const [values, setValues] = useState<LoginPayload>({ username: '', password: '' })
+  const [values, setValues] = useState<LoginPayload>({ email: '', password: '' })
   const [errors, setErrors] = useState<Errors>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -34,7 +34,9 @@ export default function LoginForm({ onSubmit, onSwitchToRegister }: LoginFormPro
     setFormError(null)
     const nextErrors = validate(values)
     setErrors(nextErrors)
-    const firstInvalid = (Object.keys(nextErrors) as (keyof LoginPayload)[]).find((k) => nextErrors[k])
+    const firstInvalid = (Object.keys(nextErrors) as (keyof LoginPayload)[]).find(
+      (k) => nextErrors[k],
+    )
     if (firstInvalid) {
       document.getElementById(`login-${firstInvalid}`)?.focus()
       return
@@ -42,7 +44,7 @@ export default function LoginForm({ onSubmit, onSwitchToRegister }: LoginFormPro
 
     setSubmitting(true)
     try {
-      await onSubmit({ username: values.username.trim(), password: values.password })
+      await onSubmit({ email: values.email.trim(), password: values.password })
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Connexion impossible.')
     } finally {
@@ -53,12 +55,14 @@ export default function LoginForm({ onSubmit, onSwitchToRegister }: LoginFormPro
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
       <Field
-        id="login-username"
-        label="Nom d'utilisateur"
-        value={values.username}
-        onChange={update('username')}
-        error={errors.username}
-        autoComplete="username"
+        id="login-email"
+        label="E-mail"
+        type="email"
+        value={values.email}
+        onChange={update('email')}
+        error={errors.email}
+        autoComplete="email"
+        inputMode="email"
       />
       <Field
         id="login-password"
