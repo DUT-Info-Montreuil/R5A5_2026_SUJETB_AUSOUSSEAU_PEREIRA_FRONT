@@ -9,14 +9,16 @@ Un petit commit par point, dans l'ordre de ton choix.
 
 ## Features restantes de la maquette
 
-- [ ] **Feature 7 : « Toutes les équipes »** (page Équipes, second onglet à côté de « Mes équipes »)
+- [x] **Feature 7 : « Toutes les équipes »** (page Équipes, second onglet à côté de « Mes équipes »)
   - Recherche par équipe, tournoi, jeu ou capitaine.
   - Filtre « Qui recrutent » (inscriptions ouvertes et moins de 5 membres).
   - Carte d'équipe : bannière, tournoi et jeu, capitaine, effectif « n / 5 », badge
     RECRUTE / COMPLÈTE / FIGÉE ; mise en avant « ✦ TA BANNIÈRE » pour les équipes du joueur.
   - Action sur la carte : « Gérer mon équipe », « Demander à rejoindre », « Demande envoyée »,
     « Déjà engagé dans ce tournoi ».
-  - Données : `GET /api/tournaments/:id/teams` (public, B-06).
+  - Données : les équipes viennent du détail des tournois déjà chargé (`GET /api/tournaments/:id`),
+    plutôt que de rappeler `GET /api/tournaments/:id/teams` pour chaque tournoi.
+  - Pas de verrou équipe ouverte / fermée : le back n'a pas cette notion.
 
 - [ ] **Feature 8 : profil et notifications**
   - Page profil (`/joueur/profil`) : avatar, pseudo, lien vers mes équipes, statistiques

@@ -22,9 +22,10 @@ export type MyTeamEntry = { tournament: Tournament; team: TournamentTeam }
 /**
  * Équipes du joueur dans les tournois pas encore terminés. Le back n'a pas de route
  * « mes équipes » : on les retrouve dans le détail des tournois, qui liste les membres.
+ * Les tournois, demandes en cours et `requestToJoin` servent aussi à « Toutes les équipes ».
  */
 export function useMyTeams() {
-  const { tournaments, status, userId, refresh } = useTournaments()
+  const { tournaments, status, userId, requests, refresh, requestToJoin } = useTournaments()
 
   const entries: MyTeamEntry[] = tournaments
     .filter((t) => t.state !== 'termine')
@@ -73,5 +74,5 @@ export function useMyTeams() {
     [refresh],
   )
 
-  return { entries, status, userId, actionsFor }
+  return { entries, status, userId, actionsFor, tournaments, requests, requestToJoin }
 }

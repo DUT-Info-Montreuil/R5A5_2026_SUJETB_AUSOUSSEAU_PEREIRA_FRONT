@@ -1,7 +1,7 @@
 import { useSearchParams } from 'react-router'
+import Tabs from '../../../components/layout/Tabs/Tabs'
 import NextMatchBanner from '../../../components/tournaments/NextMatchBanner/NextMatchBanner'
 import TournamentCard from '../../../components/tournaments/TournamentCard/TournamentCard'
-import TournamentTabs from '../../../components/tournaments/TournamentTabs/TournamentTabs'
 import { useAuth } from '../../../hooks/useAuth'
 import { useTournaments } from '../../../hooks/useTournaments'
 import { pickNextMatch } from '../../../utils/bracket'
@@ -61,7 +61,12 @@ export default function Tournaments() {
 
       {next && <NextMatchBanner tournament={next.tournament} match={next.match} />}
 
-      <TournamentTabs tabs={tabs} active={searching ? null : tab} onSelect={selectTab} />
+      <Tabs
+        tabs={tabs}
+        active={searching ? null : tab}
+        onSelect={selectTab}
+        label="Tournois par état"
+      />
 
       {searching && (
         <p className={styles.note}>
