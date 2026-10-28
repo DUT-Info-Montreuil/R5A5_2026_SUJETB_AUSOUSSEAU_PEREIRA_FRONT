@@ -23,14 +23,20 @@ export default function PlayerHeader() {
         <NavLink to="/joueur/equipes" className={navClass}>
           Équipes
         </NavLink>
-        <span className={styles.profile}>
+        <NavLink
+          to="/joueur/profil"
+          className={({ isActive }) =>
+            isActive ? `${styles.profile} ${styles.profileActive}` : styles.profile
+          }
+        >
           <span className={styles.avatar} aria-hidden="true">
             {initials(username)}
           </span>
           <span className={styles.who}>
             <span className={styles.username}>{username}</span>
+            <span className={styles.hint}>Voir mon profil</span>
           </span>
-        </span>
+        </NavLink>
       </nav>
     </header>
   )

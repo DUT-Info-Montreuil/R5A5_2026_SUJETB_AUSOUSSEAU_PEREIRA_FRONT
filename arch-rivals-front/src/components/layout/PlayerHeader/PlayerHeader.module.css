@@ -74,6 +74,15 @@
   color: var(--color-text);
 }
 
+.profile:hover,
+.profile:focus-visible {
+  border-color: var(--color-gold-hover);
+}
+
+.profileActive {
+  background: var(--team-winner-bg);
+}
+
 .avatar {
   width: 36px;
   height: 36px;
@@ -100,4 +109,11 @@
   font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.06em;
+}
+
+.hint {
+  font-family: var(--font-body);
+  font-size: 13px;
+  letter-spacing: 0;
+  color: var(--color-text-muted);
 }
