@@ -65,3 +65,16 @@ export function subscribeToTournament(id: number, onChange: () => void): () => v
     leave()
   }
 }
+
+/**
+ * Tournoi mis en avant sur la page d'accueil : le plus récent en cours, sinon un tournoi à venir
+ * (inscriptions closes, puis ouvertes). null s'il n'y en a aucun.
+ */
+export async function fetchFeaturedTournamentId(): Promise<number | null> {
+  for (const status of ['in_progress', 'registration_closed', 'registration_open']) {
+    const data = await api.get<unknown>(`/tournaments?status=${status}&limit=1`)
+    const [first] = listOf<TournamentDto>(data, 'tournaments')
+    if (first) return first.id
+  }
+  return null
+}

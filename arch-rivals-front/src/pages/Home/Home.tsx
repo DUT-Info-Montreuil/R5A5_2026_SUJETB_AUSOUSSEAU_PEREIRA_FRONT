@@ -7,21 +7,16 @@ import Podium from '../../components/home/Podium/Podium'
 import Footer from '../../components/layout/Footer/Footer'
 import Header from '../../components/layout/Header/Header'
 import { useAuth } from '../../hooks/useAuth'
-import { DEFAULT_PODIUM, TEAMS } from '../../data/teams'
-import type { BracketSize, Podium as PodiumData } from '../../types/tournament'
+import { DEFAULT_PODIUM } from '../../data/teams'
+import type { Podium as PodiumData } from '../../types/tournament'
 import styles from './Home.module.css'
 
 type HomeProps = {
-  bracketSize?: BracketSize
   animateCrown?: boolean
   podium?: PodiumData
 }
 
-export default function Home({
-  bracketSize = 8,
-  animateCrown = true,
-  podium = DEFAULT_PODIUM,
-}: HomeProps) {
+export default function Home({ animateCrown = true, podium = DEFAULT_PODIUM }: HomeProps) {
   const [authOpen, setAuthOpen] = useState(false)
   const { status } = useAuth()
   const navigate = useNavigate()
@@ -39,7 +34,7 @@ export default function Home({
       <Header onPlay={handlePlay} />
       <main>
         <Hero />
-        <Bracket teams={TEAMS} bracketSize={bracketSize} />
+        <Bracket onPlay={handlePlay} />
         <Podium podium={podium} animateCrown={animateCrown} />
       </main>
       <Footer />
