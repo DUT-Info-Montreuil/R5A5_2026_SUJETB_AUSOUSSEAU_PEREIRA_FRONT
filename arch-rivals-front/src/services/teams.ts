@@ -1,7 +1,7 @@
 import type { Game } from '../types/game'
 import type { FreeTeam } from '../types/team'
 import type { MyJoinRequest } from '../types/tournament'
-import { api, isMissingRoute } from './api'
+import { api } from './api'
 import { listOf, type JoinRequestDto, type MyTeamDto, type TeamDto } from './dto'
 import { fetchGames } from './games'
 import { toTeam } from './mappers'
@@ -13,7 +13,7 @@ import { listen } from './realtime'
 //   DELETE /join-requests/:id                → 204                  (l'auteur annule sa demande)
 //   GET    /me/join-requests?status=pending  → { joinRequests, pagination }  (mes demandes)
 //   GET    /me/teams                         → { teams: (TeamDto & { tournament })[], pagination }
-// Équipes hors tournoi (pas encore dans le back, voir BACK-ATTENDU.md § 7) :
+// Équipes hors tournoi :
 //   POST   /teams  { name, gameId }          → 201 { team }   (tournamentId: null, capitaine)
 //   GET    /teams?free=true                  → { teams, pagination }  (équipes hors tournoi)
 //   POST   /teams/:id/register { tournamentId } → { team }   (capitaine : inscrit l'équipe)
@@ -31,7 +31,7 @@ const PAGE_SIZE = 100
 
 function toFreeTeams(dtos: TeamDto[], games: readonly Game[]): FreeTeam[] {
   return dtos.flatMap((dto) => {
-    const game = games.find((g) => g.id === dto.game?.id)
+    const game = games.find((g) => g.id === dto.game.id)
     return dto.tournamentId === null && game ? [{ team: toTeam(dto), game }] : []
   })
 }
@@ -52,23 +52,13 @@ export async function fetchMyTeams(): Promise<{
   }
 }
 
-/** Route absente du back : on ne la redemande pas avant le prochain chargement de l'app. */
-let freeTeamsRouteMissing = false
-
-/** Équipes hors tournoi de tous les joueurs ; aucune tant que le back n'a pas la route. */
+/** Équipes hors tournoi de tous les joueurs (« Toutes les équipes »). */
 export async function fetchFreeTeams(): Promise<FreeTeam[]> {
-  if (freeTeamsRouteMissing) return []
-  try {
-    const [data, games] = await Promise.all([
-      api.get<unknown>(`/teams?free=true&limit=${PAGE_SIZE}`),
-      fetchGames(),
-    ])
-    return toFreeTeams(listOf<TeamDto>(data, 'teams'), games)
-  } catch (err) {
-    if (!isMissingRoute(err)) throw err
-    freeTeamsRouteMissing = true
-    return []
-  }
+  const [data, games] = await Promise.all([
+    api.get<unknown>(`/teams?free=true&limit=${PAGE_SIZE}`),
+    fetchGames(),
+  ])
+  return toFreeTeams(listOf<TeamDto>(data, 'teams'), games)
 }
 
 /** Crée une équipe hors tournoi ; renvoie son identifiant. */

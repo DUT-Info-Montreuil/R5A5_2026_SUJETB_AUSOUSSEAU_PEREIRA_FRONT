@@ -28,11 +28,6 @@ export class ApiError extends Error {
   }
 }
 
-/** Route absente du back (404 « Route introuvable ») : fonction pas encore livrée côté serveur. */
-export function isMissingRoute(err: unknown) {
-  return err instanceof ApiError && err.status === 404 && err.code === 'NOT_FOUND'
-}
-
 let authToken: string | null = null
 
 /** Token envoyé en `Authorization: Bearer …` sur toutes les requêtes. */

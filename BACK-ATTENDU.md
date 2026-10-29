@@ -4,8 +4,7 @@
 > `FRONT-ATTENDU.md`) et le front les utilise. Le stockage local et le calcul des statistiques ont
 > été retirés ; le détail des tournois n'est plus lu que pour ceux qui en ont besoin.
 >
-> **Point 7 : à faire côté back.** Le front est prêt (branche `fix/retours-tests-esteban`) ; tant
-> que les routes manquent, il affiche « Cette fonction n'est pas encore disponible sur le serveur ».
+> **Point 7 : livré** (dépôt BACK, commit `1f716d1`) ; le front l'utilise.
 
 Le front de l'espace joueur fonctionne avec le contrat actuel (`api-routes.md` du dépôt BACK).
 Certains besoins y sont couverts par des contournements côté front : ce fichier liste ce qu'il
@@ -87,7 +86,7 @@ GET /api/users/:id/stats  → 200 {
 - Équipe ouverte / fermée aux demandes (`visibility: 'open' | 'private'` dans `TeamDto`, modifiable
   par le capitaine) : cadenas de la maquette, badge INCOMPLÈTE.
 
-## 7. Équipes hors tournoi (à faire)
+## 7. Équipes hors tournoi
 
 Demande issue des tests d'Esteban : un joueur crée une équipe sans choisir de tournoi, la compose,
 puis l'inscrit depuis son tableau de bord à un tournoi aux inscriptions ouvertes.
