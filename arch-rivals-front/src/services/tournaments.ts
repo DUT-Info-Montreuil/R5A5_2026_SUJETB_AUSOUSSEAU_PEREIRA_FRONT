@@ -1,6 +1,6 @@
 import type { Tournament } from '../types/tournament'
 import { api } from './api'
-import { listOf, type TeamDto, type TournamentDetailDto, type TournamentDto } from './dto'
+import { listOf, type TournamentDetailDto, type TournamentDto } from './dto'
 import { fetchGames } from './games'
 import { toTournament } from './mappers'
 import { follow, listen } from './realtime'
@@ -26,16 +26,10 @@ export async function fetchTournament(id: number): Promise<Tournament> {
   return toTournament(tournament, games)
 }
 
-/** Tournois où le joueur a (ou a eu) une équipe. */
-async function fetchMyTournamentIds(): Promise<Set<number>> {
-  const data = await api.get<unknown>(`/me/teams?limit=${PAGE_SIZE}`)
-  return new Set(listOf<TeamDto>(data, 'teams').map((team) => team.tournamentId))
-}
-
-export async function fetchTournaments(): Promise<Tournament[]> {
-  const [data, mine, games] = await Promise.all([
+/** `mine` : tournois où le joueur a (ou a eu) une équipe (voir fetchMyTeams). */
+export async function fetchTournaments(mine: ReadonlySet<number>): Promise<Tournament[]> {
+  const [data, games] = await Promise.all([
     api.get<unknown>(`/tournaments?limit=${PAGE_SIZE}`),
-    fetchMyTournamentIds(),
     fetchGames(),
   ])
   return Promise.all(

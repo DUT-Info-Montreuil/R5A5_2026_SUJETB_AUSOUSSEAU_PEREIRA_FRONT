@@ -135,7 +135,7 @@ export default function TournamentCard({
           </Link>
           {myTeam && state !== 'termine' && (
             <Link
-              to={`/joueur/equipes?tournoi=${id}`}
+              to={`/joueur/equipes?equipe=${myTeam.id}`}
               className={`${styles.action} ${styles.primary}`}
             >
               Mon équipe

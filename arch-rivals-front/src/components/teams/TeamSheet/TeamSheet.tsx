@@ -1,13 +1,20 @@
 import { Link } from 'react-router'
 import { useJoinRequests } from '../../../hooks/useJoinRequests'
 import type { TeamActions } from '../../../hooks/useMyTeams'
+import type { Game } from '../../../types/game'
 import type { Tournament, TournamentTeam } from '../../../types/tournament'
 import { endWithDate } from '../../../utils/dates'
 import { bannerInitials } from '../../../utils/initials'
-import { isCaptain, membersWithoutRole, missingPlayers } from '../../../utils/teams'
+import {
+  isCaptain,
+  membersWithoutRole,
+  missingPlayers,
+  registrableTournaments,
+} from '../../../utils/teams'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
 import ConfirmAction from '../ConfirmAction/ConfirmAction'
 import JoinRequests from '../JoinRequests/JoinRequests'
+import JoinTournament from '../JoinTournament/JoinTournament'
 import MemberRow from '../MemberRow/MemberRow'
 import TeamNameEditor from '../TeamNameEditor/TeamNameEditor'
 import VisibilitySwitch from '../VisibilitySwitch/VisibilitySwitch'
@@ -15,16 +22,28 @@ import styles from './TeamSheet.module.css'
 
 type TeamSheetProps = {
   team: TournamentTeam
-  tournament: Tournament
+  /** null : équipe hors tournoi, son effectif reste modifiable. */
+  tournament: Tournament | null
+  /** Jeu de l'équipe : il fixe les rôles proposés. */
+  game: Game
   /** Joueur connecté. */
   userId: number | null
   actions: TeamActions
+  /** Tous les tournois chargés : une équipe hors tournoi choisit parmi eux où s'inscrire. */
+  tournaments: readonly Tournament[]
 }
 
-export default function TeamSheet({ team, tournament, userId, actions }: TeamSheetProps) {
-  // L'effectif ne bouge que tant que les inscriptions sont ouvertes (B-11),
-  // et seul le capitaine y touche (B-10).
-  const open = tournament.state === 'ouvertes'
+export default function TeamSheet({
+  team,
+  tournament,
+  game,
+  userId,
+  actions,
+  tournaments,
+}: TeamSheetProps) {
+  // L'effectif ne bouge que tant que les inscriptions sont ouvertes (B-11), ou tant que
+  // l'équipe n'est inscrite à aucun tournoi ; seul le capitaine y touche (B-10).
+  const open = tournament === null || tournament.state === 'ouvertes'
   const captain = isCaptain(team, userId)
   const editable = captain && open
   const missing = missingPlayers(team)
@@ -41,9 +60,13 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
         </div>
         <div className={styles.identity}>
           <TeamNameEditor name={team.name} editable={editable} onRename={actions.rename} />
-          <Link to={`/joueur/tournois/${tournament.id}`} className={styles.tournament}>
-            {tournament.name} · {tournament.game} →
-          </Link>
+          {tournament ? (
+            <Link to={`/joueur/tournois/${tournament.id}`} className={styles.tournament}>
+              {tournament.name} · {tournament.game} →
+            </Link>
+          ) : (
+            <span className={styles.tournament}>Hors tournoi · {game.name}</span>
+          )}
         </div>
       </div>
 
@@ -52,18 +75,22 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
           open ? `${styles.lock} ${styles.lockOpen}` : `${styles.lock} ${styles.lockClosed}`
         }
       >
-        <span className={styles.lockTag}>{open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ'}</span>
+        <span className={styles.lockTag}>
+          {!tournament ? 'HORS TOURNOI' : open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ'}
+        </span>
         <span>
-          {open
-            ? tournament.registrationClosesAt
+          {!tournament
+            ? 'Pas encore inscrite à un tournoi : l’effectif reste modifiable.'
+            : open && tournament.registrationClosesAt
               ? `Effectif modifiable jusqu’au ${endWithDate(tournament.registrationClosesAt)}`
-              : 'Effectif modifiable jusqu’à la clôture des inscriptions.'
-            : 'Les inscriptions sont closes, plus aucun changement possible.'}
+              : open
+                ? 'Effectif modifiable jusqu’à la clôture des inscriptions.'
+                : 'Les inscriptions sont closes, plus aucun changement possible.'}
         </span>
       </div>
 
       {/* Au lancement, une équipe est incomplète s'il manque un joueur ou un rôle (B-04, B-08). */}
-      {open && (missing > 0 || noRole > 0) && (
+      {tournament && open && (missing > 0 || noRole > 0) && (
         <p className={styles.warning} role="status">
           {missing > 0 && `Il manque ${missing} joueur${missing > 1 ? 's' : ''}. `}
           {noRole > 0 && `${noRole} joueur${noRole > 1 ? 's' : ''} sans rôle. `}
@@ -94,7 +121,7 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
               isCaptain={member.isCaptain}
               isMe={member.userId === userId}
               editable={editable}
-              roles={tournament.roles}
+              roles={game.roles}
               onRoleChange={(roleId) => actions.setRole(member.userId, roleId)}
               onTransfer={() => actions.transferCaptaincy(member.userId)}
               onKick={() => actions.kick(member.userId)}
@@ -122,6 +149,15 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
           full={missing === 0}
           onAccept={actions.accept}
           onRefuse={actions.reject}
+        />
+      )}
+
+      {!tournament && (
+        <JoinTournament
+          tournaments={registrableTournaments(tournaments, team, game.id)}
+          game={game.name}
+          captain={captain}
+          onRegister={actions.register}
         />
       )}
 

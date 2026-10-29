@@ -1,9 +1,10 @@
 import styles from './TeamChips.module.css'
 
 export type TeamChip = {
-  tournamentId: number
+  teamId: number
   teamName: string
-  tournamentName: string
+  /** Tournoi de l'équipe, ou « Hors tournoi · jeu ». */
+  context: string
   /** Messages non lus de l'équipe. */
   unread: number
 }
@@ -11,23 +12,23 @@ export type TeamChip = {
 type TeamChipsProps = {
   chips: readonly TeamChip[]
   selected: number
-  onSelect: (tournamentId: number) => void
+  onSelect: (teamId: number) => void
 }
 
-/** Une pastille par équipe du joueur (une seule équipe par tournoi). */
+/** Une pastille par équipe du joueur (une par tournoi, plus ses équipes hors tournoi). */
 export default function TeamChips({ chips, selected, onSelect }: TeamChipsProps) {
   return (
     <div className={styles.chips} role="group" aria-label="Mes équipes">
       {chips.map((chip) => {
-        const on = chip.tournamentId === selected
+        const on = chip.teamId === selected
         const unread = on ? 0 : chip.unread
         return (
           <button
-            key={chip.tournamentId}
+            key={chip.teamId}
             type="button"
             className={on ? `${styles.chip} ${styles.on}` : styles.chip}
             aria-pressed={on}
-            onClick={() => onSelect(chip.tournamentId)}
+            onClick={() => onSelect(chip.teamId)}
           >
             <span className={styles.line}>
               <span className={styles.team}>{chip.teamName}</span>
@@ -41,7 +42,7 @@ export default function TeamChips({ chips, selected, onSelect }: TeamChipsProps)
                 </span>
               )}
             </span>
-            <span className={styles.tournament}>{chip.tournamentName}</span>
+            <span className={styles.tournament}>{chip.context}</span>
           </button>
         )
       })}

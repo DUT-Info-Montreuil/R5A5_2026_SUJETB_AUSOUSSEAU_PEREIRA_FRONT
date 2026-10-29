@@ -67,3 +67,69 @@
   background: var(--color-gold-hover);
   color: var(--color-on-gold);
 }
+
+.emptyActions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 16px;
+  padding: 0 22px;
+  background: transparent;
+  color: var(--color-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  border: 1px solid var(--color-input-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.ctaGhost:hover,
+.ctaGhost:focus-visible {
+  border-color: var(--color-gold-hover);
+}
+
+/* Pastilles d'équipes et bouton « Créer une équipe » sur la même ligne. */
+.chipsRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.createButton {
+  min-height: 44px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--color-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  border: 1px dashed var(--color-input-border);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.createButton:hover,
+.createButton:focus-visible {
+  border-color: var(--color-gold-hover);
+  color: var(--color-gold-hover);
+}
+
+/* Formulaire de création, dans un cadre comme sur les cartes de tournoi. */
+.create {
+  margin-top: 16px;
+  padding-top: 20px;
+  background: linear-gradient(180deg, var(--color-surface), var(--color-surface-deep));
+  border: 1px solid var(--color-card-border);
+}

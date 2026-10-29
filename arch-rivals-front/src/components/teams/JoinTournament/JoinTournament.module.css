@@ -1,0 +1,93 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  background: var(--team-loser-bg);
+  border: 1px solid var(--color-gold-dark);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.tournament {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 12px;
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-card-border);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text-strong);
+}
+
+.meta {
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.register {
+  min-height: 40px;
+  padding: 0 14px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  border: 1px solid var(--color-gold-hover);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.register:hover:not(:disabled),
+.register:focus-visible {
+  background: var(--color-gold-hover);
+}
+
+.register:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.note {
+  margin: 0;
+  font-size: 15px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}
+
+.error {
+  margin: 0;
+  font-size: 15px;
+  color: var(--color-danger);
+}

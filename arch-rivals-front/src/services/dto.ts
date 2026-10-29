@@ -58,7 +58,10 @@ export type MemberDto = {
 /** GET /api/teams/:id, élément de GET /api/tournaments/:id/teams, événement team:updated. */
 export type TeamDto = {
   id: number
-  tournamentId: number
+  /** null : équipe hors tournoi (à ajouter au back, voir BACK-ATTENDU.md § 7). */
+  tournamentId: number | null
+  /** Jeu de l'équipe (à ajouter au back) ; pour une équipe inscrite, celui du tournoi. */
+  game?: { id: number; name: string }
   name: string
   isEliminated: boolean
   /** Équipe privée : les nouvelles demandes sont refusées (409 TEAM_PRIVATE). */
@@ -97,7 +100,8 @@ export type TournamentDetailDto = TournamentDto & {
 export type JoinRequestDto = {
   id: number
   teamId: number
-  tournamentId: number
+  /** null : demande vers une équipe hors tournoi. */
+  tournamentId: number | null
   team: { id: number; name: string }
   user: { id: number; username: string }
   /** rejected : refus du capitaine ou clôture ; cancelled : par le joueur, ou entré dans une autre équipe. */
@@ -114,3 +118,6 @@ export type MessageDto = {
   content: string
   createdAt: string
 }
+
+/** Élément de GET /api/me/teams : `tournament` à null pour une équipe hors tournoi. */
+export type MyTeamDto = TeamDto & { tournament: TournamentDto | null }

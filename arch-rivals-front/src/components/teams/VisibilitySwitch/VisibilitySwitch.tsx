@@ -21,7 +21,7 @@ export default function VisibilitySwitch({
   const label = closed ? 'ÉQUIPE FERMÉE' : 'ÉQUIPE OUVERTE'
   const hint = closed
     ? 'Aucune demande possible : l’équipe n’apparaît plus parmi celles qui recrutent.'
-    : 'Tout joueur sans équipe dans ce tournoi peut demander à rejoindre.'
+    : 'Tout joueur peut demander à rejoindre l’équipe.'
 
   return (
     <div className={closed ? `${styles.row} ${styles.closed}` : styles.row}>

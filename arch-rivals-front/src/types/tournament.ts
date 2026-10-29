@@ -30,7 +30,8 @@ export type TeamVisibility = 'open' | 'private'
 
 export type TournamentTeam = {
   id: number
-  tournamentId: number
+  /** null : équipe hors tournoi, pas encore inscrite. */
+  tournamentId: number | null
   name: string
   isEliminated: boolean
   visibility: TeamVisibility
@@ -79,7 +80,8 @@ export type Tournament = {
 /** Demande d'adhésion envoyée par le joueur connecté (une seule par tournoi). */
 export type MyJoinRequest = {
   id: number
-  tournamentId: number
+  /** null : demande vers une équipe hors tournoi. */
+  tournamentId: number | null
   teamId: number
   teamName: string
 }

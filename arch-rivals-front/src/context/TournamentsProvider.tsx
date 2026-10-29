@@ -3,6 +3,7 @@ import { useAuth } from '../hooks/useAuth'
 import { ApiError } from '../services/api'
 import * as teamsApi from '../services/teams'
 import { fetchTournament, fetchTournaments } from '../services/tournaments'
+import type { FreeTeam } from '../types/team'
 import type { MyJoinRequest, Tournament, TournamentTeam } from '../types/tournament'
 import {
   TournamentsContext,
@@ -13,7 +14,11 @@ import {
 
 /** Une demande par tournoi : le back annule les autres quand le joueur entre dans une équipe. */
 const byTournament = (list: MyJoinRequest[]): Requests =>
-  Object.fromEntries(list.map((r) => [r.tournamentId, r]))
+  Object.fromEntries(list.flatMap((r) => (r.tournamentId === null ? [] : [[r.tournamentId, r]])))
+
+/** Demandes vers des équipes hors tournoi : une par équipe. */
+const byFreeTeam = (list: MyJoinRequest[]): Requests =>
+  Object.fromEntries(list.flatMap((r) => (r.tournamentId === null ? [[r.teamId, r]] : [])))
 
 /**
  * Tournois partagés par tout l'espace joueur : l'en-tête (badge « Équipes ») et les pages lisent
@@ -24,15 +29,26 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
   const userId = user?.id ?? null
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [requests, setRequests] = useState<Requests>({})
+  const [freeRequests, setFreeRequests] = useState<Requests>({})
+  const [freeTeams, setFreeTeams] = useState<FreeTeam[]>([])
+  const [publicFreeTeams, setPublicFreeTeams] = useState<FreeTeam[]>([])
   const [status, setStatus] = useState<TournamentsStatus>('loading')
   const inFlight = useRef<Promise<void> | null>(null)
 
   const reload = useCallback(() => {
     // L'en-tête et la page s'ouvrent ensemble : une seule lecture pour les deux.
-    inFlight.current ??= Promise.all([fetchTournaments(), teamsApi.fetchMyPendingRequests()])
-      .then(([list, pending]) => {
+    inFlight.current ??= Promise.all([
+      teamsApi.fetchMyTeams(),
+      teamsApi.fetchMyPendingRequests(),
+      teamsApi.fetchFreeTeams(),
+    ])
+      .then(async ([mine, pending, free]) => {
+        const list = await fetchTournaments(mine.tournamentIds)
         setTournaments(list)
+        setFreeTeams(mine.freeTeams)
+        setPublicFreeTeams(free)
         setRequests(byTournament(pending))
+        setFreeRequests(byFreeTeam(pending))
         setStatus('ready')
       })
       .catch(() => {
@@ -66,13 +82,30 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
     [refresh, forgetRequest],
   )
 
-  const requestToJoin = useCallback(async (tournamentId: number, team: TournamentTeam) => {
+  const requestToJoin = useCallback(async (tournamentId: number | null, team: TournamentTeam) => {
     const id = await teamsApi.requestToJoin(team.id)
-    setRequests((current) => ({
-      ...current,
-      [tournamentId]: { id, tournamentId, teamId: team.id, teamName: team.name },
-    }))
+    const request = { id, tournamentId, teamId: team.id, teamName: team.name }
+    if (tournamentId === null) setFreeRequests((current) => ({ ...current, [team.id]: request }))
+    else setRequests((current) => ({ ...current, [tournamentId]: request }))
   }, [])
+
+  const createFreeTeam = useCallback(
+    async (name: string, gameId: number) => {
+      const id = await teamsApi.createFreeTeam(name, gameId)
+      await reload()
+      return id
+    },
+    [reload],
+  )
+
+  // Une fois inscrite, l'équipe apparaît dans le tournoi : on relit tout.
+  const registerTeam = useCallback(
+    async (teamId: number, tournamentId: number) => {
+      await teamsApi.registerTeam(teamId, tournamentId)
+      await reload()
+    },
+    [reload],
+  )
 
   const cancelRequest = useCallback(
     async (tournamentId: number) => {
@@ -95,14 +128,18 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
   useEffect(
     () =>
       teamsApi.onMyRequestDecided((request) => {
-        setRequests((current) =>
-          current[request.tournamentId]?.id === request.id
-            ? (({ [request.tournamentId]: _done, ...rest }) => rest)(current)
-            : current,
-        )
-        refresh(request.tournamentId).catch(() => {})
+        const key = request.tournamentId ?? request.teamId
+        const forget = (current: Requests) =>
+          current[key]?.id === request.id ? (({ [key]: _done, ...rest }) => rest)(current) : current
+        if (request.tournamentId === null) {
+          setFreeRequests(forget)
+          reload().catch(() => {})
+        } else {
+          setRequests(forget)
+          refresh(request.tournamentId).catch(() => {})
+        }
       }),
-    [refresh],
+    [refresh, reload],
   )
 
   const value = useMemo<TournamentsContextValue>(
@@ -111,9 +148,14 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
       status,
       userId,
       requests,
+      freeRequests,
+      freeTeams,
+      publicFreeTeams,
       reload,
       refresh,
       createTeam,
+      createFreeTeam,
+      registerTeam,
       requestToJoin,
       cancelRequest,
     }),
@@ -122,9 +164,14 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
       status,
       userId,
       requests,
+      freeRequests,
+      freeTeams,
+      publicFreeTeams,
       reload,
       refresh,
       createTeam,
+      createFreeTeam,
+      registerTeam,
       requestToJoin,
       cancelRequest,
     ],

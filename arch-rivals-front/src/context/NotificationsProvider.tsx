@@ -13,24 +13,30 @@ import { NotificationsContext, type NotificationsContextValue } from './notifica
  * ses messages comme lus auprès du back (useTeamChat).
  */
 export default function NotificationsProvider({ children }: { children: ReactNode }) {
-  const { tournaments, userId } = useTournaments()
+  const { tournaments, freeTeams, userId } = useTournaments()
   const [unread, setUnread] = useState<Record<number, number>>({})
   const [pendingRequests, setPendingRequests] = useState(0)
   const activeTeam = useRef<number | null>(null)
 
-  // Équipes dont le salon est ouvert (non éliminées, tournoi pas terminé).
-  const chatKey = tournaments
-    .filter((t) => t.state !== 'termine')
-    .map((t) => findMyTeam(t, userId))
-    .filter((team) => team !== null && !team.isEliminated)
+  const free = freeTeams.map(({ team }) => team)
+
+  // Équipes dont le salon est ouvert (non éliminées, tournoi pas terminé), et hors tournoi.
+  const chatKey = [
+    ...tournaments
+      .filter((t) => t.state !== 'termine')
+      .map((t) => findMyTeam(t, userId))
+      .filter((team) => team !== null && !team.isEliminated),
+    ...free,
+  ]
     .map((team) => team!.id)
     .toSorted((a, b) => a - b)
     .join(',')
 
-  // Équipes dont je gère les demandes : capitaine, inscriptions ouvertes.
-  const captainKey = tournaments
-    .filter((t) => t.state === 'ouvertes')
-    .map((t) => findMyTeam(t, userId))
+  // Équipes dont je gère les demandes : capitaine, inscriptions ouvertes ou hors tournoi.
+  const captainKey = [
+    ...tournaments.filter((t) => t.state === 'ouvertes').map((t) => findMyTeam(t, userId)),
+    ...free,
+  ]
     .filter((team) => team !== null && isCaptain(team, userId))
     .map((team) => team!.id)
     .join(',')

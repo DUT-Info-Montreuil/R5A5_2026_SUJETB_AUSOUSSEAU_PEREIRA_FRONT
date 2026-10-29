@@ -8,6 +8,9 @@ export function teamErrorMessage(err: unknown): string {
     // 0 : fetch impossible. 502/503/504 : le proxy Vite ne joint pas le back (back éteint).
     case err.status === 0 || err.status === 502 || err.status === 503 || err.status === 504:
       return 'Serveur injoignable. Réessaie dans un instant.'
+    // Route absente : fonction prévue côté front, pas encore livrée par le back.
+    case err.status === 404 && err.code === 'NOT_FOUND':
+      return 'Cette fonction n’est pas encore disponible sur le serveur.'
     case err.status === 401:
       return 'Ta session a expiré. Reconnecte-toi.'
     case err.status === 429:
