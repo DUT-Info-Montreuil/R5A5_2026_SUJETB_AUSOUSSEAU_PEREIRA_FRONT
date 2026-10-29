@@ -2,13 +2,14 @@ import { useCallback, useEffect } from 'react'
 import { onTeamLost } from '../services/chat'
 import * as myTeamApi from '../services/myTeam'
 import type { IncomingRequest } from '../types/team'
-import type { Tournament, TournamentTeam } from '../types/tournament'
+import type { TeamVisibility, Tournament, TournamentTeam } from '../types/tournament'
 import { findMyTeam } from '../utils/tournaments'
 import { useTournaments } from './useTournaments'
 
 /** Actions sur une équipe donnée ; les erreurs remontent à l'appelant, qui les affiche. */
 export type TeamActions = {
   rename: (name: string) => Promise<void>
+  setVisibility: (visibility: TeamVisibility) => Promise<void>
   setRole: (userId: number, roleId: number | null) => Promise<void>
   transferCaptaincy: (userId: number) => Promise<void>
   kick: (userId: number) => Promise<void>
@@ -63,6 +64,7 @@ export function useMyTeams() {
       }
       return {
         rename: (name) => then(myTeamApi.renameTeam(team.id, name)),
+        setVisibility: (visibility) => then(myTeamApi.setTeamVisibility(team.id, visibility)),
         setRole: (userId, roleId) => then(myTeamApi.setMemberRole(team.id, userId, roleId)),
         transferCaptaincy: (userId) => then(myTeamApi.transferCaptaincy(team.id, userId)),
         kick: (userId) => then(myTeamApi.kickMember(team.id, userId)),

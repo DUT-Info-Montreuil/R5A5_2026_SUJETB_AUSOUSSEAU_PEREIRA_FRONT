@@ -1,4 +1,5 @@
 import { useAsyncAction } from '../../../hooks/useAsyncAction'
+import Lock from '../../icons/Lock'
 import type { DirectoryAction, DirectoryBadge, DirectoryEntry } from '../../../utils/teamDirectory'
 import { bannerInitials } from '../../../utils/initials'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
@@ -6,6 +7,7 @@ import styles from './DirectoryCard.module.css'
 
 const BADGES: Record<DirectoryBadge, string> = {
   recrute: 'RECRUTE',
+  incomplete: 'INCOMPLÈTE',
   complete: 'COMPLÈTE',
   figee: 'FIGÉE',
 }
@@ -13,6 +15,7 @@ const BADGES: Record<DirectoryBadge, string> = {
 const ACTIONS: Record<Exclude<DirectoryAction, null>, string> = {
   manage: 'Gérer mon équipe',
   join: 'Demander à rejoindre',
+  private: 'Équipe fermée',
   sent: 'Demande envoyée',
   busy: 'Demande déjà en cours',
   engaged: 'Déjà engagé dans ce tournoi',
@@ -28,7 +31,8 @@ export default function DirectoryCard({ entry, onManage, onRequest }: DirectoryC
   const { team, tournament, captain, mine, myRole, badge, action } = entry
   const { pending, error, run } = useAsyncAction()
   const primary = action === 'manage' || action === 'sent'
-  const dim = action === 'busy' || action === 'engaged'
+  const dim = action === 'busy' || action === 'engaged' || action === 'private'
+  const closed = team.visibility === 'private'
 
   return (
     <article className={mine ? `${styles.card} ${styles.mine}` : styles.card}>
@@ -49,6 +53,13 @@ export default function DirectoryCard({ entry, onManage, onRequest }: DirectoryC
               {tournament.name} · {tournament.game}
             </span>
           </div>
+          <span
+            className={closed ? `${styles.lock} ${styles.lockClosed}` : styles.lock}
+            title={closed ? 'Équipe fermée' : 'Équipe ouverte'}
+          >
+            <Lock open={!closed} size={14} />
+            <span className="sr-only">{closed ? 'Équipe fermée' : 'Équipe ouverte'}</span>
+          </span>
         </div>
 
         <div className={styles.facts}>

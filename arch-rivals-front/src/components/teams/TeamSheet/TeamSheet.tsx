@@ -9,6 +9,7 @@ import ConfirmAction from '../ConfirmAction/ConfirmAction'
 import JoinRequests from '../JoinRequests/JoinRequests'
 import MemberRow from '../MemberRow/MemberRow'
 import TeamNameEditor from '../TeamNameEditor/TeamNameEditor'
+import VisibilitySwitch from '../VisibilitySwitch/VisibilitySwitch'
 import styles from './TeamSheet.module.css'
 
 type TeamSheetProps = {
@@ -65,6 +66,14 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
           {noRole > 0 && `${noRole} joueur${noRole > 1 ? 's' : ''} sans rôle. `}
           Une équipe incomplète au lancement du tournoi est déclarée forfait sur son premier match.
         </p>
+      )}
+
+      {open && (
+        <VisibilitySwitch
+          visibility={team.visibility}
+          editable={editable}
+          onChange={actions.setVisibility}
+        />
       )}
 
       <div className={styles.roster}>

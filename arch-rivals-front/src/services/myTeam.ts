@@ -1,10 +1,13 @@
 import type { IncomingRequest } from '../types/team'
+import type { TeamVisibility } from '../types/tournament'
 import { api } from './api'
 import { listOf, type JoinRequestDto } from './dto'
 import { listen } from './realtime'
 
 // Contrat du back (api-routes.md), actions sur l'équipe du joueur :
 //   PATCH  /teams/:id                       { name }      → { team }   capitaine (B-09)
+//   PATCH  /teams/:id                       { visibility } → { team }  capitaine : 'private' refuse
+//                                                                      les nouvelles demandes
 //   DELETE /teams/:id                                     → 204        capitaine (B-10)
 //   POST   /teams/:id/transfer-captaincy    { userId }    → { team }   capitaine (B-09)
 //   PATCH  /teams/:id/members/:userId       { roleId }    → { team }   capitaine (B-08, B-09)
@@ -19,6 +22,10 @@ import { listen } from './realtime'
 
 export async function renameTeam(teamId: number, name: string): Promise<void> {
   await api.patch(`/teams/${teamId}`, { name })
+}
+
+export async function setTeamVisibility(teamId: number, visibility: TeamVisibility): Promise<void> {
+  await api.patch(`/teams/${teamId}`, { visibility })
 }
 
 export async function deleteTeam(teamId: number): Promise<void> {

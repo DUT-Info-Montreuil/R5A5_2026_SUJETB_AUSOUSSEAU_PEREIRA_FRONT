@@ -5,7 +5,7 @@ import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
 import styles from './RecruitingTeams.module.css'
 
 type RecruitingTeamsProps = {
-  /** Équipes du tournoi : seules celles qui ont une place libre sont proposées. */
+  /** Équipes du tournoi : seules celles ouvertes aux demandes, avec une place libre, sont proposées. */
   teams: readonly TournamentTeam[]
   /** Demande déjà envoyée dans ce tournoi : les autres boutons sont bloqués. */
   request: MyJoinRequest | null
@@ -15,7 +15,9 @@ type RecruitingTeamsProps = {
 export default function RecruitingTeams({ teams, request, onRequest }: RecruitingTeamsProps) {
   const [pendingId, setPendingId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const recruiting = teams.filter((t) => t.members.length < PLAYERS_PER_TEAM)
+  const recruiting = teams.filter(
+    (t) => t.visibility === 'open' && t.members.length < PLAYERS_PER_TEAM,
+  )
 
   async function ask(team: TournamentTeam) {
     setPendingId(team.id)

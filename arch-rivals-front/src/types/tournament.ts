@@ -25,13 +25,15 @@ export type TeamMember = {
   joinedAt: string
 }
 
+/** private : l'équipe n'accepte plus de nouvelles demandes (les demandes en attente restent). */
+export type TeamVisibility = 'open' | 'private'
+
 export type TournamentTeam = {
   id: number
   tournamentId: number
   name: string
   isEliminated: boolean
-  /** private : l'équipe n'accepte plus de nouvelles demandes. */
-  visibility: 'open' | 'private'
+  visibility: TeamVisibility
   createdAt: string
   members: TeamMember[]
 }
