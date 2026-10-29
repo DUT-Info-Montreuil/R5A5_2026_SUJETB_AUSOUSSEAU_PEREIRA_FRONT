@@ -5,6 +5,8 @@
 > été retirés ; le détail des tournois n'est plus lu que pour ceux qui en ont besoin.
 >
 > **Point 7 : livré** (dépôt BACK, commit `1f716d1`) ; le front l'utilise.
+>
+> **Point 8 : anomalie à corriger côté back** (suppression d'une équipe hors tournoi).
 
 Le front de l'espace joueur fonctionne avec le contrat actuel (`api-routes.md` du dépôt BACK).
 Certains besoins y sont couverts par des contournements côté front : ce fichier liste ce qu'il
@@ -111,6 +113,22 @@ POST /api/teams/:id/register { tournamentId } → 200 { team }   (capitaine)
   ses messages et ses demandes en attente ; `tournament:updated` est émis.
 - Front : `src/services/teams.ts` (`createFreeTeam`, `fetchFreeTeams`, `registerTeam`,
   `fetchMyTeams`).
+
+## 8. Anomalie : supprimer une équipe hors tournoi laisse ses membres (à corriger)
+
+Constatée en testant le point 7 contre le back (commit `1f716d1`).
+
+1. Créer une équipe hors tournoi (`POST /api/teams`), puis la supprimer (`DELETE /api/teams/:id`).
+2. Ses lignes restent dans `team_members` (avec `tournament_id` NULL).
+3. La prochaine équipe créée reprend le même `id` (`INTEGER PRIMARY KEY` sans `AUTOINCREMENT`) et
+   heurte le capitaine orphelin (`uq_one_captain_per_team`) : `409 TEAM_NAME_TAKEN`, alors que le nom
+   est libre. Plus aucune équipe ne peut être créée, hors tournoi comme dans un tournoi.
+
+Cause probable : la clé étrangère `(team_id, tournament_id) REFERENCES teams (id, tournament_id)
+ON DELETE CASCADE` n'est pas vérifiée par SQLite quand `tournament_id` est NULL, donc la cascade ne
+s'applique pas. Pistes : supprimer explicitement les membres (et demandes, messages) dans
+`DELETE /api/teams/:id`, ou une clé étrangère simple `team_id REFERENCES teams(id) ON DELETE CASCADE`.
+Le même cas se produit sans doute quand le dernier membre quitte une équipe hors tournoi.
 
 ## Rappel de configuration
 
