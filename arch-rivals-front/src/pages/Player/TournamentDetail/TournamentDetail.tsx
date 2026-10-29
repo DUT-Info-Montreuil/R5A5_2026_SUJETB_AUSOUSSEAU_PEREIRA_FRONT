@@ -66,8 +66,9 @@ export default function TournamentDetail() {
             myTeamId={findMyTeam(tournament, user?.id ?? null)?.id ?? null}
           />
           <p className={styles.note}>
-            Ton équipe est encadrée d'or. Un match ne se joue qu'une fois ses deux équipes connues ;
-            seuls les arbitres saisissent les résultats.
+            Ton équipe porte l'étiquette « TOI » ; le vainqueur de chaque match est sur fond doré.
+            Un match ne se joue qu'une fois ses deux équipes connues ; seuls les arbitres saisissent
+            les résultats.
           </p>
         </>
       ) : (

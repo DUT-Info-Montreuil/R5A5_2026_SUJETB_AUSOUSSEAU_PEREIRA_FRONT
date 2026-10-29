@@ -69,8 +69,29 @@
   color: var(--color-text-faint);
 }
 
+/* Équipe du joueur : barre d'accent, fond clair et étiquette « TOI », quel que soit son
+   résultat (les vainqueurs ont déjà un fond doré). */
 .row.mine {
+  background: linear-gradient(90deg, rgba(242, 213, 138, 0.22), rgba(242, 213, 138, 0.04));
   border-color: var(--color-gold-hover);
+  box-shadow: inset 4px 0 0 var(--color-gold-hover);
+  color: var(--color-text-strong);
+  font-weight: 700;
+}
+
+.meTag {
+  flex-shrink: 0;
+  padding: 1px 6px;
+  background: var(--color-gold-hover);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.meTag + .name {
+  flex: 1;
 }
 
 .name {
