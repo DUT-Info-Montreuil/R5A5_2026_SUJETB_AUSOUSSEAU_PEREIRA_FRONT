@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useJoinRequests } from '../../../hooks/useJoinRequests'
 import type { TeamActions } from '../../../hooks/useMyTeams'
 import type { Tournament, TournamentTeam } from '../../../types/tournament'
+import { endWithDate } from '../../../utils/dates'
 import { bannerInitials } from '../../../utils/initials'
 import { isCaptain, membersWithoutRole, missingPlayers } from '../../../utils/teams'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
@@ -54,7 +55,9 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
         <span className={styles.lockTag}>{open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ'}</span>
         <span>
           {open
-            ? 'Effectif modifiable jusqu’à la clôture des inscriptions.'
+            ? tournament.registrationClosesAt
+              ? `Effectif modifiable jusqu’au ${endWithDate(tournament.registrationClosesAt)}`
+              : 'Effectif modifiable jusqu’à la clôture des inscriptions.'
             : 'Les inscriptions sont closes, plus aucun changement possible.'}
         </span>
       </div>

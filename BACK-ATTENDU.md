@@ -1,5 +1,10 @@
 # Ce que le front attend du back
 
+> **Livré.** Le back a ajouté les six points ci-dessous (dépôt BACK, commit `555a487`, voir son
+> `FRONT-ATTENDU.md`) ; le front les utilise depuis la branche `feat/integration-back`. Les
+> contournements décrits ici (stockage local, lecture de tous les tournois, calcul des
+> statistiques) ont été retirés.
+
 Le front de l'espace joueur fonctionne avec le contrat actuel (`api-routes.md` du dépôt BACK).
 Certains besoins y sont couverts par des contournements côté front : ce fichier liste ce qu'il
 faudrait ajouter au back pour s'en passer, avec la forme attendue. Formats habituels : réponses en

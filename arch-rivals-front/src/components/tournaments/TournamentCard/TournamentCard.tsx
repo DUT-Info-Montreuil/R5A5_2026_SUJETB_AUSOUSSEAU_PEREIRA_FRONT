@@ -4,6 +4,7 @@ import { useAsyncAction } from '../../../hooks/useAsyncAction'
 import type { MyJoinRequest, Tournament, TournamentTeam } from '../../../types/tournament'
 import { playerProgress, type PlayerProgress } from '../../../utils/bracket'
 import { gameTag } from '../../../utils/games'
+import { closingLabel } from '../../../utils/dates'
 import {
   canJoinOrCreate,
   dateLabel,
@@ -73,8 +74,9 @@ export default function TournamentCard({
       : 'Tu n’as pas encore d’équipe'
   const myLineClass = myTeam ? styles.mine : request ? styles.requested : styles.noTeam
   const toggle = (next: Panel) => setPanel((current) => (current === next ? 'none' : next))
+  const closing = tournament.registrationClosesAt
   const info = open
-    ? `${teams.length} / ${TEAMS_PER_TOURNAMENT} équipes`
+    ? `${teams.length} / ${TEAMS_PER_TOURNAMENT} équipes${closing ? ` · ${closingLabel(closing)}` : ''}`
     : progressLine(playerProgress(tournament, userId))
   const progress = {
     '--progress': `${(teams.length / TEAMS_PER_TOURNAMENT) * 100}%`,

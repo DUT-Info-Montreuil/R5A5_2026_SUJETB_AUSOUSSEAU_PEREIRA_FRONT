@@ -4,6 +4,7 @@ import TournamentBracket from '../../../components/tournaments/TournamentBracket
 import { useAuth } from '../../../hooks/useAuth'
 import { useTournament } from '../../../hooks/useTournament'
 import { tournamentBracket } from '../../../utils/bracket'
+import { closingLabel } from '../../../utils/dates'
 import { dateLabel, findMyTeam, TEAMS_PER_TOURNAMENT } from '../../../utils/tournaments'
 import styles from './TournamentDetail.module.css'
 
@@ -74,6 +75,8 @@ export default function TournamentDetail() {
           <p className={styles.waitingTitle}>L'arbre sera tiré à la clôture des inscriptions</p>
           <p className={styles.waitingText}>
             {tournament.teams.length} / {TEAMS_PER_TOURNAMENT} équipes engagées
+            {tournament.registrationClosesAt &&
+              ` · ${closingLabel(tournament.registrationClosesAt)}`}
           </p>
         </div>
       )}

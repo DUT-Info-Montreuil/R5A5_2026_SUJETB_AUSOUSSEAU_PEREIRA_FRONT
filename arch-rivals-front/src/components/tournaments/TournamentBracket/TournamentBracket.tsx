@@ -1,4 +1,5 @@
 import type { BracketRound, MatchView } from '../../../utils/bracket'
+import { matchTimeLabel } from '../../../utils/dates'
 import styles from './TournamentBracket.module.css'
 
 type TournamentBracketProps = {
@@ -42,6 +43,12 @@ export default function TournamentBracket({ rounds, champion, myTeamId }: Tourna
                   ))}
                   <span className={`${styles.status} ${styles[match.status]}`}>
                     {STATUS_LABELS[match.status]}
+                    {match.scheduledAt && (
+                      <time className={styles.time} dateTime={match.scheduledAt}>
+                        {' · '}
+                        {matchTimeLabel(match.scheduledAt)}
+                      </time>
+                    )}
                   </span>
                 </div>
               ))}
