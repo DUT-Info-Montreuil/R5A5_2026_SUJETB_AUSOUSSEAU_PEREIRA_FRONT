@@ -90,6 +90,22 @@
   color: var(--color-text-muted);
 }
 
+/* Cadenas : équipe ouverte (vert) ou fermée (violet) aux demandes. */
+.lock {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-success);
+  border: 1px solid currentColor;
+}
+
+.lockClosed {
+  color: var(--color-closed);
+}
+
 .facts {
   display: flex;
   align-items: center;
@@ -127,6 +143,10 @@
 
 .recrute {
   color: var(--color-success);
+}
+
+.incomplete {
+  color: var(--color-silver);
 }
 
 .complete {

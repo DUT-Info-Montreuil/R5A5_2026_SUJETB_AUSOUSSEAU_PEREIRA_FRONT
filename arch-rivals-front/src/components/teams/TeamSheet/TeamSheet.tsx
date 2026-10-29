@@ -2,6 +2,7 @@ import { Link } from 'react-router'
 import { useJoinRequests } from '../../../hooks/useJoinRequests'
 import type { TeamActions } from '../../../hooks/useMyTeams'
 import type { Tournament, TournamentTeam } from '../../../types/tournament'
+import { endWithDate } from '../../../utils/dates'
 import { bannerInitials } from '../../../utils/initials'
 import { isCaptain, membersWithoutRole, missingPlayers } from '../../../utils/teams'
 import { PLAYERS_PER_TEAM } from '../../../utils/tournaments'
@@ -9,6 +10,7 @@ import ConfirmAction from '../ConfirmAction/ConfirmAction'
 import JoinRequests from '../JoinRequests/JoinRequests'
 import MemberRow from '../MemberRow/MemberRow'
 import TeamNameEditor from '../TeamNameEditor/TeamNameEditor'
+import VisibilitySwitch from '../VisibilitySwitch/VisibilitySwitch'
 import styles from './TeamSheet.module.css'
 
 type TeamSheetProps = {
@@ -53,7 +55,9 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
         <span className={styles.lockTag}>{open ? 'INSCRIPTIONS OUVERTES' : 'EFFECTIF FIGÉ'}</span>
         <span>
           {open
-            ? 'Effectif modifiable jusqu’à la clôture des inscriptions.'
+            ? tournament.registrationClosesAt
+              ? `Effectif modifiable jusqu’au ${endWithDate(tournament.registrationClosesAt)}`
+              : 'Effectif modifiable jusqu’à la clôture des inscriptions.'
             : 'Les inscriptions sont closes, plus aucun changement possible.'}
         </span>
       </div>
@@ -65,6 +69,14 @@ export default function TeamSheet({ team, tournament, userId, actions }: TeamShe
           {noRole > 0 && `${noRole} joueur${noRole > 1 ? 's' : ''} sans rôle. `}
           Une équipe incomplète au lancement du tournoi est déclarée forfait sur son premier match.
         </p>
+      )}
+
+      {open && (
+        <VisibilitySwitch
+          visibility={team.visibility}
+          editable={editable}
+          onChange={actions.setVisibility}
+        />
       )}
 
       <div className={styles.roster}>

@@ -1,4 +1,5 @@
 import type { Tournament, TournamentState, TournamentTeam } from '../types/tournament'
+import { shortDate } from './dates'
 
 export const TEAMS_PER_TOURNAMENT = 8
 export const PLAYERS_PER_TEAM = 5
@@ -25,16 +26,6 @@ export function canJoinOrCreate(
   hasRequest: boolean,
 ) {
   return tournament.state === 'ouvertes' && !hasRequest && !findMyTeam(tournament, userId)
-}
-
-const shortDate = (iso: string) => {
-  const date = new Date(iso)
-  const sameYear = date.getFullYear() === new Date().getFullYear()
-  return date.toLocaleDateString('fr-FR', {
-    day: 'numeric',
-    month: 'short',
-    ...(!sameYear && { year: 'numeric' }),
-  })
 }
 
 /** Date la plus parlante selon l'état : le back ne fournit pas de date de début ni de clôture prévue. */

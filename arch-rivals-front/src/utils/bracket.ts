@@ -18,6 +18,8 @@ export type BracketMatch = {
   key: number
   rows: [BracketRow, BracketRow]
   status: MatchView
+  /** Horaire prévu d'un match pas encore joué. */
+  scheduledAt: string | null
 }
 
 export type BracketRound = {
@@ -68,6 +70,7 @@ export function tournamentBracket(tournament: Tournament) {
         key: m.id,
         rows: [row(m, 'a', names), row(m, 'b', names)],
         status: matchView(m),
+        scheduledAt: m.status === 'finished' ? null : m.scheduledAt,
       })),
   }))
 
@@ -83,6 +86,7 @@ export type NextMatch = {
   round: string
   myTeam: string
   opponent: string
+  scheduledAt: string | null
 }
 
 /** Où en est l'équipe du joueur : prochain match, élimination ou titre. */
@@ -116,6 +120,7 @@ export function playerProgress(tournament: Tournament, userId: number | null): P
         round: roundName(match.round),
         myTeam: mine.name,
         opponent: (opponentId !== null && names.get(opponentId)) || '—',
+        scheduledAt: match.scheduledAt,
       },
     }
   }

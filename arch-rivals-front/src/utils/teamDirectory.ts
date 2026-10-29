@@ -1,13 +1,17 @@
 import type { MyJoinRequest, Tournament, TournamentTeam } from '../types/tournament'
 import { findMyTeam, PLAYERS_PER_TEAM } from './tournaments'
 
-/** RECRUTE : inscriptions ouvertes et place libre ; FIGÉE : inscriptions closes. */
-export type DirectoryBadge = 'recrute' | 'complete' | 'figee'
+/**
+ * RECRUTE : inscriptions ouvertes, place libre, équipe ouverte ; INCOMPLÈTE : place libre mais
+ * équipe fermée aux demandes ; FIGÉE : inscriptions closes.
+ */
+export type DirectoryBadge = 'recrute' | 'incomplete' | 'complete' | 'figee'
 
 /** Ce que le joueur peut faire depuis la carte d'une équipe. */
 export type DirectoryAction =
   | 'manage' // sa propre équipe
   | 'join' // demander à rejoindre
+  | 'private' // équipe fermée aux demandes
   | 'sent' // demande envoyée à cette équipe
   | 'busy' // demande déjà en cours vers une autre équipe du tournoi
   | 'engaged' // déjà dans une autre équipe du tournoi
@@ -26,7 +30,8 @@ export type DirectoryEntry = {
 
 function badgeOf(tournament: Tournament, team: TournamentTeam): DirectoryBadge {
   if (tournament.state !== 'ouvertes') return 'figee'
-  return team.members.length < PLAYERS_PER_TEAM ? 'recrute' : 'complete'
+  if (team.members.length >= PLAYERS_PER_TEAM) return 'complete'
+  return team.visibility === 'private' ? 'incomplete' : 'recrute'
 }
 
 function actionOf(
@@ -35,6 +40,7 @@ function actionOf(
   request: MyJoinRequest | undefined,
 ): DirectoryAction {
   if (entry.mine) return 'manage'
+  if (entry.badge === 'incomplete') return 'private'
   if (entry.badge !== 'recrute') return null
   if (myTeam) return 'engaged'
   if (request) return request.teamId === entry.team.id ? 'sent' : 'busy'

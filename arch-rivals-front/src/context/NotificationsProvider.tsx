@@ -1,90 +1,66 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useTournaments } from '../hooks/useTournaments'
-import { fetchMessages, subscribeToMessages } from '../services/chat'
-import { countJoinRequests } from '../services/myTeam'
-import { readMarkers } from '../services/readMarkers'
+import { fetchUnread, subscribeToMessages } from '../services/chat'
+import { countJoinRequests, onJoinRequestReceived } from '../services/myTeam'
 import { isCaptain } from '../utils/teams'
 import { findMyTeam } from '../utils/tournaments'
 import { NotificationsContext, type NotificationsContextValue } from './notificationsContext'
 
 /**
- * Badge « Équipes » : messages non lus de mes équipes et demandes en attente des équipes
- * dont je suis capitaine. Monté sous TournamentsProvider, dont il lit les équipes.
+ * Badge « Équipes » : messages non lus de mes équipes (GET /api/me/unread, puis message:new en
+ * direct) et demandes en attente des équipes dont je suis capitaine. Monté sous
+ * TournamentsProvider, dont il lit les équipes. La salle du conseil ouverte marque elle-même
+ * ses messages comme lus auprès du back (useTeamChat).
  */
 export default function NotificationsProvider({ children }: { children: ReactNode }) {
   const { tournaments, userId } = useTournaments()
   const [unread, setUnread] = useState<Record<number, number>>({})
   const [pendingRequests, setPendingRequests] = useState(0)
   const activeTeam = useRef<number | null>(null)
-  /** Dernier message connu par équipe : c'est lui qui devient « lu ». */
-  const latest = useRef<Record<number, number>>({})
 
   // Équipes dont le salon est ouvert (non éliminées, tournoi pas terminé).
-  const chatTeams = tournaments
+  const chatKey = tournaments
     .filter((t) => t.state !== 'termine')
     .map((t) => findMyTeam(t, userId))
     .filter((team) => team !== null && !team.isEliminated)
     .map((team) => team!.id)
-  const chatKey = chatTeams.toSorted((a, b) => a - b).join(',')
+    .toSorted((a, b) => a - b)
+    .join(',')
 
   // Équipes dont je gère les demandes : capitaine, inscriptions ouvertes.
-  const captainTeams = tournaments
+  const captainKey = tournaments
     .filter((t) => t.state === 'ouvertes')
     .map((t) => findMyTeam(t, userId))
     .filter((team) => team !== null && isCaptain(team, userId))
     .map((team) => team!.id)
+    .join(',')
 
-  const markRead = useCallback(
-    (teamId: number) => {
-      const last = latest.current[teamId]
-      if (userId !== null && last !== undefined) readMarkers.set(userId, teamId, last)
+  const setActiveTeam = useCallback((teamId: number | null) => {
+    activeTeam.current = teamId
+    if (teamId !== null)
       setUnread((current) => (current[teamId] ? { ...current, [teamId]: 0 } : current))
-    },
-    [userId],
-  )
+  }, [])
 
-  const setActiveTeam = useCallback(
-    (teamId: number | null) => {
-      activeTeam.current = teamId
-      if (teamId !== null) markRead(teamId)
-    },
-    [markRead],
-  )
-
-  // Messages : historique pour compter les non-lus, puis salons suivis en direct.
+  // Messages : compte du back, puis salons suivis en direct.
   useEffect(() => {
     if (userId === null || !chatKey) return
     let cancelled = false
     const ids = chatKey.split(',').map(Number)
 
-    for (const teamId of ids) {
-      fetchMessages(teamId)
-        .then((messages) => {
-          if (cancelled) return
-          const last = messages.at(-1)?.id ?? 0
-          latest.current[teamId] = Math.max(latest.current[teamId] ?? 0, last)
-          // Première visite sur ce navigateur : l'historique compte comme lu.
-          const marker = readMarkers.get(userId, teamId)
-          if (marker === null || activeTeam.current === teamId)
-            readMarkers.set(userId, teamId, last)
-          const count =
-            marker === null || activeTeam.current === teamId
-              ? 0
-              : messages.filter((m) => m.id > marker && m.authorId !== userId).length
-          setUnread((current) => ({ ...current, [teamId]: count }))
-        })
-        .catch(() => {
-          /* salon fermé ou back injoignable : pas de pastille */
-        })
-    }
+    fetchUnread()
+      .then((counts) => {
+        if (cancelled) return
+        // La salle ouverte est lue : le back le saura dès qu'elle aura chargé ses messages.
+        if (activeTeam.current !== null) counts[activeTeam.current] = 0
+        setUnread(counts)
+      })
+      .catch(() => {
+        /* back injoignable : pas de pastille */
+      })
 
     const unsubscribes = ids.map((teamId) =>
       subscribeToMessages(teamId, (message) => {
-        latest.current[teamId] = Math.max(latest.current[teamId] ?? 0, message.id)
-        if (message.authorId === userId || activeTeam.current === teamId) {
-          readMarkers.set(userId, teamId, message.id)
-          return
-        }
+        if (message.authorId === userId || activeTeam.current === teamId) return
         setUnread((current) => ({ ...current, [teamId]: (current[teamId] ?? 0) + 1 }))
       }),
     )
@@ -96,16 +72,19 @@ export default function NotificationsProvider({ children }: { children: ReactNod
   }, [chatKey, userId])
 
   // Demandes en attente : relues à chaque relecture des tournois (accepter, refuser, changer
-  // de page). Le back ne pousse pas encore d'événement pour une nouvelle demande.
-  const captainKey = captainTeams.join(',')
+  // de page), et comptées en direct à chaque nouvelle demande.
   useEffect(() => {
     let cancelled = false
     const ids = captainKey ? captainKey.split(',').map(Number) : []
     Promise.all(ids.map((id) => countJoinRequests(id).catch(() => 0))).then((counts) => {
       if (!cancelled) setPendingRequests(counts.reduce((sum, n) => sum + n, 0))
     })
+    const stop = onJoinRequestReceived((teamId) => {
+      if (ids.includes(teamId)) setPendingRequests((n) => n + 1)
+    })
     return () => {
       cancelled = true
+      stop()
     }
   }, [captainKey, tournaments])
 

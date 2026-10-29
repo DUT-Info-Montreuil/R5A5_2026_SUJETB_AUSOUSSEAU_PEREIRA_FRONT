@@ -135,3 +135,9 @@
   color: var(--color-gold-hover);
   text-align: center;
 }
+
+/* Horaire prévu, après le statut. */
+.time {
+  text-transform: none;
+  letter-spacing: 0.04em;
+}

@@ -65,6 +65,9 @@ export default function Teams() {
     return {
       ...base,
       rename: toastAfter(base.rename, () => 'Bannière renommée'),
+      setVisibility: toastAfter(base.setVisibility, (visibility) =>
+        visibility === 'private' ? 'Équipe fermée aux demandes' : 'Équipe ouverte aux demandes',
+      ),
       transferCaptaincy: toastAfter(
         base.transferCaptaincy,
         (id) => `${nameOf(id)} est désormais capitaine`,

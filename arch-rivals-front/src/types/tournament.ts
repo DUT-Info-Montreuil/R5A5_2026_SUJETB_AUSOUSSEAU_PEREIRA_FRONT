@@ -25,11 +25,15 @@ export type TeamMember = {
   joinedAt: string
 }
 
+/** private : l'équipe n'accepte plus de nouvelles demandes (les demandes en attente restent). */
+export type TeamVisibility = 'open' | 'private'
+
 export type TournamentTeam = {
   id: number
   tournamentId: number
   name: string
   isEliminated: boolean
+  visibility: TeamVisibility
   createdAt: string
   members: TeamMember[]
 }
@@ -49,6 +53,8 @@ export type Match = {
   winnerId: number | null
   isForfeit: boolean
   status: MatchStatus
+  /** Horaire prévu, indicatif ; null tant que l'admin ne l'a pas fixé. */
+  scheduledAt: string | null
 }
 
 export type Tournament = {
@@ -59,6 +65,8 @@ export type Tournament = {
   /** Rôles de jeu proposés dans les équipes de ce tournoi (GET /api/games). */
   roles: GameRole[]
   state: TournamentState
+  /** Clôture prévue des inscriptions, indicative. */
+  registrationClosesAt: string | null
   createdAt: string
   closedAt: string | null
   startedAt: string | null

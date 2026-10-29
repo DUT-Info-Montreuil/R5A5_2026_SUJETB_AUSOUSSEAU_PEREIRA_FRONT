@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
 import { ApiError } from '../services/api'
-import { CHAT_CLOSED, fetchMessages, sendMessage, subscribeToMessages } from '../services/chat'
+import {
+  CHAT_CLOSED,
+  fetchMessages,
+  markRead,
+  sendMessage,
+  subscribeToMessages,
+} from '../services/chat'
 import type { ChatMessage } from '../types/chat'
 
 type Loaded = { teamId: number; messages: ChatMessage[]; failed: boolean; closed: boolean }
@@ -52,6 +58,15 @@ export function useTeamChat(teamId: number, eliminated: boolean) {
       unsubscribe()
     }
   }, [teamId, eliminated, add])
+
+  // Ce qui est affiché est lu : on avance le repère du back jusqu'au dernier message.
+  const lastId = current?.messages.at(-1)?.id ?? null
+  useEffect(() => {
+    if (closed || lastId === null) return
+    markRead(teamId, lastId).catch(() => {
+      /* le badge se corrigera au prochain chargement */
+    })
+  }, [teamId, lastId, closed])
 
   const send = useCallback(
     async (text: string) => {

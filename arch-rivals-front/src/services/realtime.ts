@@ -1,6 +1,6 @@
 import { io, type Socket } from 'socket.io-client'
 import { getAuthToken } from './api'
-import type { MatchDto, MessageDto, TeamDto } from './dto'
+import type { JoinRequestDto, MatchDto, MessageDto, TeamDto } from './dto'
 
 // Canal temps réel du back (Socket.IO). Il ne fait que notifier : les écritures passent par HTTP.
 // Même origine que l'API : en dev, Vite proxifie /socket.io vers le back (voir vite.config.ts).
@@ -15,8 +15,19 @@ type ServerEvents = {
   'member:kicked': (payload: { teamId: number }) => void
   'team:deleted': (payload: { teamId: number }) => void
   'session:expired': () => void
+  /** Reçu par le capitaine, dans son salon personnel (rejoint à la connexion). */
+  'joinRequest:new': (request: JoinRequestDto) => void
+  /** Reçu par l'auteur de la demande : acceptée, refusée, annulée. */
+  'joinRequest:updated': (request: JoinRequestDto) => void
 }
 type EventName = keyof ServerEvents
+
+/** Événements du salon personnel : les écouter suffit à ouvrir le canal. */
+const PERSONAL_EVENTS = new Set<EventName>([
+  'member:kicked',
+  'joinRequest:new',
+  'joinRequest:updated',
+])
 
 type Room = `${'tournament' | 'team'}:${number}`
 type JoinAck = { ok: true } | { error: { code: string; message: string } }
@@ -47,7 +58,7 @@ function join(room: Room) {
     })
 }
 
-/** Le socket n'est ouvert qu'au premier salon suivi. */
+/** Le socket n'est ouvert qu'au premier salon suivi, ou à la première écoute d'un événement personnel. */
 function ensureSocket() {
   if (socket) return socket
   socket = io(serverOrigin(), {
@@ -81,7 +92,8 @@ export function listen<E extends EventName>(event: E, handler: ServerEvents[E]):
   const set = handlers.get(event) ?? new Set()
   set.add(listener)
   handlers.set(event, set)
-  socket?.on(event as string, listener)
+  if (PERSONAL_EVENTS.has(event) && !socket) ensureSocket()
+  else socket?.on(event as string, listener)
   return () => {
     set.delete(listener)
     socket?.off(event as string, listener)
