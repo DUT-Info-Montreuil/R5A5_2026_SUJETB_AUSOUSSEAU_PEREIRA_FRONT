@@ -26,6 +26,18 @@
   color: var(--color-gold);
 }
 
+/* Avertissement : action refusée (conflit de joueurs…). */
+.warning {
+  max-width: 560px;
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-line);
+  color: var(--color-warning-text);
+}
+
+.warning .mark {
+  color: var(--color-danger);
+}
+
 @keyframes rise {
   from {
     opacity: 0;

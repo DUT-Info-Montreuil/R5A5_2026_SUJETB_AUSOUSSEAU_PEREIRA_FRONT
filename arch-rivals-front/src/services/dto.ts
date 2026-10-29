@@ -1,4 +1,4 @@
-// Formes JSON renvoyées par le back, relevées sur son /openapi.json (dépôt BACK, commit 555a487).
+// Formes JSON renvoyées par le back, relevées sur son /openapi.json (dépôt BACK, commit 1f716d1).
 // Les événements Socket.IO réutilisent les mêmes formes (src/realtime/socketIoNotifier.ts du back).
 // Si le back change une réponse, seuls ce fichier et les fonctions de conversion des services changent.
 
@@ -58,10 +58,10 @@ export type MemberDto = {
 /** GET /api/teams/:id, élément de GET /api/tournaments/:id/teams, événement team:updated. */
 export type TeamDto = {
   id: number
-  /** null : équipe hors tournoi (à ajouter au back, voir BACK-ATTENDU.md § 7). */
+  /** null : équipe hors tournoi. */
   tournamentId: number | null
-  /** Jeu de l'équipe (à ajouter au back) ; pour une équipe inscrite, celui du tournoi. */
-  game?: { id: number; name: string }
+  /** Jeu de l'équipe ; pour une équipe inscrite, celui du tournoi. */
+  game: { id: number; name: string }
   name: string
   isEliminated: boolean
   /** Équipe privée : les nouvelles demandes sont refusées (409 TEAM_PRIVATE). */
