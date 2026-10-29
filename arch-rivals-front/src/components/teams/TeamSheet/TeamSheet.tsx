@@ -31,6 +31,8 @@ type TeamSheetProps = {
   actions: TeamActions
   /** Tous les tournois chargés : une équipe hors tournoi choisit parmi eux où s'inscrire. */
   tournaments: readonly Tournament[]
+  /** Inscription refusée : un membre joue déjà dans le tournoi avec une autre équipe. */
+  onConflict: (message: string) => void
 }
 
 export default function TeamSheet({
@@ -40,6 +42,7 @@ export default function TeamSheet({
   userId,
   actions,
   tournaments,
+  onConflict,
 }: TeamSheetProps) {
   // L'effectif ne bouge que tant que les inscriptions sont ouvertes (B-11), ou tant que
   // l'équipe n'est inscrite à aucun tournoi ; seul le capitaine y touche (B-10).
@@ -154,10 +157,12 @@ export default function TeamSheet({
 
       {!tournament && (
         <JoinTournament
-          tournaments={registrableTournaments(tournaments, team, game.id)}
+          team={team}
+          tournaments={registrableTournaments(tournaments, game.id)}
           game={game.name}
           captain={captain}
           onRegister={actions.register}
+          onConflict={onConflict}
         />
       )}
 

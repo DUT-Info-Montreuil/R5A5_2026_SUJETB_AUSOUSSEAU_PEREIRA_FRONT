@@ -9,7 +9,7 @@ import TeamSheet from '../../../components/teams/TeamSheet/TeamSheet'
 import { useGames } from '../../../hooks/useGames'
 import { useNotifications } from '../../../hooks/useNotifications'
 import { useMyTeams, type MyTeamEntry, type TeamActions } from '../../../hooks/useMyTeams'
-import { useToastAfter } from '../../../hooks/useToast'
+import { useToast, useToastAfter } from '../../../hooks/useToast'
 import { matchesTeamQuery, teamDirectory } from '../../../utils/teamDirectory'
 import styles from './Teams.module.css'
 
@@ -27,10 +27,12 @@ export default function Teams() {
     publicFreeTeams,
     requestToJoin,
     createFreeTeam,
+    reload,
   } = useMyTeams()
   const games = useGames()
   const [creating, setCreating] = useState(false)
   const navigate = useNavigate()
+  const toast = useToast()
   const toastAfter = useToastAfter()
   const { unread, setActiveTeam } = useNotifications()
 
@@ -196,6 +198,11 @@ export default function Teams() {
               tournament={current.tournament}
               game={current.game}
               tournaments={tournaments}
+              onConflict={(message) => {
+                toast(message, 'warning')
+                // Le tournoi a pu changer depuis son chargement : la ligne montrera le conflit.
+                reload().catch(() => {})
+              }}
               userId={userId}
               actions={teamActions(current)}
             />

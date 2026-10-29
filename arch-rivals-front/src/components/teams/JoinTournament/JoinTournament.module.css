@@ -55,6 +55,16 @@
   color: var(--color-text-muted);
 }
 
+/* Un membre joue déjà dans ce tournoi avec une autre équipe. */
+.conflict {
+  border-color: var(--color-warning-line);
+}
+
+.warning {
+  font-size: 14px;
+  color: var(--color-warning-text);
+}
+
 .register {
   min-height: 40px;
   padding: 0 14px;
