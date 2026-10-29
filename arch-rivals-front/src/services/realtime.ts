@@ -1,6 +1,6 @@
 import { io, type Socket } from 'socket.io-client'
 import { getAuthToken } from './api'
-import type { MatchDto, MessageDto, TeamDto } from './dto'
+import type { JoinRequestDto, MatchDto, MessageDto, TeamDto } from './dto'
 
 // Canal temps réel du back (Socket.IO). Il ne fait que notifier : les écritures passent par HTTP.
 // Même origine que l'API : en dev, Vite proxifie /socket.io vers le back (voir vite.config.ts).
@@ -15,6 +15,10 @@ type ServerEvents = {
   'member:kicked': (payload: { teamId: number }) => void
   'team:deleted': (payload: { teamId: number }) => void
   'session:expired': () => void
+  /** Reçu par le capitaine, dans son salon personnel (rejoint à la connexion). */
+  'joinRequest:new': (request: JoinRequestDto) => void
+  /** Reçu par l'auteur de la demande : acceptée, refusée, annulée. */
+  'joinRequest:updated': (request: JoinRequestDto) => void
 }
 type EventName = keyof ServerEvents
 

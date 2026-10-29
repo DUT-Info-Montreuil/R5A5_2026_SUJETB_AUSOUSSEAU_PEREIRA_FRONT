@@ -16,6 +16,7 @@ export const toTeam = (dto: TeamDto): TournamentTeam => ({
   tournamentId: dto.tournamentId,
   name: dto.name,
   isEliminated: dto.isEliminated,
+  visibility: dto.visibility,
   createdAt: dto.createdAt,
   members: dto.members.map((m) => ({
     userId: m.userId,
@@ -37,6 +38,7 @@ export const toMatch = (dto: MatchDto): Match => ({
   winnerId: dto.winnerId,
   isForfeit: dto.isForfeit,
   status: dto.status,
+  scheduledAt: dto.scheduledAt,
 })
 
 /** `games` fournit les rôles du jeu du tournoi (le détail du tournoi ne les contient pas). */
@@ -47,6 +49,7 @@ export const toTournament = (dto: TournamentDetailDto, games: readonly Game[]): 
   game: dto.game.name,
   roles: games.find((g) => g.id === dto.game.id)?.roles ?? [],
   state: STATES[dto.status],
+  registrationClosesAt: dto.registrationClosesAt,
   createdAt: dto.createdAt,
   closedAt: dto.closedAt,
   startedAt: dto.startedAt,

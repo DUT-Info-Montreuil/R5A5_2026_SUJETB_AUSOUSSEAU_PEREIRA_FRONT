@@ -1,4 +1,4 @@
-// Formes JSON renvoyées par le back, relevées sur son /openapi.json (dépôt BACK, commit eb70249).
+// Formes JSON renvoyées par le back, relevées sur son /openapi.json (dépôt BACK, commit 555a487).
 // Les événements Socket.IO réutilisent les mêmes formes (src/realtime/socketIoNotifier.ts du back).
 // Si le back change une réponse, seuls ce fichier et les fonctions de conversion des services changent.
 
@@ -39,6 +39,8 @@ export type TournamentDto = {
   status: TournamentStatus
   game: { id: number; name: string }
   teamCount: number
+  /** Date de clôture prévue des inscriptions, indicative (fixée par l'admin). */
+  registrationClosesAt: string | null
   createdAt: string
   closedAt: string | null
   startedAt: string | null
@@ -59,9 +61,13 @@ export type TeamDto = {
   tournamentId: number
   name: string
   isEliminated: boolean
+  /** Équipe privée : les nouvelles demandes sont refusées (409 TEAM_PRIVATE). */
+  visibility: TeamVisibility
   createdAt: string
   members: MemberDto[]
 }
+
+export type TeamVisibility = 'open' | 'private'
 
 /** Élément de GET /api/tournaments/:id/matches, événement match:updated. */
 export type MatchDto = {
@@ -76,6 +82,8 @@ export type MatchDto = {
   winnerId: number | null
   isForfeit: boolean
   status: 'pending' | 'ready' | 'finished'
+  /** Horaire prévu, indicatif (fixé par l'admin). */
+  scheduledAt: string | null
   validatedAt: string | null
 }
 
@@ -85,10 +93,14 @@ export type TournamentDetailDto = TournamentDto & {
   matches: MatchDto[]
 }
 
+/** Élément de GET /api/teams/:id/join-requests et /api/me/join-requests, événements joinRequest:*. */
 export type JoinRequestDto = {
   id: number
   teamId: number
+  tournamentId: number
+  team: { id: number; name: string }
   user: { id: number; username: string }
+  /** rejected : refus du capitaine ou clôture ; cancelled : par le joueur, ou entré dans une autre équipe. */
   status: 'pending' | 'accepted' | 'rejected' | 'cancelled'
   createdAt: string
   decidedAt: string | null
