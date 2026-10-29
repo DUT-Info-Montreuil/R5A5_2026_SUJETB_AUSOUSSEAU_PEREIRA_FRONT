@@ -61,5 +61,5 @@ Les formes JSON du back ne sont connues que de `services/dto.ts` et `services/ma
 ## Autres documents
 
 - `arch-rivals-front/docs/design/` : maquettes HTML.
-- `BACK-ATTENDU.md` : ce que le front a demandé au back (livré).
-- `TODO.md` : suivi des features de l'espace joueur.
+
+AUSOUSSEAU Teddy & PEREIRA Esteban
