@@ -6,6 +6,8 @@ import { follow, listen } from './realtime'
 // Contrat du back (api-routes.md), salle du conseil d'une équipe :
 //   GET  /teams/:id/messages              → { messages, pagination }  du plus récent au plus ancien
 //   POST /teams/:id/messages  { content } → 201 { message }
+//   POST /teams/:id/messages/read { messageId } → 204  (le repère ne recule jamais)
+//   GET  /me/unread                       → { teams: [{ teamId, unread, lastReadMessageId }] }
 //   Temps réel : salon `team:join` (mêmes droits que la lecture), événement `message:new`,
 //   qui pousse chaque nouveau message, y compris ceux du joueur lui-même.
 // L'espace d'une équipe éliminée est fermé en lecture et en écriture (409 TEAM_CHAT_CLOSED, B-18).
@@ -38,6 +40,17 @@ export async function sendMessage(teamId: number, text: string): Promise<ChatMes
     content: text.trim(),
   })
   return toMessage(message)
+}
+
+/** Messages non lus par équipe (équipes encore en lice). */
+export async function fetchUnread(): Promise<Record<number, number>> {
+  const { teams } = await api.get<{ teams: { teamId: number; unread: number }[] }>('/me/unread')
+  return Object.fromEntries(teams.map((t) => [t.teamId, t.unread]))
+}
+
+/** Marque lus les messages de l'équipe jusqu'à `messageId` inclus. */
+export async function markRead(teamId: number, messageId: number): Promise<void> {
+  await api.post(`/teams/${teamId}/messages/read`, { messageId })
 }
 
 /** S'abonne aux nouveaux messages de l'équipe ; renvoie la fonction qui coupe l'abonnement. */
