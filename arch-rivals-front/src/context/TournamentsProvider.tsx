@@ -1,11 +1,9 @@
-import { useCallback, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useAuth } from '../hooks/useAuth'
 import { ApiError } from '../services/api'
-import { requestStorage } from '../services/requestStorage'
 import * as teamsApi from '../services/teams'
 import { fetchTournament, fetchTournaments } from '../services/tournaments'
-import type { Tournament, TournamentTeam } from '../types/tournament'
-import { findMyTeam } from '../utils/tournaments'
+import type { MyJoinRequest, Tournament, TournamentTeam } from '../types/tournament'
 import {
   TournamentsContext,
   type Requests,
@@ -13,18 +11,9 @@ import {
   type TournamentsStatus,
 } from './tournamentsContext'
 
-/**
- * Ne garde que les demandes encore crédibles : tournoi aux inscriptions ouvertes et joueur
- * toujours sans équipe (une demande acceptée le fait apparaître dans une équipe).
- */
-function stillPending(requests: Requests, tournaments: Tournament[], userId: number): Requests {
-  return Object.fromEntries(
-    Object.entries(requests).filter(([, r]) => {
-      const t = tournaments.find((x) => x.id === r.tournamentId)
-      return t?.state === 'ouvertes' && !findMyTeam(t, userId)
-    }),
-  )
-}
+/** Une demande par tournoi : le back annule les autres quand le joueur entre dans une équipe. */
+const byTournament = (list: MyJoinRequest[]): Requests =>
+  Object.fromEntries(list.map((r) => [r.tournamentId, r]))
 
 /**
  * Tournois partagés par tout l'espace joueur : l'en-tête (badge « Équipes ») et les pages lisent
@@ -40,14 +29,10 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
 
   const reload = useCallback(() => {
     // L'en-tête et la page s'ouvrent ensemble : une seule lecture pour les deux.
-    inFlight.current ??= fetchTournaments()
-      .then((list) => {
+    inFlight.current ??= Promise.all([fetchTournaments(), teamsApi.fetchMyPendingRequests()])
+      .then(([list, pending]) => {
         setTournaments(list)
-        if (userId !== null) {
-          const kept = stillPending(requestStorage.load(userId), list, userId)
-          requestStorage.save(userId, kept)
-          setRequests(kept)
-        }
+        setRequests(byTournament(pending))
         setStatus('ready')
       })
       .catch(() => {
@@ -58,17 +43,11 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
         inFlight.current = null
       })
     return inFlight.current
-  }, [userId])
+  }, [])
 
-  const saveRequests = useCallback(
-    (update: (current: Requests) => Requests) => {
-      setRequests((current) => {
-        const next = update(current)
-        if (userId !== null) requestStorage.save(userId, next)
-        return next
-      })
-    },
-    [userId],
+  const forgetRequest = useCallback(
+    (tournamentId: number) => setRequests(({ [tournamentId]: _done, ...rest }) => rest),
+    [],
   )
 
   const refresh = useCallback(async (tournamentId: number) => {
@@ -81,22 +60,19 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
     async (tournamentId: number, name: string) => {
       await teamsApi.createTeam(tournamentId, name)
       // Le back annule les autres demandes du joueur dans ce tournoi.
-      saveRequests(({ [tournamentId]: _cancelled, ...rest }) => rest)
+      forgetRequest(tournamentId)
       await refresh(tournamentId)
     },
-    [refresh, saveRequests],
+    [refresh, forgetRequest],
   )
 
-  const requestToJoin = useCallback(
-    async (tournamentId: number, team: TournamentTeam) => {
-      const id = await teamsApi.requestToJoin(team.id)
-      saveRequests((current) => ({
-        ...current,
-        [tournamentId]: { id, tournamentId, teamId: team.id, teamName: team.name },
-      }))
-    },
-    [saveRequests],
-  )
+  const requestToJoin = useCallback(async (tournamentId: number, team: TournamentTeam) => {
+    const id = await teamsApi.requestToJoin(team.id)
+    setRequests((current) => ({
+      ...current,
+      [tournamentId]: { id, tournamentId, teamId: team.id, teamName: team.name },
+    }))
+  }, [])
 
   const cancelRequest = useCallback(
     async (tournamentId: number) => {
@@ -108,10 +84,25 @@ export default function TournamentsProvider({ children }: { children: ReactNode 
         // 404 : la demande n'est plus en attente (acceptée ou refusée entre-temps).
         if (!(err instanceof ApiError && err.status === 404)) throw err
       }
-      saveRequests(({ [tournamentId]: _cancelled, ...rest }) => rest)
+      forgetRequest(tournamentId)
       await refresh(tournamentId)
     },
-    [requests, refresh, saveRequests],
+    [requests, refresh, forgetRequest],
+  )
+
+  // Ma demande acceptée, refusée ou annulée par le back : on l'oublie et on relit le tournoi
+  // (acceptée, le joueur apparaît dans l'équipe).
+  useEffect(
+    () =>
+      teamsApi.onMyRequestDecided((request) => {
+        setRequests((current) =>
+          current[request.tournamentId]?.id === request.id
+            ? (({ [request.tournamentId]: _done, ...rest }) => rest)(current)
+            : current,
+        )
+        refresh(request.tournamentId).catch(() => {})
+      }),
+    [refresh],
   )
 
   const value = useMemo<TournamentsContextValue>(

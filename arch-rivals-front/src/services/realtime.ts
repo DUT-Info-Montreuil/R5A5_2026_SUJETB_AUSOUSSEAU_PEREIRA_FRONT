@@ -22,6 +22,13 @@ type ServerEvents = {
 }
 type EventName = keyof ServerEvents
 
+/** Événements du salon personnel : les écouter suffit à ouvrir le canal. */
+const PERSONAL_EVENTS = new Set<EventName>([
+  'member:kicked',
+  'joinRequest:new',
+  'joinRequest:updated',
+])
+
 type Room = `${'tournament' | 'team'}:${number}`
 type JoinAck = { ok: true } | { error: { code: string; message: string } }
 
@@ -51,7 +58,7 @@ function join(room: Room) {
     })
 }
 
-/** Le socket n'est ouvert qu'au premier salon suivi. */
+/** Le socket n'est ouvert qu'au premier salon suivi, ou à la première écoute d'un événement personnel. */
 function ensureSocket() {
   if (socket) return socket
   socket = io(serverOrigin(), {
@@ -85,7 +92,8 @@ export function listen<E extends EventName>(event: E, handler: ServerEvents[E]):
   const set = handlers.get(event) ?? new Set()
   set.add(listener)
   handlers.set(event, set)
-  socket?.on(event as string, listener)
+  if (PERSONAL_EVENTS.has(event) && !socket) ensureSocket()
+  else socket?.on(event as string, listener)
   return () => {
     set.delete(listener)
     socket?.off(event as string, listener)
