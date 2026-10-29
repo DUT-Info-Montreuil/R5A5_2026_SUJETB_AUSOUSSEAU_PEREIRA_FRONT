@@ -12,6 +12,7 @@ import { listen } from './realtime'
 //   DELETE /teams/:id/members/me                          → 204        membre, capitaine compris (B-06)
 //   GET    /teams/:id/join-requests                       → { joinRequests, pagination }  capitaine
 //   POST   /join-requests/:id/accept | /reject            → { joinRequest }               capitaine
+//   Temps réel : joinRequest:new, reçu par le capitaine dans son salon personnel.
 // Toute modification est refusée (409) une fois les inscriptions closes (B-11). Si le capitaine
 // quitte l'équipe, le membre arrivé le plus tôt prend la main ; s'il était seul, l'équipe est
 // supprimée. Après une écriture, le front relit le tournoi (useMyTeams).
@@ -68,6 +69,11 @@ export async function rejectJoinRequest(requestId: number): Promise<void> {
  */
 export function onTeamUpdated(onUpdate: (tournamentId: number) => void): () => void {
   return listen('team:updated', (team) => onUpdate(team.tournamentId))
+}
+
+/** Nouvelle demande reçue par une de mes équipes (capitaine) ; renvoie la fonction qui coupe l'écoute. */
+export function onJoinRequestReceived(onReceived: (teamId: number) => void): () => void {
+  return listen('joinRequest:new', (request) => onReceived(request.teamId))
 }
 
 /** Nombre de demandes en attente (badge « Équipes » du capitaine). */

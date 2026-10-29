@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { useTournaments } from '../hooks/useTournaments'
 import { fetchUnread, subscribeToMessages } from '../services/chat'
-import { countJoinRequests } from '../services/myTeam'
+import { countJoinRequests, onJoinRequestReceived } from '../services/myTeam'
 import { isCaptain } from '../utils/teams'
 import { findMyTeam } from '../utils/tournaments'
 import { NotificationsContext, type NotificationsContextValue } from './notificationsContext'
@@ -72,15 +72,19 @@ export default function NotificationsProvider({ children }: { children: ReactNod
   }, [chatKey, userId])
 
   // Demandes en attente : relues à chaque relecture des tournois (accepter, refuser, changer
-  // de page).
+  // de page), et comptées en direct à chaque nouvelle demande.
   useEffect(() => {
     let cancelled = false
     const ids = captainKey ? captainKey.split(',').map(Number) : []
     Promise.all(ids.map((id) => countJoinRequests(id).catch(() => 0))).then((counts) => {
       if (!cancelled) setPendingRequests(counts.reduce((sum, n) => sum + n, 0))
     })
+    const stop = onJoinRequestReceived((teamId) => {
+      if (ids.includes(teamId)) setPendingRequests((n) => n + 1)
+    })
     return () => {
       cancelled = true
+      stop()
     }
   }, [captainKey, tournaments])
 

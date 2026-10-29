@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { fetchJoinRequests } from '../services/myTeam'
+import { fetchJoinRequests, onJoinRequestReceived } from '../services/myTeam'
 import type { IncomingRequest } from '../types/team'
 
 type Loaded = { teamId: number; requests: IncomingRequest[] }
@@ -7,7 +7,8 @@ type Loaded = { teamId: number; requests: IncomingRequest[] }
 /**
  * Demandes reçues par l'équipe, réservées au capitaine (403 sinon) : `enabled` évite de les
  * demander quand le joueur n'est pas capitaine ou que les inscriptions sont closes.
- * `version` change à chaque modification de l'équipe, ce qui relance la lecture.
+ * `version` change à chaque modification de l'équipe, ce qui relance la lecture ; une nouvelle
+ * demande (joinRequest:new) aussi.
  */
 export function useJoinRequests(teamId: number, enabled: boolean, version: unknown) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
@@ -36,6 +37,19 @@ export function useJoinRequests(teamId: number, enabled: boolean, version: unkno
       cancelled = true
     }
   }, [enabled, load, version])
+
+  // Nouvelle demande poussée par le back : on relit la liste.
+  useEffect(() => {
+    if (!enabled) return
+    let cancelled = false
+    const stop = onJoinRequestReceived((id) => {
+      if (id === teamId) load(() => cancelled)
+    })
+    return () => {
+      cancelled = true
+      stop()
+    }
+  }, [enabled, load, teamId])
 
   const requests = enabled && loaded?.teamId === teamId ? loaded.requests : []
   return { requests, failed: enabled && failed }
