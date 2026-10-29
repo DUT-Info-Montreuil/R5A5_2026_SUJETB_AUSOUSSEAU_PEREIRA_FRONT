@@ -74,7 +74,7 @@ export async function rejectJoinRequest(requestId: number): Promise<void> {
  * Équipe modifiée par un autre membre (arrivée, départ, rôle, capitaine), poussée sur le salon
  * de l'équipe ; renvoie la fonction qui coupe l'écoute.
  */
-export function onTeamUpdated(onUpdate: (tournamentId: number) => void): () => void {
+export function onTeamUpdated(onUpdate: (tournamentId: number | null) => void): () => void {
   return listen('team:updated', (team) => onUpdate(team.tournamentId))
 }
 

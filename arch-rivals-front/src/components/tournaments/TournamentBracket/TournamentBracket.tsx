@@ -26,21 +26,21 @@ export default function TournamentBracket({ rounds, champion, myTeamId }: Tourna
             <div className={styles.matches}>
               {round.matches.map((match) => (
                 <div key={match.key} className={styles.match}>
-                  {match.rows.map((row, i) => (
-                    <div
-                      key={i}
-                      className={[
-                        styles.row,
-                        styles[row.outcome],
-                        row.teamId !== null && row.teamId === myTeamId && styles.mine,
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}
-                    >
-                      <span className={styles.name}>{row.team ?? '—'}</span>
-                      <span className={styles.score}>{row.score}</span>
-                    </div>
-                  ))}
+                  {match.rows.map((row, i) => {
+                    const mine = row.teamId !== null && row.teamId === myTeamId
+                    return (
+                      <div
+                        key={i}
+                        className={[styles.row, styles[row.outcome], mine && styles.mine]
+                          .filter(Boolean)
+                          .join(' ')}
+                      >
+                        {mine && <span className={styles.meTag}>TOI</span>}
+                        <span className={styles.name}>{row.team ?? '—'}</span>
+                        <span className={styles.score}>{row.score}</span>
+                      </div>
+                    )
+                  })}
                   <span className={`${styles.status} ${styles[match.status]}`}>
                     {STATUS_LABELS[match.status]}
                     {match.scheduledAt && (

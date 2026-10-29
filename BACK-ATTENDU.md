@@ -1,9 +1,11 @@
 # Ce que le front attend du back
 
-> **Livré.** Le back a ajouté les six points ci-dessous (dépôt BACK, commit `555a487`, voir son
-> `FRONT-ATTENDU.md`) ; le front les utilise depuis la branche `feat/integration-back`. Les
-> contournements décrits ici (stockage local, lecture de tous les tournois, calcul des
-> statistiques) ont été retirés.
+> **Points 1 à 6 : livrés.** Le back les a ajoutés (dépôt BACK, commit `555a487`, voir son
+> `FRONT-ATTENDU.md`) et le front les utilise. Le stockage local et le calcul des statistiques ont
+> été retirés ; le détail des tournois n'est plus lu que pour ceux qui en ont besoin.
+>
+> **Point 7 : à faire côté back.** Le front est prêt (branche `fix/retours-tests-esteban`) ; tant
+> que les routes manquent, il affiche « Cette fonction n'est pas encore disponible sur le serveur ».
 
 Le front de l'espace joueur fonctionne avec le contrat actuel (`api-routes.md` du dépôt BACK).
 Certains besoins y sont couverts par des contournements côté front : ce fichier liste ce qu'il
@@ -84,6 +86,32 @@ GET /api/users/:id/stats  → 200 {
 - Date de clôture prévue des inscriptions (`registrationClosesAt` dans `TournamentDto`).
 - Équipe ouverte / fermée aux demandes (`visibility: 'open' | 'private'` dans `TeamDto`, modifiable
   par le capitaine) : cadenas de la maquette, badge INCOMPLÈTE.
+
+## 7. Équipes hors tournoi (à faire)
+
+Demande issue des tests d'Esteban : un joueur crée une équipe sans choisir de tournoi, la compose,
+puis l'inscrit depuis son tableau de bord à un tournoi aux inscriptions ouvertes.
+Aujourd'hui `teams.tournament_id` est `NOT NULL`.
+
+```
+POST /api/teams  { name, gameId }        → 201 { team }   (connecté : il en devient capitaine)
+GET  /api/teams?free=true&search=        → 200 { teams: TeamDto[], pagination }   (public)
+POST /api/teams/:id/register { tournamentId } → 200 { team }   (capitaine)
+```
+
+- `TeamDto` : `tournamentId: number | null` (null : hors tournoi) et `game: { id, name }`, pour toutes
+  les équipes (celui du tournoi pour une équipe inscrite).
+- `GET /api/me/teams` renvoie aussi mes équipes hors tournoi, avec `tournament: null`.
+- `JoinRequestDto.tournamentId` vaut `null` pour une demande vers une équipe hors tournoi.
+- Hors tournoi, tout fonctionne comme dans un tournoi aux inscriptions ouvertes : renommer, rôles,
+  visibilité, demandes, exclusion, capitanat, départ, suppression, chat (`team:join`).
+- `register` : inscriptions ouvertes (`409 REGISTRATION_CLOSED`), même jeu (`409 GAME_MISMATCH`),
+  moins de 8 équipes (`409 TOURNAMENT_FULL`), aucun membre déjà dans une équipe du tournoi
+  (`409 MEMBER_ALREADY_IN_TOURNAMENT`), nom libre dans le tournoi (`409 TEAM_NAME_TAKEN`), équipe
+  pas déjà inscrite (`409 TEAM_ALREADY_REGISTERED`). L'équipe garde son identifiant, ses membres,
+  ses messages et ses demandes en attente ; `tournament:updated` est émis.
+- Front : `src/services/teams.ts` (`createFreeTeam`, `fetchFreeTeams`, `registerTeam`,
+  `fetchMyTeams`).
 
 ## Rappel de configuration
 

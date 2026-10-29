@@ -28,7 +28,7 @@ type DirectoryCardProps = {
 }
 
 export default function DirectoryCard({ entry, onManage, onRequest }: DirectoryCardProps) {
-  const { team, tournament, captain, mine, myRole, badge, action } = entry
+  const { team, context, game, captain, mine, myRole, badge, action } = entry
   const { pending, error, run } = useAsyncAction()
   const primary = action === 'manage' || action === 'sent'
   const dim = action === 'busy' || action === 'engaged' || action === 'private'
@@ -50,7 +50,7 @@ export default function DirectoryCard({ entry, onManage, onRequest }: DirectoryC
           <div className={styles.identity}>
             <h3 className={styles.name}>{team.name}</h3>
             <span className={styles.tournament}>
-              {tournament.name} · {tournament.game}
+              {context} · {game}
             </span>
           </div>
           <span

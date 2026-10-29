@@ -30,29 +30,50 @@
   color: var(--color-gold);
 }
 
-.reset {
-  min-height: 36px;
-  padding: 0 16px;
-  background: transparent;
-  color: var(--color-text-muted);
+.heading {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+}
+
+.state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--font-ui);
-  font-size: 12px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  border: 1px solid var(--team-pending-border);
-  border-radius: 0;
-  cursor: pointer;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  color: var(--color-live);
 }
 
-.reset:hover:not(:disabled),
-.reset:focus-visible {
-  border-color: var(--color-gold);
-  color: var(--color-gold-hover);
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-live);
 }
 
-.reset:disabled {
-  opacity: 0.4;
-  cursor: default;
+.heading .name {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--color-text-strong);
+}
+
+.game {
+  font-size: 15px;
+  color: var(--color-text-muted);
+}
+
+.message {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--color-text-faint);
 }
 
 /* Défilement horizontal interne : le body ne scrolle jamais en largeur. */
@@ -69,12 +90,28 @@
   gap: clamp(8px, 1.5vw, 20px);
 }
 
-.round {
+.round,
+.championCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.matches {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   gap: 10px;
-  min-width: 0;
+}
+
+.roundLabel {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--color-gold);
+  text-align: center;
 }
 
 .match {
@@ -94,19 +131,7 @@
   font-family: var(--font-body);
   font-size: 15px;
   color: var(--color-text);
-  text-align: left;
   border: 1px solid;
-  border-radius: 0;
-  cursor: pointer;
-}
-
-.team:hover:not(:disabled),
-.team:focus-visible {
-  border-color: var(--color-gold);
-}
-
-.team:disabled {
-  cursor: default;
 }
 
 .pending {
@@ -136,22 +161,6 @@
   color: var(--color-gold);
 }
 
-.championCol {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.championLabel {
-  font-family: var(--font-ui);
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: var(--color-gold);
-}
-
 .champion {
   display: flex;
   align-items: center;
@@ -168,4 +177,65 @@
   letter-spacing: 0.06em;
   color: var(--color-gold-hover);
   text-align: center;
+}
+
+/* Tournoi à venir */
+.upcoming {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 0 8px;
+  text-align: center;
+}
+
+.upcomingTitle {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--color-text-strong);
+}
+
+.upcomingText {
+  margin: 0;
+  font-size: 17px;
+  color: var(--color-text-muted);
+}
+
+.teams {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.teamChip {
+  padding: 8px 14px;
+  background: var(--team-pending-bg);
+  border: 1px solid var(--team-pending-border);
+  font-size: 15px;
+}
+
+.play {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 22px;
+  background: var(--color-gold);
+  color: var(--color-on-gold);
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.play:hover,
+.play:focus-visible {
+  background: var(--color-gold-hover);
 }
