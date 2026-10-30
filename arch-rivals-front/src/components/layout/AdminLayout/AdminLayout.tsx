@@ -23,6 +23,9 @@ export default function AdminLayout() {
             <NavLink to="/admin/tournois" className={navClass}>
               Tournois
             </NavLink>
+            <NavLink to="/admin/jeux" className={navClass}>
+              Jeux
+            </NavLink>
             <Link to="/joueur" className={`${header.link} ${styles.exit}`}>
               Espace joueur →
             </Link>

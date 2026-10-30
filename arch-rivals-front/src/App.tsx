@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import AdminLayout from './components/layout/AdminLayout/AdminLayout'
 import PlayerLayout from './components/layout/PlayerLayout/PlayerLayout'
 import ProtectedRoute from './components/routing/ProtectedRoute'
+import AdminGames from './pages/Admin/Games/AdminGames'
 import AdminTournament from './pages/Admin/Tournament/AdminTournament'
 import AdminTournaments from './pages/Admin/Tournaments/AdminTournaments'
 import Home from './pages/Home/Home'
@@ -38,6 +39,7 @@ const router = createBrowserRouter([
       { index: true, element: <Navigate to="tournois" replace /> },
       { path: 'tournois', element: <AdminTournaments /> },
       { path: 'tournois/:id', element: <AdminTournament /> },
+      { path: 'jeux', element: <AdminGames /> },
     ],
   },
   { path: '*', element: <Navigate to="/" replace /> },
