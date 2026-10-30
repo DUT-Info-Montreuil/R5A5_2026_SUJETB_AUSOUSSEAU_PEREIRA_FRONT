@@ -4,8 +4,6 @@ import type { Tournament } from '../types/tournament'
 
 type Status = 'loading' | 'ready' | 'error'
 
-const NONE: ReadonlySet<number> = new Set()
-
 /** Tous les tournois, pour l'administrateur ; relus à chaque visite de la liste. */
 export function useAdminTournaments() {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
@@ -13,7 +11,7 @@ export function useAdminTournaments() {
 
   useEffect(() => {
     let cancelled = false
-    fetchTournaments(NONE)
+    fetchTournaments(new Set())
       .then((list) => {
         if (cancelled) return
         setTournaments(list)

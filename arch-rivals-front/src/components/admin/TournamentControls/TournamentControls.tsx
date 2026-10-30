@@ -98,11 +98,7 @@ function StartControl({
       )}
       <ConfirmAction
         label="Lancer le tournoi"
-        question={
-          incomplete.length
-            ? `Lancer le tournoi ? ${incomplete.length} équipe${incomplete.length > 1 ? 's' : ''} déclarée${incomplete.length > 1 ? 's' : ''} forfait.`
-            : 'Lancer le tournoi ? Les matchs deviennent jouables.'
-        }
+        question="Lancer le tournoi ? Les matchs deviennent jouables."
         confirmLabel="Lancer"
         onConfirm={onStart}
       />

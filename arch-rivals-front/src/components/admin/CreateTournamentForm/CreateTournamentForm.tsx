@@ -9,6 +9,7 @@ const NAME_MIN = 3
 const NAME_MAX = 100
 
 type CreateTournamentFormProps = {
+  /** Au moins un jeu : le formulaire ne s'ouvre pas sans. */
   games: readonly Game[]
   onCreate: (name: string, gameId: number, registrationClosesAt: string | null) => Promise<void>
   onCancel: () => void
@@ -22,7 +23,7 @@ export default function CreateTournamentForm({
 }: CreateTournamentFormProps) {
   const id = useId()
   const [name, setName] = useState('')
-  const [gameId, setGameId] = useState<number | null>(games[0]?.id ?? null)
+  const [gameId, setGameId] = useState(games[0].id)
   const [closesAt, setClosesAt] = useState('')
   const [invalid, setInvalid] = useState<string | null>(null)
   const { pending, error, run } = useAsyncAction()
@@ -31,13 +32,9 @@ export default function CreateTournamentForm({
     event.preventDefault()
     const trimmed = name.trim()
     const problem =
-      trimmed.length < NAME_MIN
-        ? `Le nom doit faire au moins ${NAME_MIN} caractères.`
-        : gameId === null
-          ? 'Choisis le jeu du tournoi.'
-          : null
+      trimmed.length < NAME_MIN ? `Le nom doit faire au moins ${NAME_MIN} caractères.` : null
     setInvalid(problem)
-    if (problem || gameId === null) return
+    if (problem) return
     run(() => onCreate(trimmed, gameId, fromDateTimeInput(closesAt)))
   }
 
@@ -65,7 +62,7 @@ export default function CreateTournamentForm({
           <span className={admin.label}>JEU</span>
           <select
             className={admin.input}
-            value={gameId ?? ''}
+            value={gameId}
             onChange={(e) => setGameId(Number(e.target.value))}
           >
             {games.map((game) => (

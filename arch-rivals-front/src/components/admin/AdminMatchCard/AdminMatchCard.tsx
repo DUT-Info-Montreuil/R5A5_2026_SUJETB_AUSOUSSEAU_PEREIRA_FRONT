@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useAsyncAction } from '../../../hooks/useAsyncAction'
 import type { Match } from '../../../types/tournament'
+import { bracketRow } from '../../../utils/bracket'
 import { matchTimeLabel } from '../../../utils/dates'
 import ConfirmAction from '../../teams/ConfirmAction/ConfirmAction'
 import DateTimeForm from '../DateTimeForm/DateTimeForm'
@@ -30,32 +31,22 @@ export default function AdminMatchCard({
   onForfeit,
   onSchedule,
 }: AdminMatchCardProps) {
-  const name = (teamId: number | null) => (teamId === null ? '—' : (names.get(teamId) ?? '—'))
-  const playable = live && match.status === 'ready'
+  const rows = [bracketRow(match, 'a', names), bracketRow(match, 'b', names)]
+  const [teamA, teamB] = rows.map((r) => r.team ?? '—')
   const finished = match.status === 'finished'
 
-  const sides = [
-    { teamId: match.teamAId, score: match.scoreA },
-    { teamId: match.teamBId, score: match.scoreB },
-  ]
-
   return (
-    <article
-      className={styles.card}
-      aria-label={`${name(match.teamAId)} contre ${name(match.teamBId)}`}
-    >
+    <article className={styles.card} aria-label={`${teamA} contre ${teamB}`}>
       <div className={styles.teams}>
-        {sides.map(({ teamId, score }, i) => {
-          const won = finished && teamId !== null && teamId === match.winnerId
-          return (
-            <div key={i} className={[styles.team, won && styles.winner].filter(Boolean).join(' ')}>
-              <span className={styles.name}>{name(teamId)}</span>
-              {finished && (
-                <span className={styles.score}>{match.isForfeit ? (won ? '' : 'F') : score}</span>
-              )}
-            </div>
-          )
-        })}
+        {rows.map((row, i) => (
+          <div
+            key={i}
+            className={row.outcome === 'winner' ? `${styles.team} ${styles.winner}` : styles.team}
+          >
+            <span className={styles.name}>{row.team ?? '—'}</span>
+            <span className={styles.score}>{row.score}</span>
+          </div>
+        ))}
       </div>
 
       <p className={styles.status}>
@@ -63,21 +54,18 @@ export default function AdminMatchCard({
         {!finished && match.scheduledAt && ` · ${matchTimeLabel(match.scheduledAt)}`}
       </p>
 
-      {playable && match.teamAId !== null && match.teamBId !== null && (
+      {/* Jouable : ses deux équipes sont connues (B-14). */}
+      {live && match.status === 'ready' && (
         <>
-          <ResultForm
-            teamA={name(match.teamAId)}
-            teamB={name(match.teamBId)}
-            onSubmit={(a, b) => onResult(match, a, b)}
-          />
+          <ResultForm teamA={teamA} teamB={teamB} onSubmit={(a, b) => onResult(match, a, b)} />
           <div className={styles.forfeits}>
-            {[match.teamAId, match.teamBId].map((teamId) => (
+            {rows.map(({ teamId, team }) => (
               <ConfirmAction
                 key={teamId}
-                label={`Forfait de ${name(teamId)}`}
-                question={`${name(teamId)} déclare forfait : l'adversaire est qualifié.`}
+                label={`Forfait de ${team}`}
+                question={`${team} déclare forfait : l'adversaire est qualifié.`}
                 confirmLabel="Déclarer forfait"
-                onConfirm={() => onForfeit(match, teamId)}
+                onConfirm={() => onForfeit(match, teamId!)}
               />
             ))}
           </div>
@@ -113,21 +101,13 @@ function ResultForm({
 
   function submit(event: FormEvent) {
     event.preventDefault()
-    const a = Number(scoreA)
-    const b = Number(scoreB)
-    const problem =
-      scoreA === '' ||
-      scoreB === '' ||
-      !Number.isInteger(a) ||
-      !Number.isInteger(b) ||
-      a < 0 ||
-      b < 0
-        ? 'Saisis deux scores entiers positifs.'
-        : a === b
-          ? 'Égalité impossible : il faut un vainqueur.'
-          : null
+    const problem = ![scoreA, scoreB].every((score) => /^\d+$/.test(score))
+      ? 'Saisis deux scores entiers positifs.'
+      : Number(scoreA) === Number(scoreB)
+        ? 'Égalité impossible : il faut un vainqueur.'
+        : null
     setInvalid(problem)
-    if (!problem) run(() => onSubmit(a, b))
+    if (!problem) run(() => onSubmit(Number(scoreA), Number(scoreB)))
   }
 
   const message = invalid ?? error
