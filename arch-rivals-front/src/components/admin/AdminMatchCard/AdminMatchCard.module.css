@@ -1,0 +1,66 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--color-surface-deep);
+  border: 1px solid var(--color-card-border);
+}
+
+.teams {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 12px;
+  background: var(--team-pending-bg);
+  border: 1px solid var(--team-pending-border);
+}
+
+.winner {
+  background: var(--team-winner-bg);
+  border-color: var(--team-winner-border);
+}
+
+.name {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--color-text);
+}
+
+.score {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--color-gold-hover);
+}
+
+.status {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.scoreField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 1 140px;
+  min-width: 100px;
+}
+
+.forfeits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

@@ -30,7 +30,7 @@ export type BracketRound = {
 const ROUND_LABELS = ['QUARTS', 'DEMIES', 'FINALE']
 const ROUND_NAMES = ['Quart de finale', 'Demi-finale', 'Finale']
 
-const roundName = (round: number) => ROUND_NAMES[round - 1] ?? `Tour ${round}`
+export const roundName = (round: number) => ROUND_NAMES[round - 1] ?? `Tour ${round}`
 
 function matchView(match: Match): MatchView {
   if (match.status === 'pending') return 'waiting'
@@ -38,7 +38,11 @@ function matchView(match: Match): MatchView {
   return match.isForfeit ? 'forfeit' : 'done'
 }
 
-function row(match: Match, side: 'a' | 'b', names: Map<number, string>): BracketRow {
+export function bracketRow(
+  match: Match,
+  side: 'a' | 'b',
+  names: ReadonlyMap<number, string>,
+): BracketRow {
   const teamId = side === 'a' ? match.teamAId : match.teamBId
   const finished = match.status === 'finished'
   const outcome =
@@ -68,7 +72,7 @@ export function tournamentBracket(tournament: Tournament) {
       .filter((m) => m.round === round)
       .map((m) => ({
         key: m.id,
-        rows: [row(m, 'a', names), row(m, 'b', names)],
+        rows: [bracketRow(m, 'a', names), bracketRow(m, 'b', names)],
         status: matchView(m),
         scheduledAt: m.status === 'finished' ? null : m.scheduledAt,
       })),

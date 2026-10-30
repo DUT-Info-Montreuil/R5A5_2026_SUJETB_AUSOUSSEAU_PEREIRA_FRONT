@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ApiError } from '../services/api'
 import { fetchTournament, subscribeToTournament } from '../services/tournaments'
 import type { Tournament } from '../types/tournament'
@@ -16,6 +16,9 @@ const COALESCE_MS = 150
 
 export function useTournament(id: number) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
+  // Relecture demandée par l'écran (après une action de l'administrateur).
+  const [version, setVersion] = useState(0)
+  const reload = useCallback(() => setVersion((v) => v + 1), [])
 
   // Tant que la réponse pour cet id n'est pas arrivée, on est en chargement.
   const current = loaded?.id === id ? loaded : null
@@ -33,13 +36,18 @@ export function useTournament(id: number) {
       .catch((err: unknown) => {
         if (cancelled) return
         const notFound = err instanceof ApiError && err.status === 404
-        setLoaded({ id, tournament: null, status: notFound ? 'not-found' : 'error' })
+        // Une relecture qui échoue garde le dernier tournoi connu.
+        setLoaded((prev) =>
+          prev?.id === id && prev.tournament && !notFound
+            ? prev
+            : { id, tournament: null, status: notFound ? 'not-found' : 'error' },
+        )
       })
 
     return () => {
       cancelled = true
     }
-  }, [id])
+  }, [id, version])
 
   // Suivi en direct (B-19) : chaque changement poussé par le back relit le tournoi.
   useEffect(() => {
@@ -67,5 +75,5 @@ export function useTournament(id: number) {
     }
   }, [id])
 
-  return { tournament, status, live }
+  return { tournament, status, live, reload }
 }
