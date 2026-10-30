@@ -13,7 +13,7 @@ import { follow, listen } from './realtime'
 // L'espace d'une équipe éliminée est fermé en lecture et en écriture (409 TEAM_CHAT_CLOSED, B-18).
 // Un joueur exclu est retiré du salon côté serveur et reçoit `member:kicked` (B-17).
 
-export const MESSAGE_MAX = 500
+export const MESSAGE_MAX = 2000
 /** Historique chargé à l'ouverture. */
 const HISTORY_LIMIT = 100
 

@@ -82,7 +82,7 @@ export default function RegisterForm({ onSubmit, onSwitchToLogin }: RegisterForm
         value={values.username}
         onChange={update('username')}
         error={errors.username}
-        hint={`${USERNAME_MIN} à ${USERNAME_MAX} caractères : lettres, chiffres, _ - .`}
+        hint={`${USERNAME_MIN} à ${USERNAME_MAX} caractères.`}
         autoComplete="username"
       />
       <Field

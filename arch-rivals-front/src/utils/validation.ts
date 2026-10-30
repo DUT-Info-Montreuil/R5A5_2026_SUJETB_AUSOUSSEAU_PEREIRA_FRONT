@@ -1,10 +1,9 @@
 // Chaque validateur renvoie un message d'erreur, ou null si la valeur est valide.
+// Les bornes sont celles des schémas du back : le front ne refuse rien que le back accepte.
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const USERNAME_RE = /^[A-Za-z0-9_.-]+$/
 
 export const USERNAME_MIN = 3
-/** Bornes du schéma du back (users.username : 3 à 32 caractères). */
 export const USERNAME_MAX = 32
 export const PASSWORD_MIN = 8
 /** bcrypt ignore tout ce qui dépasse 72 octets : on refuse plutôt que de tronquer en silence. */
@@ -24,7 +23,7 @@ export function validateUsername(value: string) {
   if (!v) return "Le nom d'utilisateur est obligatoire."
   if (v.length < USERNAME_MIN || v.length > USERNAME_MAX)
     return `Entre ${USERNAME_MIN} et ${USERNAME_MAX} caractères.`
-  return USERNAME_RE.test(v) ? null : 'Lettres, chiffres, « _ », « - » ou « . » uniquement.'
+  return null
 }
 
 export function validatePassword(value: string) {
@@ -34,8 +33,8 @@ export function validatePassword(value: string) {
   return null
 }
 
-const TEAM_NAME_MIN = 3
-export const TEAM_NAME_MAX = 24
+const TEAM_NAME_MIN = 2
+export const TEAM_NAME_MAX = 50
 
 export function validateTeamName(value: string) {
   const v = value.trim()
