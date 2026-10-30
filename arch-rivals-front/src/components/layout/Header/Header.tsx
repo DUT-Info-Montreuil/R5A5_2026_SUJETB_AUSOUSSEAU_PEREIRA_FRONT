@@ -1,3 +1,4 @@
+import { Link } from 'react-router'
 import { useAuth } from '../../../hooks/useAuth'
 import styles from './Header.module.css'
 
@@ -12,14 +13,14 @@ export default function Header({ onPlay }: HeaderProps) {
 
   return (
     <header className={styles.header}>
-      <a href="#top" className={styles.logo}>
+      <a href="/#top" className={styles.logo}>
         ARCH RIVALS
       </a>
       <nav className={styles.nav} aria-label="Navigation principale">
-        <a href="#tournois" className={styles.link}>
+        <Link to="/tournois" className={styles.link}>
           Tournois
-        </a>
-        <a href="#classement" className={styles.link}>
+        </Link>
+        <a href="/#classement" className={styles.link}>
           Classement
         </a>
         {connected && (

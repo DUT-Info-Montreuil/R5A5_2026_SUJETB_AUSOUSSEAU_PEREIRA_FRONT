@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import AdminLayout from './components/layout/AdminLayout/AdminLayout'
+import PublicLayout from './components/layout/PublicLayout/PublicLayout'
 import PlayerLayout from './components/layout/PlayerLayout/PlayerLayout'
 import ProtectedRoute from './components/routing/ProtectedRoute'
 import AdminGames from './pages/Admin/Games/AdminGames'
@@ -10,9 +11,19 @@ import Profile from './pages/Player/Profile/Profile'
 import Teams from './pages/Player/Teams/Teams'
 import TournamentDetail from './pages/Player/TournamentDetail/TournamentDetail'
 import Tournaments from './pages/Player/Tournaments/Tournaments'
+import PublicTournaments from './pages/Public/Tournaments/PublicTournaments'
 
 const router = createBrowserRouter([
-  { path: '/', element: <Home /> },
+  {
+    // Ouvert à tous, sans compte (B-02, B-19).
+    path: '/',
+    element: <PublicLayout />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: 'tournois', element: <PublicTournaments /> },
+      { path: 'tournois/:id', element: <TournamentDetail backTo="/tournois" /> },
+    ],
+  },
   {
     path: '/joueur',
     element: (
