@@ -54,3 +54,17 @@ export function countdownLabel(iso: string, now = new Date()) {
 
 /** « Clôture le 30 oct. » (date prévue, indicative). */
 export const closingLabel = (iso: string) => `Clôture le ${shortDate(iso)}`
+
+const pad = (n: number) => String(n).padStart(2, '0')
+
+/** Valeur d'un `<input type="datetime-local">` (heure du navigateur) ; '' sans date. */
+export function toDateTimeInput(iso: string | null) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
+/** Date ISO 8601 avec fuseau, attendue par le back ; null pour un champ vide. */
+export function fromDateTimeInput(value: string) {
+  return value ? new Date(value).toISOString() : null
+}

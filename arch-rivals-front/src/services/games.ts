@@ -23,3 +23,8 @@ export function fetchGames(): Promise<Game[]> {
     })
   return cache
 }
+
+/** Un jeu a été créé : le prochain appel relit la liste. */
+export function resetGames() {
+  cache = null
+}

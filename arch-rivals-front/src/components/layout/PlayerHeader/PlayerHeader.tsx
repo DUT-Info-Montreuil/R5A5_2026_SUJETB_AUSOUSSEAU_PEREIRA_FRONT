@@ -32,6 +32,11 @@ export default function PlayerHeader() {
             </span>
           )}
         </NavLink>
+        {user?.isAdmin && (
+          <NavLink to="/admin" className={navClass}>
+            Administration
+          </NavLink>
+        )}
         <NavLink
           to="/joueur/profil"
           className={({ isActive }) =>
