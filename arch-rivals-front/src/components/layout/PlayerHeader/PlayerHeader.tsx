@@ -2,6 +2,7 @@ import { Link, NavLink } from 'react-router'
 import { useAuth } from '../../../hooks/useAuth'
 import { useNotifications } from '../../../hooks/useNotifications'
 import { initials } from '../../../utils/initials'
+import WalletBadge from '../../bets/WalletBadge/WalletBadge'
 import styles from './PlayerHeader.module.css'
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
@@ -32,11 +33,15 @@ export default function PlayerHeader() {
             </span>
           )}
         </NavLink>
+        <NavLink to="/joueur/paris" className={navClass}>
+          Paris
+        </NavLink>
         {user?.isAdmin && (
           <NavLink to="/admin" className={navClass}>
             Administration
           </NavLink>
         )}
+        <WalletBadge />
         <NavLink
           to="/joueur/profil"
           className={({ isActive }) =>

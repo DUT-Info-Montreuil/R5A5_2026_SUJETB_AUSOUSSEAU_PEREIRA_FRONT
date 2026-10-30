@@ -1,7 +1,9 @@
 import { Link, useParams } from 'react-router'
+import TournamentBets from '../../../components/bets/TournamentBets/TournamentBets'
 import StateBadge from '../../../components/tournaments/StateBadge/StateBadge'
 import TournamentBracket from '../../../components/tournaments/TournamentBracket/TournamentBracket'
 import { useAuth } from '../../../hooks/useAuth'
+import { usePlayIfPublic } from '../../../hooks/usePlay'
 import { useTournament } from '../../../hooks/useTournament'
 import { tournamentBracket } from '../../../utils/bracket'
 import { closingLabel } from '../../../utils/dates'
@@ -17,6 +19,7 @@ type TournamentDetailProps = {
 export default function TournamentDetail({ backTo = '/joueur/tournois' }: TournamentDetailProps) {
   const { id = '' } = useParams()
   const { user } = useAuth()
+  const login = usePlayIfPublic()
   // Identifiant mal formé (« /joueur/tournois/abc ») : traité comme un tournoi introuvable.
   const { tournament, status, live } = useTournament(Number(id) || 0)
 
@@ -77,6 +80,7 @@ export default function TournamentDetail({ backTo = '/joueur/tournois' }: Tourna
             {myTeamId !== null && ', ton équipe porte l’étiquette « TOI »'}. Un match ne se joue
             qu'une fois ses deux équipes connues ; seuls les arbitres saisissent les résultats.
           </p>
+          <TournamentBets tournament={tournament} onLogin={login} />
         </>
       ) : (
         <div className={styles.waiting}>

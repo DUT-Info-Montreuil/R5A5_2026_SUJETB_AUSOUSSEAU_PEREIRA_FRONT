@@ -40,7 +40,8 @@ production, définir `VITE_API_URL` (URL de l'API, ex. `https://api.exemple.fr/a
 |---|---|
 | `/` | Accueil, connexion et inscription |
 | `/tournois` | Recherche des tournois par état, ouverte à tous |
-| `/tournois/:id` | Avancement d'un tournoi et son arbre, en direct, ouvert à tous |
+| `/tournois/:id` | Avancement d'un tournoi, son arbre et ses paris en Écus, en direct, ouvert à tous |
+| `/paris` | Meilleurs parieurs de la semaine, tous tournois (aussi `/joueur/paris`) |
 | `/joueur/tournois` | Tournois par état, prochain match, créer ou rejoindre une équipe |
 | `/joueur/tournois/:id` | Détail d'un tournoi et son arbre, mis à jour en direct |
 | `/joueur/equipes` | Mes équipes (fiche, gestion du capitaine, salle du conseil) et toutes les équipes |

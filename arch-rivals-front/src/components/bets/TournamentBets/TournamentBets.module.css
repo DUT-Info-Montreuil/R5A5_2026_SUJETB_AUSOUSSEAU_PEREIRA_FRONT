@@ -1,0 +1,56 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 40px;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-strong);
+}
+
+.rules,
+.note {
+  margin: 0;
+  max-width: 70ch;
+  font-size: 16px;
+  color: var(--color-text-muted);
+}
+
+.note {
+  font-style: italic;
+}
+
+/* Le bouton garde sa largeur ; le reste de la section occupe toute la ligne. */
+.login {
+  align-self: flex-start;
+}
+
+.roundTitle {
+  margin: 8px 0 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 12px;
+}
+
+.boardTitle {
+  margin: 20px 0 0;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-strong);
+}
