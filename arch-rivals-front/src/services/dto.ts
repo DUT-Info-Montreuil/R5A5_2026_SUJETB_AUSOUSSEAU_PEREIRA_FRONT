@@ -116,3 +116,36 @@ export type MessageDto = {
 
 /** Élément de GET /api/me/teams : `tournament` à null pour une équipe hors tournoi. */
 export type MyTeamDto = TeamDto & { tournament: TournamentDto | null }
+
+// Paris en Écus (BACK-ATTENDU.md, § Paris) : routes pas encore livrées par le back.
+
+/** GET /api/me/wallet. */
+export type WalletDto = { balance: number; nextIncomeAt: string }
+
+/** Élément de GET /api/tournaments/:id/bets et de l'événement bets:updated. */
+export type BetPoolDto = {
+  matchId: number
+  open: boolean
+  /** Horaire prévu du match, qui ferme les paris ; null sans horaire. */
+  closesAt: string | null
+  pot: number
+  pools: { teamId: number; total: number; bettors: number }[]
+}
+
+/** Élément de GET /api/tournaments/:id/bets/me ; payout à null tant que le match n'est pas réglé. */
+export type MyBetDto = {
+  matchId: number
+  teamId: number
+  amount: number
+  status: 'pending' | 'won' | 'lost' | 'refunded'
+  payout: number | null
+}
+
+/** Ligne des classements de parieurs (tournoi, semaine). */
+export type BettorDto = {
+  rank: number
+  user: { id: number; username: string }
+  net: number
+  bets: number
+  won: number
+}

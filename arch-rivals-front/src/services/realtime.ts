@@ -1,6 +1,6 @@
 import { io, type Socket } from 'socket.io-client'
 import { getAuthToken } from './api'
-import type { JoinRequestDto, MatchDto, MessageDto, TeamDto } from './dto'
+import type { BetPoolDto, JoinRequestDto, MatchDto, MessageDto, TeamDto } from './dto'
 
 // Canal temps réel du back (Socket.IO). Il ne fait que notifier : les écritures passent par HTTP.
 // Même origine que l'API : en dev, Vite proxifie /socket.io vers le back (voir vite.config.ts).
@@ -19,6 +19,10 @@ type ServerEvents = {
   'joinRequest:new': (request: JoinRequestDto) => void
   /** Reçu par l'auteur de la demande : acceptée, refusée, annulée. */
   'joinRequest:updated': (request: JoinRequestDto) => void
+  /** Cagnottes d'un tournoi, sur le salon du tournoi : pari posé ou annulé, match réglé. */
+  'bets:updated': (payload: { tournamentId: number; matches: BetPoolDto[] }) => void
+  /** Solde du joueur, dans son salon personnel : pari posé, annulé ou réglé. */
+  'wallet:updated': (wallet: { balance: number }) => void
 }
 type EventName = keyof ServerEvents
 
@@ -27,6 +31,7 @@ const PERSONAL_EVENTS = new Set<EventName>([
   'member:kicked',
   'joinRequest:new',
   'joinRequest:updated',
+  'wallet:updated',
 ])
 
 type Room = `${'tournament' | 'team'}:${number}`
