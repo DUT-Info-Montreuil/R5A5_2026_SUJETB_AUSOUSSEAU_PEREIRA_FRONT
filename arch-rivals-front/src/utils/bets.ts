@@ -3,7 +3,7 @@ import type { BetPool, MyBet } from '../types/bet'
 import type { Tournament } from '../types/tournament'
 import { findMyTeam } from './tournaments'
 
-// Pari mutuel (BACK-ATTENDU.md, § Paris) : les gagnants d'un match se partagent sa cagnotte au
+// Pari mutuel (FRONT-ATTENDU.md du back, § 9) : les gagnants d'un match se partagent sa cagnotte au
 // prorata de leurs mises ; personne sur le vainqueur, tout le monde est remboursé.
 
 /** « 1 230 Écus » ; `signed` : « +70 Écus », « −50 Écus ». */
@@ -52,7 +52,7 @@ export function betRefusal(user: User | null, tournament: Tournament) {
  * l'horaire du match ; closed : horaire passé ou match joué. Le back n'émet rien quand l'horaire
  * passe : le front ferme lui-même à `closesAt` (le back refuserait ensuite, 409 BETS_CLOSED).
  */
-export type BetWindow = 'upcoming' | 'open' | 'closed'
+type BetWindow = 'upcoming' | 'open' | 'closed'
 
 export function betWindow(pool: BetPool | undefined, played: boolean, now: Date): BetWindow {
   if (played) return 'closed'

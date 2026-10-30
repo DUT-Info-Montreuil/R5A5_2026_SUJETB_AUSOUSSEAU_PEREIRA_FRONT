@@ -117,7 +117,7 @@ export type MessageDto = {
 /** Élément de GET /api/me/teams : `tournament` à null pour une équipe hors tournoi. */
 export type MyTeamDto = TeamDto & { tournament: TournamentDto | null }
 
-// Paris en Écus (BACK-ATTENDU.md, § Paris) : routes pas encore livrées par le back.
+// Paris en Écus (FRONT-ATTENDU.md du back, § 9).
 
 /** GET /api/me/wallet ; nextIncomeAt à null quand le solde atteint le plafond du revenu passif (100). */
 export type WalletDto = { balance: number; nextIncomeAt: string | null }

@@ -1,13 +1,11 @@
-/** Mises sur une équipe d'un match. */
-export type TeamPool = { teamId: number; total: number; bettors: number }
-
-/** Cagnotte d'un match : ouverte aux paris jusqu'à son horaire prévu ou à son résultat. */
+/** Cagnotte d'un match : ouverte aux paris jusqu'à son horaire, fermée sans horaire. */
 export type BetPool = {
   matchId: number
   open: boolean
   closesAt: string | null
   pot: number
-  pools: TeamPool[]
+  /** Mises sur chaque équipe connue du match. */
+  pools: { teamId: number; total: number; bettors: number }[]
 }
 
 /** won / lost / refunded : match réglé, `payout` connu. */
