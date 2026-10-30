@@ -1,7 +1,6 @@
-import { useEffect, useRef } from 'react'
 import { useTeamChatReader } from '../../../hooks/useTeamChatReader'
 import type { TournamentTeam } from '../../../types/tournament'
-import { formatMessageTime } from '../../../utils/chatTime'
+import MessageList from '../../teams/TeamChat/MessageList'
 import styles from '../../teams/TeamChat/TeamChat.module.css'
 
 /**
@@ -10,13 +9,6 @@ import styles from '../../teams/TeamChat/TeamChat.module.css'
  */
 export default function AdminChat({ team }: { team: TournamentTeam }) {
   const { messages, status } = useTeamChatReader(team.id)
-  const listRef = useRef<HTMLDivElement>(null)
-
-  // Synchronisation avec le DOM : on garde le dernier message visible.
-  useEffect(() => {
-    const list = listRef.current
-    if (list) list.scrollTop = list.scrollHeight
-  }, [messages.length])
 
   return (
     <section className={styles.panel} aria-label={`Salle du conseil de ${team.name}`}>
@@ -27,26 +19,12 @@ export default function AdminChat({ team }: { team: TournamentTeam }) {
           {team.isEliminated ? 'Équipe éliminée · lecture seule' : 'En direct · lecture seule'}
         </span>
       </div>
-      <div ref={listRef} className={styles.messages} role="log" aria-live="polite">
-        {status === 'loading' && <p className={styles.empty}>Ouverture des portes…</p>}
-        {status === 'error' && (
-          <p className={styles.empty} role="alert">
-            Impossible de charger les messages.
-          </p>
-        )}
-        {status === 'ready' && messages.length === 0 && (
-          <p className={styles.empty}>Aucun message dans ce conseil.</p>
-        )}
-        {messages.map((message) => (
-          <div key={message.id} className={styles.msg}>
-            <span className={styles.meta}>
-              {message.author} ·{' '}
-              <time dateTime={message.sentAt}>{formatMessageTime(message.sentAt)}</time>
-            </span>
-            <span className={styles.bubble}>{message.text}</span>
-          </div>
-        ))}
-      </div>
+      <MessageList
+        messages={messages}
+        status={status}
+        userId={null}
+        emptyText="Aucun message dans ce conseil."
+      />
     </section>
   )
 }

@@ -7,3 +7,6 @@ export type ChatMessage = {
   /** Date d'envoi (ISO 8601), fixée par le serveur. */
   sentAt: string
 }
+
+/** État du fil des messages d'une salle du conseil. */
+export type ChatStatus = 'loading' | 'error' | 'ready'

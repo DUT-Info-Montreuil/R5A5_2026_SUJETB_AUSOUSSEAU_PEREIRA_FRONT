@@ -7,6 +7,8 @@ type TournamentBracketProps = {
   champion: string | null
   /** Équipe du joueur connecté, encadrée d'or. */
   myTeamId: number | null
+  /** false : sans cadre, quand l'arbre est déjà dans un cadre (accueil). */
+  framed?: boolean
 }
 
 const STATUS_LABELS: Record<MatchView, string> = {
@@ -16,9 +18,14 @@ const STATUS_LABELS: Record<MatchView, string> = {
   forfeit: 'FORFAIT',
 }
 
-export default function TournamentBracket({ rounds, champion, myTeamId }: TournamentBracketProps) {
+export default function TournamentBracket({
+  rounds,
+  champion,
+  myTeamId,
+  framed = true,
+}: TournamentBracketProps) {
   return (
-    <div className={styles.frame}>
+    <div className={framed ? styles.frame : styles.scroller}>
       <div className={styles.grid}>
         {rounds.map((round) => (
           <div key={round.label} className={styles.round} role="group" aria-label={round.label}>

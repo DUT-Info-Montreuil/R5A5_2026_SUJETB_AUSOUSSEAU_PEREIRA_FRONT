@@ -1,10 +1,10 @@
-import type { CSSProperties } from 'react'
 import { useFeaturedTournamentId } from '../../../hooks/useFeaturedTournament'
 import { useTournament } from '../../../hooks/useTournament'
 import type { Tournament } from '../../../types/tournament'
 import { tournamentBracket } from '../../../utils/bracket'
 import { closingLabel } from '../../../utils/dates'
 import { STATE_LABELS, TEAMS_PER_TOURNAMENT, TOURNAMENT_FORMAT } from '../../../utils/tournaments'
+import TournamentBracket from '../../tournaments/TournamentBracket/TournamentBracket'
 import styles from './Bracket.module.css'
 
 type BracketProps = {
@@ -54,7 +54,7 @@ function FeaturedTournament({ id, onPlay }: { id: number; onPlay: () => void }) 
         <span className={styles.label}>{TOURNAMENT_FORMAT.toUpperCase()}</span>
       </div>
       {tournament.matches.length ? (
-        <ReadOnlyBracket tournament={tournament} />
+        <PlayedBracket tournament={tournament} />
       ) : (
         <Upcoming tournament={tournament} onPlay={onPlay} />
       )}
@@ -63,42 +63,16 @@ function FeaturedTournament({ id, onPlay }: { id: number; onPlay: () => void }) 
 }
 
 /** Arbre tiré : résultats saisis par les arbitres, rien n'est cliquable. */
-function ReadOnlyBracket({ tournament }: { tournament: Tournament }) {
+function PlayedBracket({ tournament }: { tournament: Tournament }) {
   const bracket = tournamentBracket(tournament)
   if (!bracket) return null
-  const gridStyle = { '--bracket-cols': bracket.rounds.length + 1 } as CSSProperties
-
   return (
-    <div className={styles.scroller}>
-      <div className={styles.grid} style={gridStyle}>
-        {bracket.rounds.map((round) => (
-          <div key={round.label} className={styles.round} role="group" aria-label={round.label}>
-            <span className={styles.roundLabel}>{round.label}</span>
-            <div className={styles.matches}>
-              {round.matches.map((match) => (
-                <div key={match.key} className={styles.match}>
-                  {match.rows.map((row, i) => (
-                    <div key={i} className={`${styles.team} ${styles[row.outcome]}`}>
-                      <span className={styles.name}>{row.team ?? '—'}</span>
-                      <span className={styles.score}>{row.score}</span>
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        <div className={styles.championCol}>
-          <span className={styles.roundLabel}>CHAMPION</span>
-          <div className={styles.matches}>
-            <div className={styles.champion} aria-live="polite">
-              {bracket.champion ?? 'À déterminer'}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <TournamentBracket
+      rounds={bracket.rounds}
+      champion={bracket.champion}
+      myTeamId={null}
+      framed={false}
+    />
   )
 }
 
