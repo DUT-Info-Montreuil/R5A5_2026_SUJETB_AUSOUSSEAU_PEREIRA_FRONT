@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { fetchMessages, subscribeToMessages } from '../services/chat'
-import type { ChatMessage } from '../types/chat'
+import type { ChatMessage, ChatStatus } from '../types/chat'
 
 type Loaded = { teamId: number; messages: ChatMessage[]; failed: boolean }
 
@@ -11,7 +11,7 @@ type Loaded = { teamId: number; messages: ChatMessage[]; failed: boolean }
 export function useTeamChatReader(teamId: number) {
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const current = loaded?.teamId === teamId ? loaded : null
-  const status = !current ? 'loading' : current.failed ? 'error' : 'ready'
+  const status: ChatStatus = !current ? 'loading' : current.failed ? 'error' : 'ready'
 
   useEffect(() => {
     let cancelled = false

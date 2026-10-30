@@ -7,7 +7,7 @@ import {
   sendMessage,
   subscribeToMessages,
 } from '../services/chat'
-import type { ChatMessage } from '../types/chat'
+import type { ChatMessage, ChatStatus } from '../types/chat'
 
 type Loaded = { teamId: number; messages: ChatMessage[]; failed: boolean; closed: boolean }
 
@@ -27,7 +27,13 @@ export function useTeamChat(teamId: number, eliminated: boolean) {
   const current = loaded?.teamId === teamId ? loaded : null
   // Le back peut fermer l'espace avant que la fiche de l'équipe ne soit relue (409).
   const closed = eliminated || current?.closed === true
-  const status = closed ? 'closed' : !current ? 'loading' : current.failed ? 'error' : 'ready'
+  const status: ChatStatus | 'closed' = closed
+    ? 'closed'
+    : !current
+      ? 'loading'
+      : current.failed
+        ? 'error'
+        : 'ready'
 
   const add = useCallback(
     (incoming: ChatMessage[]) =>
