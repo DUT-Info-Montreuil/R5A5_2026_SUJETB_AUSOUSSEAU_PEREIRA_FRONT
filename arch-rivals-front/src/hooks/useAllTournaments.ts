@@ -4,8 +4,8 @@ import type { Tournament } from '../types/tournament'
 
 type Status = 'loading' | 'ready' | 'error'
 
-/** Tous les tournois, pour l'administrateur ; relus à chaque visite de la liste. */
-export function useAdminTournaments() {
+/** Tous les tournois (visiteur, administrateur) ; relus à chaque visite de la liste. */
+export function useAllTournaments() {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
   const [status, setStatus] = useState<Status>('loading')
 

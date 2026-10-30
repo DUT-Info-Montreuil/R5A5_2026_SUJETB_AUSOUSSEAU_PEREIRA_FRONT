@@ -5,7 +5,7 @@ import { useToast } from '../../../hooks/useToast'
 import { createGame } from '../../../services/admin'
 import { fetchGames } from '../../../services/games'
 import type { Game } from '../../../types/game'
-import list from '../Tournaments/AdminTournaments.module.css'
+import list from '../../../styles/listPage.module.css'
 
 /** Jeux proposés aux tournois, avec leurs rôles de jeu (B-08). */
 export default function AdminGames() {
@@ -41,7 +41,7 @@ export default function AdminGames() {
         </div>
       </div>
 
-      <div className={list.create}>
+      <div className={admin.section}>
         <CreateGameForm onCreate={create} />
       </div>
 

@@ -8,14 +8,20 @@ import { closingLabel } from '../../../utils/dates'
 import { dateLabel, findMyTeam, TEAMS_PER_TOURNAMENT } from '../../../utils/tournaments'
 import styles from './TournamentDetail.module.css'
 
-export default function TournamentDetail() {
+type TournamentDetailProps = {
+  /** Liste des tournois d'où l'on vient (espace joueur ou page publique). */
+  backTo?: string
+}
+
+/** Détail d'un tournoi et son arbre, en direct (B-02, B-19) : joueurs et visiteurs. */
+export default function TournamentDetail({ backTo = '/joueur/tournois' }: TournamentDetailProps) {
   const { id = '' } = useParams()
   const { user } = useAuth()
   // Identifiant mal formé (« /joueur/tournois/abc ») : traité comme un tournoi introuvable.
   const { tournament, status, live } = useTournament(Number(id) || 0)
 
   const back = (
-    <Link to="/joueur/tournois" className={styles.back}>
+    <Link to={backTo} className={styles.back}>
       ← TOUS LES TOURNOIS
     </Link>
   )
@@ -34,6 +40,7 @@ export default function TournamentDetail() {
   }
 
   const bracket = tournamentBracket(tournament)
+  const myTeamId = findMyTeam(tournament, user?.id ?? null)?.id ?? null
 
   return (
     <>
@@ -63,12 +70,12 @@ export default function TournamentDetail() {
           <TournamentBracket
             rounds={bracket.rounds}
             champion={bracket.champion}
-            myTeamId={findMyTeam(tournament, user?.id ?? null)?.id ?? null}
+            myTeamId={myTeamId}
           />
           <p className={styles.note}>
-            Ton équipe porte l'étiquette « TOI » ; le vainqueur de chaque match est sur fond doré.
-            Un match ne se joue qu'une fois ses deux équipes connues ; seuls les arbitres saisissent
-            les résultats.
+            Le vainqueur de chaque match est sur fond doré
+            {myTeamId !== null && ', ton équipe porte l’étiquette « TOI »'}. Un match ne se joue
+            qu'une fois ses deux équipes connues ; seuls les arbitres saisissent les résultats.
           </p>
         </>
       ) : (

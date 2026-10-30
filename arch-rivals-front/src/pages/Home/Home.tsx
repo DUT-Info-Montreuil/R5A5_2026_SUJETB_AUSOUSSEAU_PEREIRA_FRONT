@@ -1,15 +1,9 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router'
-import AuthDialog from '../../components/auth/AuthDialog'
 import Bracket from '../../components/home/Bracket/Bracket'
 import Hero from '../../components/home/Hero/Hero'
 import Podium from '../../components/home/Podium/Podium'
-import Footer from '../../components/layout/Footer/Footer'
-import Header from '../../components/layout/Header/Header'
-import { useAuth } from '../../hooks/useAuth'
 import { DEFAULT_PODIUM } from '../../data/teams'
+import { usePlay } from '../../hooks/usePlay'
 import type { Podium as PodiumData } from '../../types/tournament'
-import styles from './Home.module.css'
 
 type HomeProps = {
   animateCrown?: boolean
@@ -17,28 +11,12 @@ type HomeProps = {
 }
 
 export default function Home({ animateCrown = true, podium = DEFAULT_PODIUM }: HomeProps) {
-  const [authOpen, setAuthOpen] = useState(false)
-  const { status } = useAuth()
-  const navigate = useNavigate()
-
-  const handlePlay = () => {
-    if (status !== 'authenticated') {
-      setAuthOpen(true)
-      return
-    }
-    navigate('/joueur')
-  }
-
+  const onPlay = usePlay()
   return (
-    <div id="top" className={styles.page}>
-      <Header onPlay={handlePlay} />
-      <main>
-        <Hero />
-        <Bracket onPlay={handlePlay} />
-        <Podium podium={podium} animateCrown={animateCrown} />
-      </main>
-      <Footer />
-      <AuthDialog open={authOpen} onClose={() => setAuthOpen(false)} />
-    </div>
+    <>
+      <Hero />
+      <Bracket onPlay={onPlay} />
+      <Podium podium={podium} animateCrown={animateCrown} />
+    </>
   )
 }
