@@ -42,8 +42,14 @@ production, définir `VITE_API_URL` (URL de l'API, ex. `https://api.exemple.fr/a
 | `/joueur/tournois/:id` | Détail d'un tournoi et son arbre, mis à jour en direct |
 | `/joueur/equipes` | Mes équipes (fiche, gestion du capitaine, salle du conseil) et toutes les équipes |
 | `/joueur/profil` | Statistiques, derniers faits d'armes, déconnexion |
+| `/admin/tournois` | Administration : tournois par état, création d'un tournoi |
+| `/admin/tournois/:id` | Clôture, lancement, résultats, forfaits, horaires, salles du conseil des équipes |
+| `/admin/jeux` | Jeux et rôles, création d'un jeu |
 
-L'espace joueur (`/joueur/*`) demande d'être connecté.
+L'espace joueur (`/joueur/*`) demande d'être connecté ; l'administration (`/admin/*`) est réservée
+au compte administrateur (créé par `npm run seed:admin` côté back), qui y accède par le lien
+« Administration » de l'en-tête. Le front ne fait que masquer les écrans : c'est le back qui refuse
+les actions (403).
 
 ## Organisation du code (`arch-rivals-front/src`)
 
