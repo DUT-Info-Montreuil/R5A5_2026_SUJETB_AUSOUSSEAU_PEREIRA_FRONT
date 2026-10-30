@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router'
+import { useNavigate, useSearchParams } from 'react-router'
 import CreateTournamentForm from '../../../components/admin/CreateTournamentForm/CreateTournamentForm'
 import Tabs from '../../../components/layout/Tabs/Tabs'
-import StateBadge from '../../../components/tournaments/StateBadge/StateBadge'
+import TournamentRow from '../../../components/tournaments/TournamentRow/TournamentRow'
 import controls from '../../../components/teams/controls.module.css'
-import { useAdminTournaments } from '../../../hooks/useAdminTournaments'
+import { useAllTournaments } from '../../../hooks/useAllTournaments'
 import { useGames } from '../../../hooks/useGames'
 import { useToast } from '../../../hooks/useToast'
 import { createTournament } from '../../../services/admin'
@@ -15,11 +15,12 @@ import {
   nextStep,
   type AdminFilter,
 } from '../../../utils/admin'
-import { dateLabel, matchesQuery, TEAMS_PER_TOURNAMENT } from '../../../utils/tournaments'
+import { matchesQuery } from '../../../utils/tournaments'
+import page from '../../../styles/listPage.module.css'
 import styles from './AdminTournaments.module.css'
 
 export default function AdminTournaments() {
-  const { tournaments, status } = useAdminTournaments()
+  const { tournaments, status } = useAllTournaments()
   const games = useGames()
   const toast = useToast()
   const navigate = useNavigate()
@@ -60,15 +61,15 @@ export default function AdminTournaments() {
 
   return (
     <>
-      <div className={styles.head}>
+      <div className={page.head}>
         <div>
-          <p className={styles.eyebrow}>✦ ADMINISTRATION</p>
-          <h1 className={styles.title}>Tournois</h1>
+          <p className={page.eyebrow}>✦ ADMINISTRATION</p>
+          <h1 className={page.title}>Tournois</h1>
         </div>
         <div className={styles.tools}>
           <input
             type="search"
-            className={styles.search}
+            className={page.search}
             value={query}
             onChange={(e) => update({ q: e.target.value })}
             placeholder="Chercher un tournoi ou un jeu…"
@@ -104,40 +105,23 @@ export default function AdminTournaments() {
         label="Tournois par état"
       />
 
-      {status === 'loading' && <p className={styles.empty}>Chargement des tournois…</p>}
+      {status === 'loading' && <p className={page.empty}>Chargement des tournois…</p>}
       {status === 'error' && (
-        <p className={styles.empty} role="alert">
+        <p className={page.empty} role="alert">
           Impossible de charger les tournois.
         </p>
       )}
       {status === 'ready' && (
-        <ul className={styles.list}>
+        <ul className={page.list}>
           {visible.map((t) => {
             const step = nextStep(t)
             return (
-              <li key={t.id}>
-                <Link to={`/admin/tournois/${t.id}`} className={styles.row}>
-                  <span className={styles.main}>
-                    <span className={styles.name}>{t.name}</span>
-                    <span className={styles.meta}>
-                      {t.game} · {dateLabel(t)}
-                    </span>
-                  </span>
-                  <StateBadge state={t.state} />
-                  {t.state !== 'termine' && (
-                    <span className={styles.count}>
-                      {t.teams.length} / {TEAMS_PER_TOURNAMENT} équipes
-                    </span>
-                  )}
-                  {step && <span className={styles.step}>{step}</span>}
-                  <span className={styles.arrow} aria-hidden="true">
-                    →
-                  </span>
-                </Link>
-              </li>
+              <TournamentRow key={t.id} tournament={t} to={`/admin/tournois/${t.id}`}>
+                {step && <span className={styles.step}>{step}</span>}
+              </TournamentRow>
             )
           })}
-          {visible.length === 0 && <li className={styles.empty}>Aucun tournoi ne correspond.</li>}
+          {visible.length === 0 && <li className={page.empty}>Aucun tournoi ne correspond.</li>}
         </ul>
       )}
     </>
