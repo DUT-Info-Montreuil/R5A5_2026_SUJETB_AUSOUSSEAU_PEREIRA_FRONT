@@ -6,6 +6,11 @@
   overflow-x: auto;
 }
 
+/* Sans cadre : le défilement horizontal reste interne, le body ne scrolle jamais en largeur. */
+.scroller {
+  overflow-x: auto;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
