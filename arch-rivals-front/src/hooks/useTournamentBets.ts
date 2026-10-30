@@ -12,7 +12,7 @@ type Loaded = { tournamentId: number; pools: BetPool[]; failed: boolean; version
  * relit alors mes paris (gagné, perdu, remboursé).
  */
 export function useTournamentBets(tournamentId: number, bettor: boolean) {
-  const { setBalance } = useWallet()
+  const { refresh } = useWallet()
   const [loaded, setLoaded] = useState<Loaded | null>(null)
   const [myBets, setMyBets] = useState<MyBet[]>([])
   const current = loaded?.tournamentId === tournamentId ? loaded : null
@@ -51,18 +51,20 @@ export function useTournamentBets(tournamentId: number, bettor: boolean) {
   // Les erreurs remontent à l'appelant, qui les affiche sous le formulaire du match.
   const place = useCallback(
     async (matchId: number, teamId: number, amount: number) => {
-      setBalance(await placeBet(matchId, teamId, amount))
+      await placeBet(matchId, teamId, amount)
+      refresh()
       await loadMine()
     },
-    [setBalance, loadMine],
+    [refresh, loadMine],
   )
 
   const cancel = useCallback(
     async (matchId: number) => {
-      setBalance(await cancelBet(matchId))
+      await cancelBet(matchId)
+      refresh()
       await loadMine()
     },
-    [setBalance, loadMine],
+    [refresh, loadMine],
   )
 
   return {

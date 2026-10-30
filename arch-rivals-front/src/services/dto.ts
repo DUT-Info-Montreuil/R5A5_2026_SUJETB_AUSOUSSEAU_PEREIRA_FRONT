@@ -119,8 +119,8 @@ export type MyTeamDto = TeamDto & { tournament: TournamentDto | null }
 
 // Paris en Écus (BACK-ATTENDU.md, § Paris) : routes pas encore livrées par le back.
 
-/** GET /api/me/wallet. */
-export type WalletDto = { balance: number; nextIncomeAt: string }
+/** GET /api/me/wallet ; nextIncomeAt à null quand le solde atteint le plafond du revenu passif (100). */
+export type WalletDto = { balance: number; nextIncomeAt: string | null }
 
 /** Élément de GET /api/tournaments/:id/bets et de l'événement bets:updated. */
 export type BetPoolDto = {

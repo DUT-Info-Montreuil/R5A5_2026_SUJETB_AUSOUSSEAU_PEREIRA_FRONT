@@ -1,9 +1,10 @@
 import { useId, useState, type FormEvent } from 'react'
 import { useAsyncAction } from '../../../hooks/useAsyncAction'
+import { useNow } from '../../../hooks/useNow'
 import { BET_MIN } from '../../../services/bets'
 import type { BetPool, MyBet } from '../../../types/bet'
 import type { Match } from '../../../types/tournament'
-import { betOutcome, ecus, estimatedPayout, odds, share } from '../../../utils/bets'
+import { betOutcome, betWindow, ecus, estimatedPayout, odds, share } from '../../../utils/bets'
 import { matchTimeLabel } from '../../../utils/dates'
 import controls from '../../teams/controls.module.css'
 import styles from './MatchBet.module.css'
@@ -11,7 +12,7 @@ import styles from './MatchBet.module.css'
 type MatchBetProps = {
   match: Match
   names: ReadonlyMap<number, string>
-  /** Cagnotte du match ; absente tant qu'il n'est pas ouvert aux paris. */
+  /** Cagnotte du match. */
   pool: BetPool | undefined
   myBet: MyBet | undefined
   /** Le lecteur peut parier sur ce tournoi (connecté, ni admin, ni joueur du tournoi). */
@@ -37,6 +38,10 @@ export default function MatchBet({
   )
   const bettors = pool?.pools.reduce((sum, p) => sum + p.bettors, 0) ?? 0
   const cancel = useAsyncAction()
+  // Relue toutes les 15 s : les paris se ferment d'eux-mêmes à l'horaire du match.
+  const now = useNow(15_000)
+  const phase = betWindow(pool, match.status === 'finished', now)
+  const open = phase === 'open'
 
   return (
     <article className={styles.card} aria-label={teams.map((t) => t.name).join(' contre ')}>
@@ -51,11 +56,11 @@ export default function MatchBet({
                 {team.name}
                 {mine && <span className={styles.tag}>TA MISE</span>}
               </span>
-              {pool && (
+              {pool?.pot ? (
                 <span className={styles.figures}>
                   {part} %{odds(pool, team.id) && ` · ${odds(pool, team.id)}`}
                 </span>
-              )}
+              ) : null}
               <span className={styles.bar} aria-hidden="true">
                 <span className={styles.fill} style={{ width: `${part}%` }} />
               </span>
@@ -65,13 +70,11 @@ export default function MatchBet({
       </ul>
 
       <p className={styles.meta}>
-        {!pool
-          ? 'Paris pas encore ouverts'
+        {phase === 'upcoming' || !pool
+          ? 'Paris à venir : ils ouvrent quand l’horaire du match est fixé.'
           : `${ecus(pool.pot)} en jeu · ${bettors} parieur${bettors > 1 ? 's' : ''} · ${
-              pool.open
-                ? pool.closesAt
-                  ? `ouvert jusqu'à ${matchTimeLabel(pool.closesAt)}`
-                  : 'ouvert jusqu’au résultat'
+              open && pool.closesAt
+                ? `ouverts jusqu'à ${matchTimeLabel(pool.closesAt)}`
                 : 'paris fermés'
             }`}
       </p>
@@ -82,7 +85,7 @@ export default function MatchBet({
             Ta mise : {ecus(myBet.amount)} sur {names.get(myBet.teamId) ?? '—'}
             {betOutcome(myBet) && <strong> · {betOutcome(myBet)}</strong>}
           </span>
-          {myBet.status === 'pending' && pool?.open && (
+          {myBet.status === 'pending' && open && (
             <button
               type="button"
               className={controls.btn}
@@ -100,7 +103,7 @@ export default function MatchBet({
         </div>
       )}
 
-      {!myBet && canBet && pool?.open && (
+      {!myBet && canBet && open && pool && (
         <BetForm pool={pool} teams={teams} balance={balance} onPlace={onPlace} />
       )}
     </article>

@@ -46,3 +46,16 @@ export function betRefusal(user: User | null, tournament: Tournament) {
   if (user.isAdmin) return 'admin'
   return findMyTeam(tournament, user.id) ? 'player' : null
 }
+
+/**
+ * upcoming : pas encore d'horaire, les paris ouvriront quand l'admin le fixera ; open : jusqu'à
+ * l'horaire du match ; closed : horaire passé ou match joué. Le back n'émet rien quand l'horaire
+ * passe : le front ferme lui-même à `closesAt` (le back refuserait ensuite, 409 BETS_CLOSED).
+ */
+export type BetWindow = 'upcoming' | 'open' | 'closed'
+
+export function betWindow(pool: BetPool | undefined, played: boolean, now: Date): BetWindow {
+  if (played) return 'closed'
+  if (!pool?.closesAt) return 'upcoming'
+  return pool.open && new Date(pool.closesAt) > now ? 'open' : 'closed'
+}

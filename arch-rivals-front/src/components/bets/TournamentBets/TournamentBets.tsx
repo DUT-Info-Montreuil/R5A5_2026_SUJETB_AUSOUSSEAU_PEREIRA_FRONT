@@ -43,7 +43,8 @@ export default function TournamentBets({ tournament, onLogin }: TournamentBetsPr
       <p className={styles.rules}>
         Mise des Écus sur une équipe, match par match : les gagnants se partagent la cagnotte du
         match au prorata de leur mise. Pas d'argent réel : 100 Écus à l'inscription, puis 10 par
-        heure.
+        heure tant que ton solde est sous 100. Les paris d'un match ouvrent quand son horaire est
+        fixé et ferment à cet horaire.
       </p>
       {refusal === 'anonymous' && onLogin && (
         <button

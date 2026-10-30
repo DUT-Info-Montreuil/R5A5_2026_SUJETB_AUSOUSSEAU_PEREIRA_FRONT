@@ -3,8 +3,8 @@ import { api } from './api'
 import { listOf, type BetPoolDto, type BettorDto, type MyBetDto, type WalletDto } from './dto'
 import { follow, listen } from './realtime'
 
-// Paris en Écus (BACK-ATTENDU.md, § Paris), pas d'argent réel :
-//   GET    /me/wallet                         → { balance, nextIncomeAt }
+// Paris en Écus (FRONT-ATTENDU.md du back, § 9, commits 8e1ed90 et 5c98255), pas d'argent réel :
+//   GET    /me/wallet                         → { balance, nextIncomeAt }  (null au plafond de 100)
 //   GET    /tournaments/:id/bets              → { matches: BetPoolDto[] }            (public)
 //   GET    /tournaments/:id/bets/me           → { bets: MyBetDto[] }
 //   POST   /matches/:id/bets { teamId, amount } → 201 { bet, balance }
@@ -13,6 +13,8 @@ import { follow, listen } from './realtime'
 //   GET    /bets/leaderboard?week=            → { from, to, leaderboard, pagination }      (public)
 //   Temps réel : bets:updated (salon du tournoi), wallet:updated (salon personnel).
 // Refus : 403 ADMIN_CANNOT_BET, PLAYER_CANNOT_BET ; 409 BETS_CLOSED, ALREADY_BET, INSUFFICIENT_FUNDS.
+// Un match sans horaire n'est pas ouvert aux paris ; ils ferment à son horaire (`closesAt`), que le
+// front surveille lui-même : le back n'émet rien à ce moment-là.
 
 /** Mise minimale acceptée par le back. */
 export const BET_MIN = 10
@@ -47,7 +49,7 @@ function toPage(data: unknown): BettorPage {
   return { bettors, total }
 }
 
-export async function fetchWallet(): Promise<{ balance: number; nextIncomeAt: string }> {
+export async function fetchWallet(): Promise<WalletDto> {
   return api.get<WalletDto>('/me/wallet')
 }
 
@@ -61,19 +63,13 @@ export async function fetchMyBets(tournamentId: number): Promise<MyBet[]> {
   return listOf<MyBetDto>(data, 'bets').map(toBet)
 }
 
-/** Renvoie le nouveau solde. */
-export async function placeBet(matchId: number, teamId: number, amount: number): Promise<number> {
-  const { balance } = await api.post<{ balance: number }>(`/matches/${matchId}/bets`, {
-    teamId,
-    amount,
-  })
-  return balance
+export async function placeBet(matchId: number, teamId: number, amount: number): Promise<void> {
+  await api.post(`/matches/${matchId}/bets`, { teamId, amount })
 }
 
-/** Annule mon pari (paris du match encore ouverts) ; renvoie le nouveau solde. */
-export async function cancelBet(matchId: number): Promise<number> {
-  const { balance } = await api.delete<{ balance: number }>(`/matches/${matchId}/bets/me`)
-  return balance
+/** Annule mon pari (paris du match encore ouverts) : la mise est rendue. */
+export async function cancelBet(matchId: number): Promise<void> {
+  await api.delete(`/matches/${matchId}/bets/me`)
 }
 
 export async function fetchTournamentBettors(tournamentId: number, offset: number) {
@@ -104,7 +100,7 @@ export function subscribeToBets(tournamentId: number, onPools: (pools: BetPool[]
   }
 }
 
-/** Nouveau solde poussé par le back ; renvoie la fonction qui coupe l'écoute. */
-export function onWalletUpdated(onBalance: (balance: number) => void) {
-  return listen('wallet:updated', ({ balance }) => onBalance(balance))
+/** Solde modifié (pari posé, annulé ou réglé) ; renvoie la fonction qui coupe l'écoute. */
+export function onWalletUpdated(onChange: () => void) {
+  return listen('wallet:updated', () => onChange())
 }
