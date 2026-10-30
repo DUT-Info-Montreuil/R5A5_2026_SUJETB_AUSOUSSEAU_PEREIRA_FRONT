@@ -1,18 +1,11 @@
-import { useSearchParams } from 'react-router'
 import Tabs from '../../../components/layout/Tabs/Tabs'
 import NextMatchBanner from '../../../components/tournaments/NextMatchBanner/NextMatchBanner'
 import TournamentCard from '../../../components/tournaments/TournamentCard/TournamentCard'
 import { useAuth } from '../../../hooks/useAuth'
 import { useToastAfter } from '../../../hooks/useToast'
+import { useTournamentTabs } from '../../../hooks/useTournamentTabs'
 import { useTournaments } from '../../../hooks/useTournaments'
 import { pickNextMatch } from '../../../utils/bracket'
-import {
-  inTab,
-  isTournamentTab,
-  matchesQuery,
-  TOURNAMENT_TABS,
-  type TournamentTab,
-} from '../../../utils/tournaments'
 import styles from './Tournaments.module.css'
 
 export default function Tournaments() {
@@ -21,28 +14,9 @@ export default function Tournaments() {
     useTournaments()
   const toastAfter = useToastAfter()
 
-  // Onglet et recherche vivent dans l'URL : ils survivent à F5 et se partagent.
-  const [params, setParams] = useSearchParams()
-  const rawTab = params.get('onglet')
-  const tab: TournamentTab = isTournamentTab(rawTab) ? rawTab : 'cours'
-  const query = params.get('q') ?? ''
-  const searching = query.trim().length > 0
-
-  const visible = searching
-    ? tournaments.filter((t) => matchesQuery(t, query))
-    : tournaments.filter((t) => inTab(t, tab))
-
+  const { query, searching, activeTab, tabs, visible, selectTab, search } =
+    useTournamentTabs(tournaments)
   const next = pickNextMatch(tournaments, userId)
-
-  const tabs = TOURNAMENT_TABS.map(({ id, label }) => ({
-    id,
-    label,
-    count: tournaments.filter((t) => inTab(t, id)).length,
-  }))
-
-  const selectTab = (id: TournamentTab) => setParams({ onglet: id })
-  const search = (value: string) =>
-    setParams(value ? { onglet: tab, q: value } : { onglet: tab }, { replace: true })
 
   return (
     <>
@@ -63,12 +37,7 @@ export default function Tournaments() {
 
       {next && <NextMatchBanner tournament={next.tournament} match={next.match} />}
 
-      <Tabs
-        tabs={tabs}
-        active={searching ? null : tab}
-        onSelect={selectTab}
-        label="Tournois par état"
-      />
+      <Tabs tabs={tabs} active={activeTab} onSelect={selectTab} label="Tournois par état" />
 
       {searching && (
         <p className={styles.note}>
