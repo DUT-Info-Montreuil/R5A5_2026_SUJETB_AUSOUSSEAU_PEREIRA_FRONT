@@ -32,6 +32,7 @@ production, définir `VITE_API_URL` (URL de l'API, ex. `https://api.exemple.fr/a
 | `npm run dev` | Serveur de développement |
 | `npm run build` | Vérification des types puis build dans `dist/` |
 | `npm run lint` | oxlint |
+| `npm run format` | Mise en forme Prettier (`npm run format:check` pour vérifier) |
 
 ## Pages
 

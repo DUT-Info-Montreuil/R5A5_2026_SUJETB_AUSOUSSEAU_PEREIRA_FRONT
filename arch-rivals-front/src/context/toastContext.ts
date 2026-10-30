@@ -4,6 +4,6 @@ import { createContext } from 'react'
 export type ToastTone = 'info' | 'warning'
 
 /** Affiche un message éphémère. */
-export type ShowToast = (text: string, tone?: ToastTone) => void
+type ShowToast = (text: string, tone?: ToastTone) => void
 
 export const ToastContext = createContext<ShowToast | null>(null)

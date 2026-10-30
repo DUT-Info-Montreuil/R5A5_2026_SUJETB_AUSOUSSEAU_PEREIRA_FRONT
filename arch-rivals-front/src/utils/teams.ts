@@ -30,7 +30,7 @@ export function registrableTournaments(
 }
 
 /** Un membre de l'équipe déjà engagé dans le tournoi avec une autre équipe (B-07). */
-export type RegistrationConflict = { username: string; teamName: string }
+type RegistrationConflict = { username: string; teamName: string }
 
 export function registrationConflicts(
   tournament: Tournament,

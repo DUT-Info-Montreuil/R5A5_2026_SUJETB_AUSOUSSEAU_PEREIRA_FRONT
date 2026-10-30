@@ -1,4 +1,4 @@
-import type { Match, Tournament } from '../types/tournament'
+import type { Match, Podium, Tournament } from '../types/tournament'
 import { findMyTeam } from './tournaments'
 
 // L'arbre est calculé par le back (tirage à la clôture, gagnant qui avance) : le front ne fait
@@ -7,7 +7,7 @@ import { findMyTeam } from './tournaments'
 /** waiting : équipes pas encore connues ; ready : jouable ; done / forfeit : résultat validé. */
 export type MatchView = 'waiting' | 'ready' | 'done' | 'forfeit'
 
-export type BracketRow = {
+type BracketRow = {
   teamId: number | null
   team: string | null
   score: string
@@ -84,6 +84,21 @@ export function tournamentBracket(tournament: Tournament) {
       ? (names.get(final.winnerId) ?? null)
       : null
   return { rounds, champion }
+}
+
+/** Podium d'un tournoi terminé, ou null si sa finale n'est pas jouée. */
+export function tournamentPodium(tournament: Tournament): Podium | null {
+  const final = tournament.matches.toSorted(byRound).at(-1)
+  if (final?.status !== 'finished' || final.winnerId === null) return null
+  const names = new Map(tournament.teams.map((t) => [t.id, t.name]))
+  const name = (id: number | null) => (id !== null && names.get(id)) || '—'
+  const loser = (m: Match) => (m.winnerId === m.teamAId ? m.teamBId : m.teamAId)
+  return {
+    tournament: tournament.name,
+    first: name(final.winnerId),
+    second: name(loser(final)),
+    third: tournament.matches.filter((m) => m.round === final.round - 1).map((m) => name(loser(m))),
+  }
 }
 
 export type NextMatch = {

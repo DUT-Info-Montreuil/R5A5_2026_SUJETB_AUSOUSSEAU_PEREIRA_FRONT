@@ -6,7 +6,7 @@ import styles from './AuthDialog.module.css'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 
-export type AuthMode = 'login' | 'register'
+type AuthMode = 'login' | 'register'
 
 type AuthDialogProps = {
   open: boolean
@@ -26,7 +26,10 @@ function AuthContent({ initialMode, onClose }: { initialMode: AuthMode; onClose:
   const [mode, setMode] = useState<AuthMode>(initialMode)
   const auth = useAuth()
   const rootRef = useRef<HTMLDivElement>(null)
-  const tabRefs = useRef<Record<AuthMode, HTMLButtonElement | null>>({ login: null, register: null })
+  const tabRefs = useRef<Record<AuthMode, HTMLButtonElement | null>>({
+    login: null,
+    register: null,
+  })
 
   // Les formulaires affichent le message de l'erreur levée ; on la traduit ici.
   const handleLogin = async (payload: LoginPayload) => {

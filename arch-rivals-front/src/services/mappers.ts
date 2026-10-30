@@ -27,7 +27,7 @@ export const toTeam = (dto: TeamDto): TournamentTeam => ({
   })),
 })
 
-export const toMatch = (dto: MatchDto): Match => ({
+const toMatch = (dto: MatchDto): Match => ({
   id: dto.id,
   round: dto.round,
   position: dto.position,

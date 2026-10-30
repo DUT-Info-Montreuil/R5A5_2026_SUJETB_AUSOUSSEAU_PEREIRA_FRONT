@@ -3,7 +3,11 @@
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg);
-  background-image: radial-gradient(ellipse at 50% -10%, var(--color-surface-glow) 0%, var(--color-bg) 55%);
+  background-image: radial-gradient(
+    ellipse at 50% -10%,
+    var(--color-surface-glow) 0%,
+    var(--color-bg) 55%
+  );
   color: var(--color-text);
 }
 
