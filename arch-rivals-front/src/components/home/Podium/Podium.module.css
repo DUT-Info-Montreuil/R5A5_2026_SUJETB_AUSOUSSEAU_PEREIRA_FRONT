@@ -17,6 +17,13 @@
   overflow-wrap: break-word;
 }
 
+.caption {
+  margin: 18px 0 0;
+  font-size: 17px;
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
 .podium {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -36,11 +43,15 @@
   min-width: 0;
 }
 
-.team {
+.names {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.team {
+  overflow-wrap: anywhere;
   font-size: 15px;
   letter-spacing: 0.06em;
   color: var(--color-text-muted);

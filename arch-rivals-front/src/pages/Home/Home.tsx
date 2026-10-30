@@ -1,22 +1,17 @@
 import Bracket from '../../components/home/Bracket/Bracket'
 import Hero from '../../components/home/Hero/Hero'
 import Podium from '../../components/home/Podium/Podium'
-import { DEFAULT_PODIUM } from '../../data/teams'
 import { usePlay } from '../../hooks/usePlay'
-import type { Podium as PodiumData } from '../../types/tournament'
+import { usePodium } from '../../hooks/usePodium'
 
-type HomeProps = {
-  animateCrown?: boolean
-  podium?: PodiumData
-}
-
-export default function Home({ animateCrown = true, podium = DEFAULT_PODIUM }: HomeProps) {
+export default function Home() {
   const onPlay = usePlay()
+  const podium = usePodium()
   return (
     <>
       <Hero />
       <Bracket onPlay={onPlay} />
-      <Podium podium={podium} animateCrown={animateCrown} />
+      <Podium podium={podium} />
     </>
   )
 }

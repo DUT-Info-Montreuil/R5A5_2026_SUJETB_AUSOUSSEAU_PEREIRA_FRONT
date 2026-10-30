@@ -72,3 +72,12 @@ export async function fetchFeaturedTournamentId(): Promise<number | null> {
   }
   return null
 }
+
+/** Dernier tournoi terminé (la liste du back est triée par date de création), ou null. */
+export async function fetchLastFinishedTournament(): Promise<Tournament | null> {
+  const data = await api.get<unknown>(`/tournaments?status=finished&limit=${PAGE_SIZE}`)
+  const [last] = listOf<TournamentDto>(data, 'tournaments').toSorted((a, b) =>
+    (b.finishedAt ?? '').localeCompare(a.finishedAt ?? ''),
+  )
+  return last ? fetchTournament(last.id) : null
+}

@@ -1,10 +1,11 @@
 import type { GameRole } from './game'
 
-/** Noms des équipes du podium de l'accueil. */
+/** Podium d'un tournoi terminé : sans petite finale, les deux demi-finalistes battus sont 3es. */
 export type Podium = {
+  tournament: string
   first: string
   second: string
-  third: string
+  third: string[]
 }
 
 /** Les quatre états d'un tournoi : ce qui est permis dépend de l'état. */
