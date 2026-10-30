@@ -6,7 +6,7 @@ import styles from './AuthDialog.module.css'
 import LoginForm from './LoginForm'
 import RegisterForm from './RegisterForm'
 
-export type AuthMode = 'login' | 'register'
+type AuthMode = 'login' | 'register'
 
 type AuthDialogProps = {
   open: boolean

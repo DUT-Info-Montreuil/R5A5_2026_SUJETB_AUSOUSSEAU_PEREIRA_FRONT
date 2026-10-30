@@ -1,16 +1,10 @@
 import type { GameRole } from './game'
 
-/** Nom d'équipe (arbre interactif de la page d'accueil). */
-export type Team = string
-
-export type BracketSize = 4 | 8 | 16
-
-export type Side = 'a' | 'b'
-
+/** Noms des équipes du podium de l'accueil. */
 export type Podium = {
-  first: Team
-  second: Team
-  third: Team
+  first: string
+  second: string
+  third: string
 }
 
 /** Les quatre états d'un tournoi : ce qui est permis dépend de l'état. */

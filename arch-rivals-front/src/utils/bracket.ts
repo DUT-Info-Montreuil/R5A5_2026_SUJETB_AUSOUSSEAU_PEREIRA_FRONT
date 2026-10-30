@@ -7,7 +7,7 @@ import { findMyTeam } from './tournaments'
 /** waiting : équipes pas encore connues ; ready : jouable ; done / forfeit : résultat validé. */
 export type MatchView = 'waiting' | 'ready' | 'done' | 'forfeit'
 
-export type BracketRow = {
+type BracketRow = {
   teamId: number | null
   team: string | null
   score: string

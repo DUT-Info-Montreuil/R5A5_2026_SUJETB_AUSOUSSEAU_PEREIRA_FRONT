@@ -1,6 +1,6 @@
 import styles from './TeamChips.module.css'
 
-export type TeamChip = {
+type TeamChip = {
   teamId: number
   teamName: string
   /** Tournoi de l'équipe, ou « Hors tournoi · jeu ». */

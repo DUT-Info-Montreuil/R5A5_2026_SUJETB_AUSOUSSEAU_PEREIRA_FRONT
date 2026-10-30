@@ -8,7 +8,7 @@ export const USERNAME_MIN = 3
 export const USERNAME_MAX = 32
 export const PASSWORD_MIN = 8
 /** bcrypt ignore tout ce qui dépasse 72 octets : on refuse plutôt que de tronquer en silence. */
-export const PASSWORD_MAX_BYTES = 72
+const PASSWORD_MAX_BYTES = 72
 
 export function required(value: string, label: string) {
   return value.trim() ? null : `${label} est obligatoire.`
@@ -34,7 +34,7 @@ export function validatePassword(value: string) {
   return null
 }
 
-export const TEAM_NAME_MIN = 3
+const TEAM_NAME_MIN = 3
 export const TEAM_NAME_MAX = 24
 
 export function validateTeamName(value: string) {
