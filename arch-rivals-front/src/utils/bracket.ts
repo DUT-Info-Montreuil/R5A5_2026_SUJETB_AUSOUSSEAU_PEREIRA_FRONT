@@ -30,7 +30,7 @@ export type BracketRound = {
 const ROUND_LABELS = ['QUARTS', 'DEMIES', 'FINALE']
 const ROUND_NAMES = ['Quart de finale', 'Demi-finale', 'Finale']
 
-const roundName = (round: number) => ROUND_NAMES[round - 1] ?? `Tour ${round}`
+export const roundName = (round: number) => ROUND_NAMES[round - 1] ?? `Tour ${round}`
 
 function matchView(match: Match): MatchView {
   if (match.status === 'pending') return 'waiting'

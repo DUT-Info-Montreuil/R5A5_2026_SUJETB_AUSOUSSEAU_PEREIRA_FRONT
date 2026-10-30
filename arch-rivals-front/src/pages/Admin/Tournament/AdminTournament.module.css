@@ -1,0 +1,29 @@
+.controls {
+  margin-top: 28px;
+}
+
+.round + .round {
+  margin-top: 24px;
+}
+
+.roundTitle {
+  margin: 0 0 12px;
+  font-family: var(--font-ui);
+  font-size: 13px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+.matches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 12px;
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 360px), 1fr));
+  align-items: start;
+  gap: 16px;
+}
