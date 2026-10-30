@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 import { useAuth } from '../../../hooks/useAuth'
+import WalletBadge from '../../bets/WalletBadge/WalletBadge'
 import styles from './Header.module.css'
 
 type HeaderProps = {
@@ -20,11 +21,15 @@ export default function Header({ onPlay }: HeaderProps) {
         <Link to="/tournois" className={styles.link}>
           Tournois
         </Link>
+        <Link to="/paris" className={styles.link}>
+          Paris
+        </Link>
         <a href="/#classement" className={styles.link}>
           Classement
         </a>
         {connected && (
           <div className={styles.account}>
+            <WalletBadge />
             <span className={styles.user} title={user.username}>
               <span className="sr-only">Connecté en tant que </span>
               {user.username}

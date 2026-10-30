@@ -3,7 +3,8 @@ import styles from './Tabs.module.css'
 type TabItem<T extends string> = {
   id: T
   label: string
-  count: number
+  /** Nombre d'éléments de l'onglet, affiché à côté du libellé. */
+  count?: number
 }
 
 type TabsProps<T extends string> = {
@@ -15,7 +16,7 @@ type TabsProps<T extends string> = {
   label: string
 }
 
-/** Onglets avec compteur (tournois par état, mes équipes / toutes les équipes). */
+/** Onglets, avec compteur facultatif (tournois par état, mes équipes / toutes les équipes). */
 export default function Tabs<T extends string>({ tabs, active, onSelect, label }: TabsProps<T>) {
   return (
     <div className={styles.tabs} role="tablist" aria-label={label}>
@@ -31,7 +32,7 @@ export default function Tabs<T extends string>({ tabs, active, onSelect, label }
             onClick={() => onSelect(id)}
           >
             {label}
-            <span className={styles.count}>{count}</span>
+            {count !== undefined && <span className={styles.count}>{count}</span>}
           </button>
         )
       })}

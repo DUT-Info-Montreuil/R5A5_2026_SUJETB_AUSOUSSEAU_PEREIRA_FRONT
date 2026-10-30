@@ -1,0 +1,66 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+.table th {
+  padding: 10px 12px;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-gold-line);
+}
+
+.table td {
+  padding: 10px 12px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-card-border);
+  overflow-wrap: anywhere;
+}
+
+.me td {
+  background: var(--team-winner-bg);
+  color: var(--color-gold-hover);
+}
+
+.rank {
+  font-family: var(--font-ui);
+  font-weight: 700;
+  color: var(--color-gold);
+}
+
+.gain,
+.loss {
+  white-space: nowrap;
+}
+
+.gain {
+  color: var(--color-success);
+}
+
+.loss {
+  color: var(--color-danger);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 14px;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.empty {
+  margin: 0;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--color-text-faint);
+}

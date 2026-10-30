@@ -1,7 +1,22 @@
 # Ce que le front attend du back
 
-Rien n'est en attente. Les routes demandées par le front ont toutes été livrées (dépôt BACK,
-commits `555a487` et `1f716d1`) et sont utilisées.
+Rien n'est en attente. Les routes demandées par le front ont toutes été livrées (dépôt BACK, commits
+`555a487`, `1f716d1`, `8e1ed90` et `5c98255`) et sont utilisées.
+
+## Paris en Écus : livrés
+
+Demandés par le front (spectateurs, pari mutuel match par match, classements du tournoi et de la
+semaine), livrés dans les commits `8e1ed90` et `5c98255` ; la référence est le § 9 de
+`FRONT-ATTENDU.md` du back. Les pronostics d'arbre ont été retirés du back.
+
+Deux règles ont changé par rapport à la demande, pour éviter la triche et l'inflation, et le front
+les applique :
+
+- **Pas d'horaire, pas de paris** : un match sans `scheduledAt` n'est pas ouvert. Le front affiche
+  « Paris à venir », et rappelle à l'administrateur de fixer l'horaire. Les paris ferment à cet
+  horaire ; le back n'émet rien à ce moment-là, le front grise lui-même le formulaire.
+- **Revenu passif plafonné à 100** : les 10 Écus par heure ne tombent que sous 100 Écus ;
+  `nextIncomeAt` vaut alors `null`. Les gains de paris peuvent dépasser 100.
 
 ## Anomalie corrigée : suppression d'une équipe hors tournoi
 

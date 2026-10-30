@@ -53,6 +53,9 @@ export default function AdminMatchCard({
         {match.isForfeit ? 'Forfait' : STATUS_LABELS[match.status]}
         {!finished && match.scheduledAt && ` · ${matchTimeLabel(match.scheduledAt)}`}
       </p>
+      {match.status === 'ready' && !match.scheduledAt && (
+        <p className={admin.hint}>Fixe l'horaire : les paris restent fermés tant qu'il manque.</p>
+      )}
 
       {/* Jouable : ses deux équipes sont connues (B-14). */}
       {live && match.status === 'ready' && (

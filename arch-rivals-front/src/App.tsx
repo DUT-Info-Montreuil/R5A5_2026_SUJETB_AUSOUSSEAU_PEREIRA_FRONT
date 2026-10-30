@@ -1,6 +1,7 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router'
 import AdminLayout from './components/layout/AdminLayout/AdminLayout'
 import PublicLayout from './components/layout/PublicLayout/PublicLayout'
+import WeeklyBettors from './pages/Bets/WeeklyBettors'
 import PlayerLayout from './components/layout/PlayerLayout/PlayerLayout'
 import ProtectedRoute from './components/routing/ProtectedRoute'
 import AdminGames from './pages/Admin/Games/AdminGames'
@@ -22,6 +23,7 @@ const router = createBrowserRouter([
       { index: true, element: <Home /> },
       { path: 'tournois', element: <PublicTournaments /> },
       { path: 'tournois/:id', element: <TournamentDetail backTo="/tournois" /> },
+      { path: 'paris', element: <WeeklyBettors /> },
     ],
   },
   {
@@ -36,6 +38,7 @@ const router = createBrowserRouter([
       { path: 'tournois', element: <Tournaments /> },
       { path: 'tournois/:id', element: <TournamentDetail /> },
       { path: 'equipes', element: <Teams /> },
+      { path: 'paris', element: <WeeklyBettors /> },
       { path: 'profil', element: <Profile /> },
     ],
   },
