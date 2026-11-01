@@ -9,6 +9,7 @@
     "lint": "oxlint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "seed:demo": "node scripts/seed-demo.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
