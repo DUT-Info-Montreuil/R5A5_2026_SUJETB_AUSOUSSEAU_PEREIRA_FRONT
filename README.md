@@ -33,6 +33,7 @@ production, définir `VITE_API_URL` (URL de l'API, ex. `https://api.exemple.fr/a
 | `npm run build` | Vérification des types puis build dans `dist/` |
 | `npm run lint` | oxlint |
 | `npm run format` | Mise en forme Prettier (`npm run format:check` pour vérifier) |
+| `npm run seed:demo` | Données de démonstration dans le back : jeu, joueurs, paris, trois tournois (voir l'en-tête de `scripts/seed-demo.mjs`) |
 
 ## Pages
 
